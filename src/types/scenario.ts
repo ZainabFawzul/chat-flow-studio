@@ -1,5 +1,10 @@
 // Core types for the Chat Scenario Builder
 
+export interface NodePosition {
+  x: number;
+  y: number;
+}
+
 export interface ResponseOption {
   id: string;
   text: string;
@@ -11,6 +16,7 @@ export interface ChatMessage {
   content: string;
   isEndpoint: boolean;
   responseOptions: ResponseOption[];
+  position: NodePosition;
 }
 
 export interface ChatTheme {
@@ -58,11 +64,12 @@ export const createEmptyScenario = (): ScenarioData => ({
   updatedAt: new Date().toISOString(),
 });
 
-export const createMessage = (content: string = ""): ChatMessage => ({
+export const createMessage = (content: string = "", position?: NodePosition): ChatMessage => ({
   id: crypto.randomUUID(),
   content,
   isEndpoint: false,
   responseOptions: [],
+  position: position || { x: 100, y: 100 },
 });
 
 export const createResponseOption = (text: string = ""): ResponseOption => ({

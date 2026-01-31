@@ -65,7 +65,8 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
   };
 
   const handleAddFollowUp = (optionId: string) => {
-    addFollowUpMessage(messageId, optionId, "");
+    // Position will be calculated in the flowchart canvas now
+    addFollowUpMessage(messageId, optionId, "", { x: 0, y: 0 });
   };
 
   return (
