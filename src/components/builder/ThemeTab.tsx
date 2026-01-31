@@ -5,95 +5,34 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X } from "lucide-react";
+import { Upload, X, User, Palette, MessageCircle, Type } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { ColorPicker } from "@/components/ui/color-picker";
+import { cn } from "@/lib/utils";
 
-function ColorPicker({ 
-  label, 
-  value, 
-  onChange,
-  id,
-}: { 
-  label: string; 
-  value: string; 
-  onChange: (value: string) => void;
+interface SectionProps {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
   id: string;
-}) {
-  // Convert HSL string to hex for the color picker
-  const hslToHex = (hsl: string): string => {
-    const [h, s, l] = hsl.split(" ").map((v) => parseFloat(v.replace("%", "")));
-    const sNorm = s / 100;
-    const lNorm = l / 100;
-    
-    const c = (1 - Math.abs(2 * lNorm - 1)) * sNorm;
-    const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
-    const m = lNorm - c / 2;
-    
-    let r = 0, g = 0, b = 0;
-    
-    if (h >= 0 && h < 60) { r = c; g = x; b = 0; }
-    else if (h >= 60 && h < 120) { r = x; g = c; b = 0; }
-    else if (h >= 120 && h < 180) { r = 0; g = c; b = x; }
-    else if (h >= 180 && h < 240) { r = 0; g = x; b = c; }
-    else if (h >= 240 && h < 300) { r = x; g = 0; b = c; }
-    else { r = c; g = 0; b = x; }
-    
-    const toHex = (n: number) => {
-      const hex = Math.round((n + m) * 255).toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
-    };
-    
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  };
-  
-  // Convert hex to HSL string
-  const hexToHsl = (hex: string): string => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    if (!result) return value;
-    
-    let r = parseInt(result[1], 16) / 255;
-    let g = parseInt(result[2], 16) / 255;
-    let b = parseInt(result[3], 16) / 255;
-    
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0;
-    let s = 0;
-    const l = (max + min) / 2;
-    
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
-      switch (max) {
-        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-        case g: h = ((b - r) / d + 2) / 6; break;
-        case b: h = ((r - g) / d + 4) / 6; break;
-      }
-    }
-    
-    return `${Math.round(h * 360)} ${Math.round(s * 100)}% ${Math.round(l * 100)}%`;
-  };
+}
 
+function Section({ icon, title, children, id }: SectionProps) {
   return (
-    <div className="flex items-center justify-between gap-md">
-      <Label htmlFor={id} className="text-body text-foreground">
-        {label}
-      </Label>
-      <div className="flex items-center gap-sm">
-        <input
-          type="color"
-          id={id}
-          value={hslToHex(value)}
-          onChange={(e) => onChange(hexToHsl(e.target.value))}
-          className="h-8 w-12 cursor-pointer rounded border border-border bg-transparent"
-          aria-label={label}
-        />
-        <span className="text-small text-muted-foreground w-24 truncate">
-          {hslToHex(value)}
-        </span>
+    <section 
+      aria-labelledby={id}
+      className="rounded-2xl bg-card border border-border/50 p-5 shadow-sm hover:shadow-md transition-shadow duration-300"
+    >
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          {icon}
+        </div>
+        <h2 id={id} className="text-base font-semibold text-foreground">
+          {title}
+        </h2>
       </div>
-    </div>
+      {children}
+    </section>
   );
 }
 
@@ -124,37 +63,36 @@ export function ThemeTab() {
 
   return (
     <ScrollArea className="h-full">
-      <div className="flex flex-col gap-lg p-md">
-        <section aria-labelledby="contact-heading">
-          <h2 id="contact-heading" className="mb-md text-heading-md text-foreground">
-            Contact Info
-          </h2>
-          
-          <div className="flex flex-col gap-md">
+      <div className="flex flex-col gap-4 p-4">
+        {/* Contact Info */}
+        <Section icon={<User className="h-4 w-4" />} title="Contact Info" id="contact-heading">
+          <div className="flex flex-col gap-4">
             <div>
-              <Label htmlFor="contact-name" className="mb-xs block text-body">
-                Contact Name
+              <Label htmlFor="contact-name" className="mb-2 block text-sm font-medium">
+                Display Name
               </Label>
               <Input
                 id="contact-name"
                 value={theme.contactName}
                 onChange={(e) => updateTheme({ contactName: e.target.value })}
                 placeholder="Enter contact name"
-                className="w-full"
+                className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
               />
             </div>
             
             <div>
-              <Label className="mb-xs block text-body">Contact Avatar</Label>
-              <div className="flex items-center gap-md">
-                <Avatar className="h-12 w-12">
-                  {theme.contactAvatar ? (
-                    <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
-                  ) : null}
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {getInitials(theme.contactName)}
-                  </AvatarFallback>
-                </Avatar>
+              <Label className="mb-2 block text-sm font-medium">Avatar</Label>
+              <div className="flex items-center gap-4">
+                <div className="relative group">
+                  <Avatar className="h-14 w-14 ring-2 ring-border/50 ring-offset-2 ring-offset-background transition-all group-hover:ring-primary/50">
+                    {theme.contactAvatar ? (
+                      <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
+                    ) : null}
+                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground font-semibold">
+                      {getInitials(theme.contactName)}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
                 
                 <input
                   ref={avatarInputRef}
@@ -165,42 +103,40 @@ export function ThemeTab() {
                   aria-label="Upload avatar image"
                 />
                 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => avatarInputRef.current?.click()}
-                  className="gap-xs"
-                >
-                  <Upload className="h-4 w-4" aria-hidden="true" />
-                  Upload
-                </Button>
-                
-                {theme.contactAvatar && (
+                <div className="flex gap-2">
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    onClick={() => updateTheme({ contactAvatar: null })}
-                    aria-label="Remove avatar"
+                    onClick={() => avatarInputRef.current?.click()}
+                    className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80"
                   >
-                    <X className="h-4 w-4" aria-hidden="true" />
+                    <Upload className="h-4 w-4" aria-hidden="true" />
+                    Upload
                   </Button>
-                )}
+                  
+                  {theme.contactAvatar && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => updateTheme({ contactAvatar: null })}
+                      aria-label="Remove avatar"
+                      className="rounded-xl text-muted-foreground hover:text-destructive"
+                    >
+                      <X className="h-4 w-4" aria-hidden="true" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </section>
+        </Section>
 
-        <hr className="border-border" />
-
-        <section aria-labelledby="sender-heading">
-          <h2 id="sender-heading" className="mb-md text-heading-md text-foreground">
-            Sender Bubbles (You)
-          </h2>
-          
-          <div className="flex flex-col gap-sm">
+        {/* Sender Bubbles */}
+        <Section icon={<MessageCircle className="h-4 w-4" />} title="Your Messages" id="sender-heading">
+          <div className="flex flex-col gap-4">
             <ColorPicker
               id="sender-bg"
-              label="Background"
+              label="Bubble Color"
               value={theme.senderBubbleColor}
               onChange={(value) => updateTheme({ senderBubbleColor: value })}
             />
@@ -210,20 +146,28 @@ export function ThemeTab() {
               value={theme.senderTextColor}
               onChange={(value) => updateTheme({ senderTextColor: value })}
             />
+            
+            {/* Preview */}
+            <div className="mt-2 flex justify-end">
+              <div
+                className="max-w-[80%] rounded-2xl rounded-tr-md px-4 py-2.5 shadow-sm"
+                style={{
+                  backgroundColor: `hsl(${theme.senderBubbleColor})`,
+                  color: `hsl(${theme.senderTextColor})`,
+                }}
+              >
+                <span className="text-sm">Preview message</span>
+              </div>
+            </div>
           </div>
-        </section>
+        </Section>
 
-        <hr className="border-border" />
-
-        <section aria-labelledby="receiver-heading">
-          <h2 id="receiver-heading" className="mb-md text-heading-md text-foreground">
-            Receiver Bubbles (Contact)
-          </h2>
-          
-          <div className="flex flex-col gap-sm">
+        {/* Receiver Bubbles */}
+        <Section icon={<MessageCircle className="h-4 w-4" />} title="Contact Messages" id="receiver-heading">
+          <div className="flex flex-col gap-4">
             <ColorPicker
               id="receiver-bg"
-              label="Background"
+              label="Bubble Color"
               value={theme.receiverBubbleColor}
               onChange={(value) => updateTheme({ receiverBubbleColor: value })}
             />
@@ -233,53 +177,59 @@ export function ThemeTab() {
               value={theme.receiverTextColor}
               onChange={(value) => updateTheme({ receiverTextColor: value })}
             />
+            
+            {/* Preview */}
+            <div className="mt-2 flex justify-start">
+              <div
+                className="max-w-[80%] rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm"
+                style={{
+                  backgroundColor: `hsl(${theme.receiverBubbleColor})`,
+                  color: `hsl(${theme.receiverTextColor})`,
+                }}
+              >
+                <span className="text-sm">Preview message</span>
+              </div>
+            </div>
           </div>
-        </section>
+        </Section>
 
-        <hr className="border-border" />
-
-        <section aria-labelledby="chat-heading">
-          <h2 id="chat-heading" className="mb-md text-heading-md text-foreground">
-            Chat Background
-          </h2>
-          
+        {/* Chat Background */}
+        <Section icon={<Palette className="h-4 w-4" />} title="Background" id="chat-heading">
           <ColorPicker
             id="chat-bg"
-            label="Background Color"
+            label="Chat Background"
             value={theme.chatBackground}
             onChange={(value) => updateTheme({ chatBackground: value })}
           />
-        </section>
+        </Section>
 
-        <hr className="border-border" />
-
-        <section aria-labelledby="font-heading">
-          <h2 id="font-heading" className="mb-md text-heading-md text-foreground">
-            Typography
-          </h2>
-          
-          <div className="flex flex-col gap-md">
-            <div>
-              <div className="flex items-center justify-between mb-xs">
-                <Label htmlFor="font-size" className="text-body">
-                  Font Size
-                </Label>
-                <span className="text-small text-muted-foreground">
-                  {theme.fontSize}px
-                </span>
-              </div>
-              <Slider
-                id="font-size"
-                min={12}
-                max={20}
-                step={1}
-                value={[theme.fontSize]}
-                onValueChange={([value]) => updateTheme({ fontSize: value })}
-                aria-label="Font size"
-              />
+        {/* Typography */}
+        <Section icon={<Type className="h-4 w-4" />} title="Typography" id="font-heading">
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <Label htmlFor="font-size" className="text-sm font-medium">
+                Message Size
+              </Label>
+              <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
+                {theme.fontSize}px
+              </span>
+            </div>
+            <Slider
+              id="font-size"
+              min={12}
+              max={20}
+              step={1}
+              value={[theme.fontSize]}
+              onValueChange={([value]) => updateTheme({ fontSize: value })}
+              aria-label="Font size"
+              className="py-2"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground mt-1">
+              <span>Small</span>
+              <span>Large</span>
             </div>
           </div>
-        </section>
+        </Section>
       </div>
     </ScrollArea>
   );

@@ -1,4 +1,4 @@
-import { Download, Upload, MessageSquare } from "lucide-react";
+import { Download, Upload, MessageSquare, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useScenario } from "@/context/ScenarioContext";
 import { useRef } from "react";
@@ -66,13 +66,20 @@ export function TopBar() {
   };
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-border bg-card px-lg" role="banner">
-      <div className="flex items-center gap-sm">
-        <MessageSquare className="h-6 w-6 text-primary" aria-hidden="true" />
-        <h1 className="text-heading-md text-foreground">Chat Scenario Builder</h1>
+    <header className="flex h-16 items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur-xl px-6" role="banner">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
+          <MessageSquare className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
+        </div>
+        <div>
+          <h1 className="text-lg font-semibold text-foreground tracking-tight">
+            Chat Scenario Builder
+          </h1>
+          <p className="text-xs text-muted-foreground">Design branching conversations</p>
+        </div>
       </div>
       
-      <nav className="flex items-center gap-sm" aria-label="Main actions">
+      <nav className="flex items-center gap-3" aria-label="Main actions">
         <input
           ref={fileInputRef}
           type="file"
@@ -86,7 +93,7 @@ export function TopBar() {
           variant="outline"
           size="sm"
           onClick={handleImportClick}
-          className="gap-xs"
+          className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80 hover:border-border"
         >
           <Upload className="h-4 w-4" aria-hidden="true" />
           <span>Import</span>
@@ -96,7 +103,7 @@ export function TopBar() {
           variant="default"
           size="sm"
           onClick={handleExportJSON}
-          className="gap-xs"
+          className="gap-2 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
         >
           <Download className="h-4 w-4" aria-hidden="true" />
           <span>Export</span>

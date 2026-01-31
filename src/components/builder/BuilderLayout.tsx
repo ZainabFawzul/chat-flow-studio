@@ -10,7 +10,7 @@ export function BuilderLayout() {
         <TopBar />
         <div className="flex flex-1 overflow-hidden">
           {/* Left Panel - 40% */}
-          <div className="w-2/5 min-w-[320px] max-w-[600px]">
+          <div className="w-2/5 min-w-[360px] max-w-[560px] border-r border-border/50">
             <LeftPanel />
           </div>
           

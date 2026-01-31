@@ -11,6 +11,7 @@ import {
   Flag,
   MessageSquare,
   GripVertical,
+  CornerDownRight,
 } from "lucide-react";
 import {
   Collapsible,
@@ -71,23 +72,23 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
     <div
       className={cn(
         "relative",
-        depth > 0 && "ml-lg pl-md border-l-2 border-border"
+        depth > 0 && "ml-6 pl-4 border-l-2 border-border/50"
       )}
       role="treeitem"
       aria-expanded={isOpen}
       aria-level={depth + 1}
     >
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <div className="group mb-sm rounded-lg border border-border bg-card p-md transition-shadow hover:shadow-sm">
+        <div className="group mb-3 rounded-2xl border border-border/50 bg-card p-4 transition-all duration-200 hover:shadow-lg hover:border-border">
           {/* Message Header */}
-          <div className="mb-sm flex items-start justify-between gap-sm">
-            <div className="flex items-center gap-xs">
+          <div className="mb-3 flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2">
               {(message.responseOptions.length > 0 || hasChildren) && (
                 <CollapsibleTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6"
+                    className="h-7 w-7 rounded-lg hover:bg-secondary/80"
                     aria-label={isOpen ? "Collapse" : "Expand"}
                   >
                     {isOpen ? (
@@ -98,18 +99,23 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
                   </Button>
                 </CollapsibleTrigger>
               )}
-              <MessageSquare className="h-4 w-4 text-primary" aria-hidden="true" />
-              <span className="text-small font-medium text-muted-foreground">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
+                <MessageSquare className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+              </div>
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Contact Message
               </span>
             </div>
 
-            <div className="flex items-center gap-xs opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="flex items-center gap-1.5 opacity-0 transition-opacity group-hover:opacity-100">
               <Button
                 variant={message.isEndpoint ? "secondary" : "ghost"}
                 size="sm"
                 onClick={() => toggleEndpoint(messageId)}
-                className="gap-xs text-small"
+                className={cn(
+                  "gap-1.5 text-xs rounded-lg h-8",
+                  message.isEndpoint && "bg-success/20 text-success-foreground hover:bg-success/30"
+                )}
                 aria-pressed={message.isEndpoint}
               >
                 <Flag className="h-3 w-3" aria-hidden="true" />
@@ -122,13 +128,13 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                       aria-label="Delete message"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="rounded-2xl">
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete this message?</AlertDialogTitle>
                       <AlertDialogDescription>
@@ -137,10 +143,10 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
                       <AlertDialogAction
                         onClick={() => deleteMessage(messageId)}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
                       >
                         Delete
                       </AlertDialogAction>
@@ -156,21 +162,21 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
             value={message.content}
             onChange={(e) => updateMessage(messageId, e.target.value)}
             placeholder="Enter the contact's message..."
-            className="min-h-[60px] resize-none"
+            className="min-h-[80px] resize-none rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
             aria-label="Message content"
           />
 
           {/* Status indicators */}
-          <div className="mt-xs flex items-center gap-sm">
+          <div className="mt-3 flex items-center gap-2">
             {message.isEndpoint && (
-              <span className="inline-flex items-center gap-xs rounded-full bg-success/20 px-sm py-xs text-small text-success-foreground">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-3 py-1 text-xs font-medium text-success">
                 <Flag className="h-3 w-3" aria-hidden="true" />
                 Conversation End
               </span>
             )}
             {!isComplete && (
-              <span className="inline-flex items-center gap-xs rounded-full bg-warning/20 px-sm py-xs text-small text-warning-foreground">
-                Needs response options
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1 text-xs font-medium text-warning">
+                Add response options
               </span>
             )}
           </div>
@@ -179,40 +185,37 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
         {/* Response Options */}
         {!message.isEndpoint && (
           <CollapsibleContent>
-            <div className="mb-sm ml-lg space-y-sm">
+            <div className="mb-3 ml-6 space-y-2">
               {message.responseOptions.map((option, index) => (
                 <div
                   key={option.id}
-                  className="group/option rounded-lg border border-border bg-secondary/50 p-sm"
+                  className="group/option rounded-xl border border-border/30 bg-secondary/30 p-3 transition-all hover:bg-secondary/50"
                 >
-                  <div className="flex items-center gap-sm">
-                    <GripVertical
-                      className="h-4 w-4 cursor-grab text-muted-foreground"
-                      aria-hidden="true"
-                    />
-                    <span className="text-small font-medium text-primary">
-                      Option {index + 1}:
-                    </span>
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 text-xs font-semibold text-primary shrink-0">
+                      {index + 1}
+                    </div>
+                    <CornerDownRight className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
                     <Input
                       value={option.text}
                       onChange={(e) =>
                         updateResponseOption(messageId, option.id, e.target.value)
                       }
                       placeholder="Enter response text..."
-                      className="flex-1 h-8 text-body"
+                      className="flex-1 h-9 rounded-lg border-border/50 bg-card text-sm"
                       aria-label={`Response option ${index + 1}`}
                     />
 
-                    <div className="flex items-center gap-xs opacity-0 transition-opacity group-hover/option:opacity-100">
+                    <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover/option:opacity-100">
                       {!option.nextMessageId && (
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleAddFollowUp(option.id)}
-                          className="gap-xs text-small"
+                          className="gap-1.5 text-xs rounded-lg h-8 hover:bg-primary/10 hover:text-primary"
                         >
                           <Plus className="h-3 w-3" aria-hidden="true" />
-                          Add Follow-up
+                          Follow-up
                         </Button>
                       )}
 
@@ -221,13 +224,13 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 text-destructive hover:bg-destructive/10"
+                            className="h-8 w-8 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                             aria-label="Delete option"
                           >
-                            <Trash2 className="h-3 w-3" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="rounded-2xl">
                           <AlertDialogHeader>
                             <AlertDialogTitle>Delete this option?</AlertDialogTitle>
                             <AlertDialogDescription>
@@ -236,10 +239,10 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               onClick={() => deleteResponseOption(messageId, option.id)}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
                             >
                               Delete
                             </AlertDialogAction>
@@ -251,7 +254,7 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
 
                   {/* Nested follow-up message */}
                   {option.nextMessageId && (
-                    <div className="mt-sm">
+                    <div className="mt-3">
                       <MessageNode
                         messageId={option.nextMessageId}
                         depth={depth + 1}
@@ -262,12 +265,12 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
               ))}
 
               {/* Add new option */}
-              <div className="flex items-center gap-sm rounded-lg border border-dashed border-border p-sm">
+              <div className="flex items-center gap-2 rounded-xl border-2 border-dashed border-border/50 p-3 transition-colors hover:border-primary/30 hover:bg-primary/5">
                 <Input
                   value={newOptionText}
                   onChange={(e) => setNewOptionText(e.target.value)}
                   placeholder="Type a new response option..."
-                  className="flex-1 h-8"
+                  className="flex-1 h-9 border-0 bg-transparent focus-visible:ring-0 text-sm"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
@@ -277,14 +280,14 @@ export function MessageNode({ messageId, depth }: MessageNodeProps) {
                   aria-label="New response option"
                 />
                 <Button
-                  variant="outline"
+                  variant="default"
                   size="sm"
                   onClick={handleAddOption}
                   disabled={!newOptionText.trim()}
-                  className="gap-xs"
+                  className="gap-1.5 rounded-lg h-8 shadow-sm"
                 >
                   <Plus className="h-3 w-3" aria-hidden="true" />
-                  Add Option
+                  Add
                 </Button>
               </div>
             </div>
