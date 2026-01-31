@@ -76,7 +76,7 @@ export function ResponseOptionRow({
     if (typeof value === "string") return value || '""';
     return String(value);
   };
-  const handleSetCondition = (variableId: string | null, requiredValue: boolean) => {
+  const handleSetCondition = (variableId: string | null, requiredValue: VariableValue) => {
     if (variableId) {
       setResponseCondition(messageId, option.id, {
         variableId,
@@ -86,6 +86,22 @@ export function ResponseOptionRow({
       setResponseCondition(messageId, option.id, null);
     }
   };
+
+  const handleConditionValueChange = (requiredValue: VariableValue) => {
+    if (option.condition) {
+      setResponseCondition(messageId, option.id, {
+        variableId: option.condition.variableId,
+        requiredValue
+      });
+    }
+  };
+
+  const getConditionVariable = () => {
+    if (!option.condition) return null;
+    return variables[option.condition.variableId] || null;
+  };
+
+  const conditionVariable = getConditionVariable();
   return <TooltipProvider>
       <div className={cn("group relative flex items-center gap-2 rounded-lg bg-secondary/30 p-2", isPendingSource && "ring-2 ring-primary animate-pulse")}>
         <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-xs font-semibold text-primary shrink-0">
@@ -113,7 +129,7 @@ export function ResponseOptionRow({
               </span>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p>Requires: {variables[option.condition.variableId].name} = {option.condition.requiredValue ? "true" : "false"}</p>
+              <p>Requires: {variables[option.condition.variableId].name} = {formatDisplayValue(option.condition.requiredValue)}</p>
             </TooltipContent>
           </Tooltip>}
 
@@ -201,26 +217,61 @@ export function ResponseOptionRow({
                     Show only if
                   </label>
                   <div className="flex gap-2">
-                    <Select value={option.condition?.variableId || "none"} onValueChange={val => handleSetCondition(val === "none" ? null : val, true)}>
+                    <Select 
+                      value={option.condition?.variableId || "none"} 
+                      onValueChange={val => {
+                        if (val === "none") {
+                          handleSetCondition(null, true);
+                        } else {
+                          const selectedVar = variables[val];
+                          const defaultVal = selectedVar ? getDefaultValueForType(selectedVar.type) : true;
+                          handleSetCondition(val, defaultVal);
+                        }
+                      }}
+                    >
                       <SelectTrigger className="h-8 text-xs flex-1">
                         <SelectValue placeholder="Always visible" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">Always visible</SelectItem>
                         {variableList.map(v => <SelectItem key={v.id} value={v.id}>
-                            {v.name}
+                            {v.name} ({v.type})
                           </SelectItem>)}
                       </SelectContent>
                     </Select>
-                    {option.condition && <Select value={option.condition.requiredValue ? "true" : "false"} onValueChange={val => handleSetCondition(option.condition!.variableId, val === "true")}>
-                        <SelectTrigger className="h-8 text-xs w-20">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="true">= true</SelectItem>
-                          <SelectItem value="false">= false</SelectItem>
-                        </SelectContent>
-                      </Select>}
+                    
+                    {/* Condition value input based on variable type */}
+                    {option.condition && conditionVariable && (
+                      conditionVariable.type === "boolean" ? (
+                        <Select 
+                          value={option.condition.requiredValue === true ? "true" : "false"} 
+                          onValueChange={val => handleConditionValueChange(val === "true")}
+                        >
+                          <SelectTrigger className="h-8 text-xs w-20">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="true">= true</SelectItem>
+                            <SelectItem value="false">= false</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : conditionVariable.type === "text" ? (
+                        <Input
+                          value={String(option.condition.requiredValue)}
+                          onChange={e => handleConditionValueChange(e.target.value)}
+                          placeholder="Value..."
+                          className="h-8 text-xs w-24"
+                        />
+                      ) : conditionVariable.type === "number" ? (
+                        <Input
+                          type="number"
+                          value={String(option.condition.requiredValue)}
+                          onChange={e => handleConditionValueChange(Number(e.target.value) || 0)}
+                          placeholder="0"
+                          className="h-8 text-xs w-20"
+                        />
+                      ) : null
+                    )}
                   </div>
                 </div>
               </div>

@@ -19,7 +19,7 @@ export interface ScenarioVariable {
 
 export interface VariableCondition {
   variableId: string;
-  requiredValue: boolean;
+  requiredValue: VariableValue;
 }
 
 export interface VariableAssignment {
