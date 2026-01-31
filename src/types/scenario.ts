@@ -8,11 +8,13 @@ export interface NodePosition {
 // Variable types for conditional logic
 export type VariableType = "boolean" | "text" | "number";
 
+export type VariableValue = boolean | string | number;
+
 export interface ScenarioVariable {
   id: string;
   name: string;
   type: VariableType;
-  defaultValue: boolean;
+  defaultValue: VariableValue;
 }
 
 export interface VariableCondition {
@@ -139,9 +141,17 @@ export const createResponseOption = (text: string = ""): ResponseOption => ({
   nextMessageId: null,
 });
 
+const getDefaultValueForType = (type: VariableType): VariableValue => {
+  switch (type) {
+    case "text": return "";
+    case "number": return 0;
+    default: return false;
+  }
+};
+
 export const createVariable = (name: string, type: VariableType = "boolean"): ScenarioVariable => ({
   id: crypto.randomUUID(),
   name,
   type,
-  defaultValue: false,
+  defaultValue: getDefaultValueForType(type),
 });
