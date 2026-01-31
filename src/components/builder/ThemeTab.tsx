@@ -5,11 +5,12 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, Palette, MessageCircle, Type } from "lucide-react";
+import { Upload, X, User, Palette, MessageCircle, Type, Play, Settings } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
 import { BubbleBorderRadius, DEFAULT_BORDER_RADIUS } from "@/types/scenario";
+import { Switch } from "@/components/ui/switch";
 
 const DEFAULT_SENDER_RADIUS: BubbleBorderRadius = { topLeft: 16, topRight: 4, bottomRight: 16, bottomLeft: 16 };
 const DEFAULT_RECEIVER_RADIUS: BubbleBorderRadius = { topLeft: 4, topRight: 16, bottomRight: 16, bottomLeft: 16 };
@@ -22,18 +23,18 @@ interface BorderRadiusControlProps {
 
 function BorderRadiusControl({ label, value, onChange }: BorderRadiusControlProps) {
   const corners = [
-    { key: "topLeft" as const, label: "TL" },
-    { key: "topRight" as const, label: "TR" },
-    { key: "bottomRight" as const, label: "BR" },
-    { key: "bottomLeft" as const, label: "BL" },
+    { key: "topLeft" as const, label: "TOP LEFT" },
+    { key: "topRight" as const, label: "TOP RIGHT" },
+    { key: "bottomLeft" as const, label: "BOTTOM LEFT" },
+    { key: "bottomRight" as const, label: "BOTTOM RIGHT" },
   ];
 
   return (
     <div>
       <Label className="mb-2 block text-sm font-medium">{label}</Label>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 gap-3">
         {corners.map(({ key, label: cornerLabel }) => (
-          <div key={key} className="flex flex-col items-center gap-1">
+          <div key={key} className="flex flex-col gap-1">
             <span className="text-[10px] text-muted-foreground font-medium">{cornerLabel}</span>
             <Input
               type="number"
@@ -176,6 +177,69 @@ export function ThemeTab() {
                 </div>
               </div>
             </div>
+          </div>
+        </Section>
+
+        {/* Start Screen */}
+        <Section icon={<Play className="h-4 w-4" />} title="Start Screen" id="start-screen-heading">
+          <div className="flex flex-col gap-4">
+            <div>
+              <Label htmlFor="start-title" className="mb-2 block text-sm font-medium">
+                Title
+              </Label>
+              <Input
+                id="start-title"
+                value={theme.startScreenTitle ?? "Ready to Start"}
+                onChange={(e) => updateTheme({ startScreenTitle: e.target.value })}
+                placeholder="Ready to Start"
+                className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="start-subtitle" className="mb-2 block text-sm font-medium">
+                Subtitle
+              </Label>
+              <Input
+                id="start-subtitle"
+                value={theme.startScreenSubtitle ?? "Begin the conversation"}
+                onChange={(e) => updateTheme({ startScreenSubtitle: e.target.value })}
+                placeholder="Begin the conversation"
+                className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="start-button" className="mb-2 block text-sm font-medium">
+                Button Text
+              </Label>
+              <Input
+                id="start-button"
+                value={theme.startButtonText ?? "Start"}
+                onChange={(e) => updateTheme({ startButtonText: e.target.value })}
+                placeholder="Start"
+                className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+              />
+            </div>
+          </div>
+        </Section>
+
+        {/* Controls */}
+        <Section icon={<Settings className="h-4 w-4" />} title="Controls" id="controls-heading">
+          <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-0.5">
+              <Label htmlFor="show-reset" className="text-sm font-medium">
+                Show Reset Button
+              </Label>
+              <span className="text-xs text-muted-foreground">
+                Allow users to restart the conversation
+              </span>
+            </div>
+            <Switch
+              id="show-reset"
+              checked={theme.showResetButton ?? true}
+              onCheckedChange={(checked) => updateTheme({ showResetButton: checked })}
+            />
           </div>
         </Section>
 

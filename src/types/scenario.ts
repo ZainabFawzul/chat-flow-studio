@@ -58,6 +58,12 @@ export interface ChatTheme {
   chatBackground: string;
   fontSize: number; // in pixels
   fontFamily: string;
+  // Start screen customization
+  startScreenTitle: string;
+  startScreenSubtitle: string;
+  startButtonText: string;
+  // Controls
+  showResetButton: boolean;
 }
 
 export interface ScenarioData {
@@ -91,6 +97,12 @@ export const DEFAULT_THEME: ChatTheme = {
   chatBackground: "40 23% 97%", // Background
   fontSize: 14,
   fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif",
+  // Start screen customization
+  startScreenTitle: "Ready to Start",
+  startScreenSubtitle: "Begin the conversation",
+  startButtonText: "Start",
+  // Controls
+  showResetButton: true,
 };
 
 export const createEmptyScenario = (): ScenarioData => ({
