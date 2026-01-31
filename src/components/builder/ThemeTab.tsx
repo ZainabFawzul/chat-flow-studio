@@ -244,8 +244,8 @@ export function ThemeTab() {
 
         {/* Receiver Bubbles */}
         <Section icon={<MessageCircle className="h-4 w-4" />} title="Contact Messages" id="receiver-heading">
-          <div className="flex-col flex items-start justify-start gap-[20px]">
-            <div className="flex gap-4">
+          <div className="flex flex-col gap-[20px]">
+            <div className="flex gap-md">
               <ColorPicker id="receiver-bg" label="Bubble" value={theme.receiverBubbleColor} onChange={value => updateTheme({
               receiverBubbleColor: value
             })} />
