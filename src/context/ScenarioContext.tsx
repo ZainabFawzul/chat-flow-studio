@@ -32,10 +32,19 @@ function migrateScenario(input: any): ScenarioData {
     showResetButton: existingTheme?.showResetButton ?? DEFAULT_THEME.showResetButton,
   };
 
+  // Migrate existing variables to include type field
+  const migratedVariables: Record<string, ScenarioData["variables"][string]> = {};
+  Object.entries(scenario.variables ?? {}).forEach(([id, variable]) => {
+    migratedVariables[id] = {
+      ...(variable as any),
+      type: (variable as any).type ?? "boolean",
+    };
+  });
+
   return {
     ...(scenario as ScenarioData),
     theme,
-    variables: (scenario.variables as ScenarioData["variables"]) ?? {},
+    variables: migratedVariables,
   };
 }
 

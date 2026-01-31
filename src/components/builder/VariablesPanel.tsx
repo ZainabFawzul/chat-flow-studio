@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useScenario } from "@/context/ScenarioContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ToggleLeft, Plus, Trash2, X } from "lucide-react";
+import { ToggleLeft, Plus, Trash2, X, Type, Hash, Lock } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -25,12 +25,28 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import type { VariableType } from "@/types/scenario";
+
+const VARIABLE_TYPES = [
+  { id: "boolean" as const, label: "True/False", icon: ToggleLeft, locked: false },
+  { id: "text" as const, label: "Text", icon: Type, locked: true },
+  { id: "number" as const, label: "Number", icon: Hash, locked: true },
+];
+
+const getVariableIcon = (type: VariableType = "boolean") => {
+  switch (type) {
+    case "text": return Type;
+    case "number": return Hash;
+    default: return ToggleLeft;
+  }
+};
 
 export function VariablesPanel() {
   const { scenario, addVariable, updateVariable, deleteVariable } = useScenario();
   const [newVariableName, setNewVariableName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+  const [selectedType, setSelectedType] = useState<VariableType>("boolean");
 
   const variables = Object.values(scenario.variables || {});
 
@@ -100,11 +116,48 @@ export function VariablesPanel() {
         <div className="p-3 border-b border-border">
           <h3 className="font-semibold text-sm">Conditional Variables</h3>
           <p className="text-xs text-muted-foreground mt-1">
-            Boolean flags that control response visibility
+            Flags that control response visibility
           </p>
         </div>
 
-        <div className="max-h-[240px] overflow-y-auto p-2 space-y-1">
+        {/* Type Selector */}
+        <div className="p-3 border-b border-border">
+          <div className="text-xs text-muted-foreground mb-2">Variable Type</div>
+          <div className="flex gap-1">
+            {VARIABLE_TYPES.map((vt) => (
+              <Tooltip key={vt.id}>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={() => !vt.locked && setSelectedType(vt.id)}
+                    disabled={vt.locked}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors",
+                      selectedType === vt.id && !vt.locked
+                        ? "bg-primary/20 text-primary"
+                        : vt.locked
+                        ? "opacity-50 cursor-not-allowed text-muted-foreground"
+                        : "hover:bg-secondary text-muted-foreground"
+                    )}
+                  >
+                    <vt.icon className="h-3 w-3" />
+                    {vt.label}
+                    {vt.locked && <Lock className="h-2.5 w-2.5 ml-0.5" />}
+                  </button>
+                </TooltipTrigger>
+                {vt.locked && (
+                  <TooltipContent side="bottom">
+                    <p>Coming soon</p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            ))}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-1.5 text-center">
+            Text and Number types coming soon
+          </div>
+        </div>
+
+        <div className="max-h-[200px] overflow-y-auto p-2 space-y-1">
           {variables.length === 0 && (
             <div className="text-center py-4 text-sm text-muted-foreground">
               No variables yet
@@ -122,9 +175,14 @@ export function VariablesPanel() {
                   editingId === variable.id && "bg-secondary/50"
                 )}
               >
-                <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-xs font-semibold text-primary shrink-0">
-                  <ToggleLeft className="h-3 w-3" />
-                </div>
+                {(() => {
+                  const VariableIcon = getVariableIcon(variable.type);
+                  return (
+                    <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-xs font-semibold text-primary shrink-0">
+                      <VariableIcon className="h-3 w-3" />
+                    </div>
+                  );
+                })()}
 
                 {editingId === variable.id ? (
                   <div className="flex-1 flex items-center gap-1">
