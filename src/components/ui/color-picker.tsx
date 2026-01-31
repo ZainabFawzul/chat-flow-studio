@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from "react";
-import { HexColorPicker, HexColorInput } from "react-colorful";
+import * as React from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface ColorPickerProps {
@@ -69,11 +69,18 @@ function hexToHsl(hex: string): string {
 }
 
 export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
   const hexValue = hslToHex(value);
-  const [isOpen, setIsOpen] = useState(false);
 
-  const handleChange = (hex: string) => {
-    onChange(hexToHsl(hex));
+  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(hexToHsl(e.target.value));
+  };
+
+  const handleHexInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let hex = e.target.value.replace(/[^a-fA-F0-9]/g, "");
+    if (hex.length === 6) {
+      onChange(hexToHsl(`#${hex}`));
+    }
   };
 
   return (
@@ -84,6 +91,7 @@ export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <button
+            type="button"
             id={id}
             className={cn(
               "group flex items-center gap-3 rounded-full border border-border/50 bg-card px-3 py-1.5",
@@ -108,30 +116,38 @@ export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
           sideOffset={8}
         >
           <div className="flex flex-col gap-4">
-            <div className="color-picker-wrapper">
-              <HexColorPicker 
-                color={hexValue} 
-                onChange={handleChange}
-                style={{ width: '200px', height: '180px' }}
+            {/* Modern color picker using native input */}
+            <div className="relative">
+              <input
+                type="color"
+                value={hexValue}
+                onChange={handleColorChange}
+                className="w-[200px] h-[150px] cursor-pointer border-0 rounded-xl overflow-hidden bg-transparent"
+                style={{
+                  WebkitAppearance: 'none',
+                  padding: 0,
+                }}
               />
             </div>
-            <div className="flex items-center gap-2">
+            
+            {/* Hex input with preview swatch */}
+            <div className="flex items-center gap-3">
               <div
-                className="h-8 w-8 rounded-full shadow-md ring-1 ring-black/10 shrink-0"
+                className="h-10 w-10 rounded-full shadow-lg ring-2 ring-white/20 shrink-0"
                 style={{ backgroundColor: hexValue }}
               />
               <div className="flex-1 relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">#</span>
-                <HexColorInput
-                  color={hexValue}
-                  onChange={handleChange}
-                  prefixed={false}
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">#</span>
+                <Input
+                  value={hexValue.replace('#', '')}
+                  onChange={handleHexInput}
+                  maxLength={6}
                   className={cn(
-                    "w-full h-9 pl-7 pr-3 rounded-lg border border-border bg-secondary/50",
+                    "h-10 pl-7 pr-3 rounded-xl border-border/50 bg-secondary/50",
                     "text-sm font-mono uppercase tracking-wider",
-                    "focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent",
-                    "placeholder:text-muted-foreground"
+                    "focus:bg-background transition-colors"
                   )}
+                  placeholder="000000"
                 />
               </div>
             </div>

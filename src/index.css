@@ -166,29 +166,29 @@
   }
 }
 
-/* React Colorful customization */
-.react-colorful {
-  width: 100% !important;
-  border-radius: 12px !important;
-  overflow: hidden;
+/* Modern native color picker styling */
+input[type="color"] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
 
-.react-colorful__saturation {
-  border-radius: 10px 10px 0 0 !important;
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+  border-radius: 12px;
 }
 
-.react-colorful__hue {
-  height: 14px !important;
-  border-radius: 7px !important;
-  margin-top: 12px !important;
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 12px;
 }
 
-.react-colorful__saturation-pointer,
-.react-colorful__hue-pointer {
-  width: 20px !important;
-  height: 20px !important;
-  border: 3px solid white !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+input[type="color"]::-moz-color-swatch {
+  border: none;
+  border-radius: 12px;
 }
 
 /* Smooth transitions */
