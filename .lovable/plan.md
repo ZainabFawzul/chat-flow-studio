@@ -1,192 +1,132 @@
 
-# Conditional Variables & Click-to-Connect Implementation
+# Functional Enhancements Plan
 
 ## Overview
 
-This plan implements three features for the flowchart builder:
-1. **Link button** on response options for click-to-connect (alternative to drag-and-drop)
-2. **Variables panel** inside the canvas for managing boolean conditional variables
-3. **Visual indicators** on responses that set or require variables
+This plan implements four functional changes:
+1. Replace corner radius abbreviations (TL, TR, BR, BL) with full text (TOP LEFT, TOP RIGHT, etc.)
+2. Add a typing indicator ("...") before contact messages appear
+3. Allow customization of the start screen content in the theme
+4. Make the Reset button optional via a theme toggle
 
 ---
 
-## 1. Data Model Updates
+## 1. Corner Radius Label Updates
+
+**File: `src/components/builder/ThemeTab.tsx`**
+
+Update the `corners` array in `BorderRadiusControl` to use full labels:
+
+```typescript
+const corners = [
+  { key: "topLeft" as const, label: "TOP LEFT" },
+  { key: "topRight" as const, label: "TOP RIGHT" },
+  { key: "bottomRight" as const, label: "BOTTOM RIGHT" },
+  { key: "bottomLeft" as const, label: "BOTTOM LEFT" },
+];
+```
+
+Adjust layout to accommodate longer labels with a 2x2 grid instead of 4-column.
+
+---
+
+## 2. Typing Indicator for Contact Messages
+
+**File: `src/components/builder/ChatPreview.tsx`**
+
+Add state to track a "typing" phase before showing contact messages:
+
+```typescript
+const [isTyping, setIsTyping] = useState(false);
+```
+
+When a contact message is added:
+1. Show a "..." bubble in the contact's style
+2. After a short delay (e.g., 800-1200ms), replace with the actual message
+
+This creates the illusion of a live chat where the contact is composing their response.
+
+**File: `src/lib/exportZip.ts`**
+
+Add the same typing indicator logic to the exported standalone HTML so the finalized interactive also shows the "..." bubble.
+
+---
+
+## 3. Start Screen Customization
 
 **File: `src/types/scenario.ts`**
 
-Add new types for variables and conditions:
+Add new fields to `ChatTheme`:
 
 ```typescript
-// New types to add
-export interface ScenarioVariable {
-  id: string;
-  name: string;
-  defaultValue: boolean;
-}
-
-export interface VariableCondition {
-  variableId: string;
-  requiredValue: boolean;
-}
-
-export interface VariableAssignment {
-  variableId: string;
-  value: boolean;
+export interface ChatTheme {
+  // ... existing fields
+  startScreenTitle: string;       // e.g., "Ready to Start"
+  startScreenSubtitle: string;    // e.g., "Begin the conversation"
+  startButtonText: string;        // e.g., "Start"
 }
 ```
 
-Update existing types:
+Update `DEFAULT_THEME`:
 
 ```typescript
-export interface ResponseOption {
-  id: string;
-  text: string;
-  nextMessageId: string | null;
-  setsVariable?: VariableAssignment;  // NEW: When chosen, set this variable
-  condition?: VariableCondition;       // NEW: Only show if condition is met
-}
-
-export interface ChatMessage {
-  // ... existing fields
-  condition?: VariableCondition;  // NEW: Message only shown if condition is met
-}
-
-export interface ScenarioData {
-  // ... existing fields
-  variables: Record<string, ScenarioVariable>;  // NEW
-}
+startScreenTitle: "Ready to Start",
+startScreenSubtitle: "Begin the conversation",
+startButtonText: "Start",
 ```
 
-Update factory functions to include variables in empty scenario.
+**File: `src/components/builder/ThemeTab.tsx`**
 
----
+Add a new "Start Screen" section with three text inputs:
+- Title (e.g., "Ready to Start")
+- Subtitle/description (e.g., "Click to begin your conversation")
+- Button text (e.g., "Begin", "Start Conversation")
 
-## 2. Context Updates
+**File: `src/lib/exportZip.ts`**
+
+Update the start screen HTML generation to use these theme values instead of hardcoded text.
 
 **File: `src/context/ScenarioContext.tsx`**
 
-### New Action Types
+Update the `migrateScenario` function to provide defaults for these new fields when loading legacy scenarios.
+
+---
+
+## 4. Optional Reset Button
+
+**File: `src/types/scenario.ts`**
+
+Add to `ChatTheme`:
+
 ```typescript
-| { type: "ADD_VARIABLE"; payload: { name: string } }
-| { type: "UPDATE_VARIABLE"; payload: { id: string; name: string } }
-| { type: "DELETE_VARIABLE"; payload: string }
-| { type: "SET_RESPONSE_VARIABLE_ASSIGNMENT"; payload: { messageId: string; optionId: string; assignment: VariableAssignment | null } }
-| { type: "SET_RESPONSE_CONDITION"; payload: { messageId: string; optionId: string; condition: VariableCondition | null } }
-| { type: "SET_MESSAGE_CONDITION"; payload: { messageId: string; condition: VariableCondition | null } }
-| { type: "START_CONNECTION"; payload: { sourceMessageId: string; optionId: string } }
-| { type: "CANCEL_CONNECTION" }
-| { type: "COMPLETE_CONNECTION"; payload: { targetMessageId: string } }
+showResetButton: boolean;
 ```
 
-### New State
-Add `pendingConnection` state for click-to-connect:
+Update `DEFAULT_THEME`:
+
 ```typescript
-interface PendingConnection {
-  sourceMessageId: string;
-  optionId: string;
-}
-
-// Add to context type
-pendingConnection: PendingConnection | null;
-startConnection: (sourceMessageId: string, optionId: string) => void;
-cancelConnection: () => void;
-completeConnection: (targetMessageId: string) => void;
+showResetButton: true,
 ```
 
-### New Context Methods
-- `addVariable(name: string)` - Create a new boolean variable
-- `updateVariable(id: string, name: string)` - Rename a variable
-- `deleteVariable(id: string)` - Remove variable and clear all references
-- `setResponseVariableAssignment(messageId, optionId, assignment)` - Set/clear what a response sets
-- `setResponseCondition(messageId, optionId, condition)` - Set/clear condition on response
-- `setMessageCondition(messageId, condition)` - Set/clear condition on message
-- `startConnection(sourceMessageId, optionId)` - Begin click-to-connect mode
-- `cancelConnection()` - Exit connection mode
-- `completeConnection(targetMessageId)` - Complete the connection
+**File: `src/components/builder/ThemeTab.tsx`**
 
----
-
-## 3. Variables Panel Component
-
-**New File: `src/components/builder/VariablesPanel.tsx`**
-
-A collapsible panel in the canvas toolbar area for managing scenario variables:
+Add a toggle switch in a new "Controls" section:
 
 ```text
 +------------------------------------------+
-| Variables                          [+ Add] |
+| Controls                                  |
 +------------------------------------------+
-| [x] interested                    [trash] |
-| [x] has_pricing                   [trash] |
-| [x] is_qualified                  [trash] |
-+------------------------------------------+
-| + New variable name...            [Add]   |
+| Show Reset Button    [toggle switch]     |
 +------------------------------------------+
 ```
 
-Features:
-- List all scenario variables with their names
-- Add new variable with inline input
-- Delete variable (with confirmation if in use)
-- Collapsible to save space
+**File: `src/components/builder/ChatPreview.tsx`**
 
----
+Conditionally render the Reset button based on `theme.showResetButton`.
 
-## 4. Canvas Toolbar Updates
+**File: `src/lib/exportZip.ts`**
 
-**File: `src/components/builder/CanvasToolbar.tsx`**
-
-Add the VariablesPanel as a popover/collapsible section in the toolbar, accessible via a "Variables" button with a `ToggleLeft` icon.
-
----
-
-## 5. Message Flow Node Updates
-
-**File: `src/components/builder/MessageFlowNode.tsx`**
-
-### Add Link Button to Response Options
-Currently responses have Unlink and Delete buttons. Add a Link button (Link2 icon) that:
-- Only shows when the option is NOT connected (`!option.nextMessageId`)
-- Clicking starts connection mode via `startConnection(messageId, optionId)`
-
-### Visual Indicators for Variables
-Add icons/badges to responses that have variable features:
-
-```text
-Response option row:
-+-------------------------------------------------------+
-| [1] "Yes, I'm interested"  [⚡] [👁]  [🔗] [✕] [🗑]   |
-+-------------------------------------------------------+
-```
-
-- **⚡ (Zap icon)**: Shows if response sets a variable - tooltip shows "Sets: variableName = true/false"
-- **👁 (Eye icon)**: Shows if response has a condition - tooltip shows "Requires: variableName = true/false"
-- **🔗 (Link icon)**: Click to start connection mode (only when unconnected)
-- **✕ (Unlink icon)**: Disconnect (only when connected)
-- **🗑 (Trash icon)**: Delete response
-
-### Connection Mode Visual Feedback
-When `pendingConnection` is active:
-- The source response option shows a pulsing/highlighted border
-- Other message node headers show a "Click to connect" indicator
-- Clicking a message header completes the connection
-
-### Message Header Condition Badge
-If a message has a condition, show a small badge in the header:
-```text
-| [3] Message | 👁 If: variableName |
-```
-
----
-
-## 6. Flow Canvas Updates
-
-**File: `src/components/builder/FlowCanvas.tsx`**
-
-- Pass `pendingConnection` state to nodes via data
-- Handle Escape key to cancel connection mode
-- Show a connection mode banner/toast when active:
-  "Connecting response — Click a message node or press Escape to cancel"
+Conditionally include the Reset button in the exported HTML based on the theme setting.
 
 ---
 
@@ -194,47 +134,90 @@ If a message has a condition, show a small badge in the header:
 
 | File | Action | Summary |
 |------|--------|---------|
-| `src/types/scenario.ts` | Modify | Add Variable types, update ResponseOption, ChatMessage, ScenarioData |
-| `src/context/ScenarioContext.tsx` | Modify | Add variable actions, pendingConnection state, new methods |
-| `src/components/builder/VariablesPanel.tsx` | Create | Variable management UI panel |
-| `src/components/builder/CanvasToolbar.tsx` | Modify | Add Variables button with popover |
-| `src/components/builder/MessageFlowNode.tsx` | Modify | Add Link button, variable indicators, connection mode handling |
-| `src/components/builder/FlowCanvas.tsx` | Modify | Pass pendingConnection, Escape handler, connection banner |
+| `src/types/scenario.ts` | Modify | Add `startScreenTitle`, `startScreenSubtitle`, `startButtonText`, `showResetButton` to ChatTheme |
+| `src/context/ScenarioContext.tsx` | Modify | Update `migrateScenario` for new theme fields |
+| `src/components/builder/ThemeTab.tsx` | Modify | Full corner labels, Start Screen section, Controls section with Reset toggle |
+| `src/components/builder/ChatPreview.tsx` | Modify | Typing indicator, conditional Reset button |
+| `src/lib/exportZip.ts` | Modify | Typing indicator in exported JS, customizable start screen text, conditional Reset button |
+
+---
+
+## Technical Details
+
+### Typing Indicator Logic (ChatPreview)
+
+```typescript
+// State
+const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
+
+// When adding a contact message
+const addContactMessage = (messageId: string, content: string) => {
+  // Show typing indicator first
+  setTypingMessageId(messageId);
+  
+  // After delay, show actual message
+  setTimeout(() => {
+    setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
+    setTypingMessageId(null);
+  }, 1000);
+};
+```
+
+### Typing Bubble CSS
+
+```css
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 12px 16px;
+}
+
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+  animation: typingBounce 1.4s infinite;
+}
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+```
+
+### Start Screen Theme Section (ThemeTab)
+
+```text
++------------------------------------------+
+| Start Screen                              |
++------------------------------------------+
+| Title                                     |
+| [Ready to Start________________]          |
+|                                           |
+| Subtitle                                  |
+| [Begin the conversation________]          |
+|                                           |
+| Button Text                               |
+| [Start_________________________]          |
++------------------------------------------+
+```
 
 ---
 
 ## Implementation Order
 
-1. **Phase 1: Data Model** - Update types in `scenario.ts`
-2. **Phase 2: Context** - Add all new actions and state to context
-3. **Phase 3: Variables Panel** - Create panel and add to toolbar
-4. **Phase 4: Response Link Button** - Add click-to-connect to MessageFlowNode
-5. **Phase 5: Variable Indicators** - Add visual badges for conditions/assignments
-6. **Phase 6: Connection Mode UX** - Escape key, banner, visual feedback
-
----
-
-## Visual Examples
-
-### Response with Link Button (not connected):
-```text
-[1] "Tell me more"    [🔗 Link] [🗑]
-```
-
-### Response with Connection + Variables:
-```text
-[2] "Yes, I'm interested"  ⚡Sets: interested  [Unlink] [🗑]
-```
-
-### Response with Condition:
-```text
-[3] "Show me pricing"  👁Needs: interested  [🔗 Link] [🗑]
-```
-
-### Connection Mode Active:
-```text
-Banner: "🔗 Connecting 'Tell me more' — Click a message or Escape"
-
-All message headers show clickable indicator
-Source response has pulsing blue border
-```
+1. Update `scenario.ts` with new theme fields
+2. Update `migrateScenario` in context for backwards compatibility
+3. Update `ThemeTab.tsx`:
+   - Change corner radius labels to full text
+   - Add Start Screen section
+   - Add Controls section with Reset toggle
+4. Update `ChatPreview.tsx`:
+   - Add typing indicator state and logic
+   - Conditionally show Reset button
+5. Update `exportZip.ts`:
+   - Add typing indicator to exported JS
+   - Use custom start screen text
+   - Conditionally include Reset button
