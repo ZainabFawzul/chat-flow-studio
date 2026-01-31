@@ -141,20 +141,20 @@ export function TopBar() {
           />
           
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={handleImportClick}
-            className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80 hover:border-border"
+            className="gap-2 rounded-xl"
           >
             <Upload className="h-4 w-4" aria-hidden="true" />
             <span>Import</span>
           </Button>
           
           <Button
-            variant="outline"
+            variant="secondary"
             size="sm"
             onClick={handleExportJSON}
-            className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80 hover:border-border"
+            className="gap-2 rounded-xl"
           >
             <Download className="h-4 w-4" aria-hidden="true" />
             <span>Export</span>
@@ -182,7 +182,7 @@ export function TopBar() {
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button
-              variant="outline"
+              variant="secondary"
               onClick={() => setIsFinalizeDialogOpen(false)}
               className="rounded-xl"
               disabled={isExporting}
