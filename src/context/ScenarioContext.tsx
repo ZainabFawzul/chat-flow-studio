@@ -8,11 +8,32 @@ import {
   ScenarioVariable,
   VariableCondition,
   VariableAssignment,
+  DEFAULT_THEME,
   createEmptyScenario,
   createMessage,
   createResponseOption,
   createVariable,
 } from "@/types/scenario";
+
+function migrateScenario(input: any): ScenarioData {
+  const scenario = input as Partial<ScenarioData>;
+
+  // Note: We intentionally preserve ids/timestamps/content; only fill missing fields.
+  const theme: ChatTheme = {
+    ...DEFAULT_THEME,
+    ...(scenario.theme as Partial<ChatTheme> | undefined),
+    senderBorderRadius:
+      (scenario.theme as Partial<ChatTheme> | undefined)?.senderBorderRadius ?? DEFAULT_THEME.senderBorderRadius,
+    receiverBorderRadius:
+      (scenario.theme as Partial<ChatTheme> | undefined)?.receiverBorderRadius ?? DEFAULT_THEME.receiverBorderRadius,
+  };
+
+  return {
+    ...(scenario as ScenarioData),
+    theme,
+    variables: (scenario.variables as ScenarioData["variables"]) ?? {},
+  };
+}
 
 // Pending connection state for click-to-connect
 export interface PendingConnection {
@@ -480,11 +501,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        // Ensure variables field exists (migration for old data)
-        if (!parsed.variables) {
-          parsed.variables = {};
-        }
-        return parsed;
+        return migrateScenario(parsed);
       }
     } catch (e) {
       console.error("Failed to load saved scenario:", e);
@@ -613,7 +630,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
   }, [pendingConnection]);
 
   const importScenario = useCallback((data: ScenarioData) => {
-    dispatch({ type: "SET_SCENARIO", payload: data });
+    dispatch({ type: "SET_SCENARIO", payload: migrateScenario(data) });
   }, []);
 
   const resetScenario = useCallback(() => {
