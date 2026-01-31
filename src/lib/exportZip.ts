@@ -116,8 +116,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       max-width: 37.5rem;
       margin: 0 auto;
       width: 100%;
-      background: white;
-      box-shadow: 0 0 1.25rem rgba(0,0,0,0.1);
+      background: #ffffff;
+      box-shadow: 0 0 1.25rem #0000001a;
     }
 
     .chat-header {
@@ -252,7 +252,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     .message-bubble {
       max-width: 75%;
       padding: 0.625rem 1rem;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 2px #0000000d;
     }
 
     .message-bubble.contact {
@@ -308,7 +308,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       gap: 0.5rem;
       padding: 0.5rem 1rem;
       border-radius: 1.25rem;
-      background: rgba(16, 185, 129, 0.15);
+      background: #10b98126;
       color: #10b981;
       font-size: 0.875rem;
       font-weight: 500;

@@ -89,6 +89,14 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
     }
   };
 
+  // Handle keyboard activation for connection targets
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (canReceiveConnection && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      completeConnection(message.id);
+    }
+  };
+
   return (
     <TooltipProvider>
       <div
@@ -96,9 +104,13 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
           "w-[320px] rounded-2xl border-2 bg-card shadow-lg transition-all",
           selected ? "border-primary shadow-primary/20" : "border-border/50",
           isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
-          canReceiveConnection && "ring-2 ring-success/50 cursor-pointer"
+          canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus-within:ring-success"
         )}
         onClick={canReceiveConnection ? () => completeConnection(message.id) : undefined}
+        onKeyDown={handleKeyDown}
+        tabIndex={canReceiveConnection ? 0 : -1}
+        role={canReceiveConnection ? "button" : undefined}
+        aria-label={canReceiveConnection ? `Connect to message ${nodeNumber}: ${message.content.slice(0, 50)}` : undefined}
       >
         {/* Input handle for connections */}
         <Handle
@@ -134,9 +146,9 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
 
             {/* Connection mode indicator */}
             {canReceiveConnection && (
-              <span className="flex items-center gap-1 text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded font-medium animate-pulse">
+              <span className="flex items-center gap-1 text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded font-medium animate-pulse" aria-hidden="true">
                 <MousePointerClick className="h-2.5 w-2.5" />
-                Click to connect
+                Press Enter to connect
               </span>
             )}
           </div>

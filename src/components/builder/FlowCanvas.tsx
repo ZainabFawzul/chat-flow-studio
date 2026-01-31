@@ -176,23 +176,28 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
           </Button>
         </Panel>
 
-        {/* Connection mode banner */}
+        {/* Connection mode banner with screen reader announcements */}
         {pendingConnection && (
           <Panel position="top-center" className="mt-4">
-            <div className="flex items-center gap-3 px-4 py-2 bg-primary text-primary-foreground rounded-xl shadow-lg animate-in slide-in-from-top-2">
-              <Link2 className="h-4 w-4" />
+            <div 
+              className="flex items-center gap-3 px-4 py-2 bg-primary text-primary-foreground rounded-xl shadow-lg animate-in slide-in-from-top-2"
+              role="status"
+              aria-live="polite"
+            >
+              <Link2 className="h-4 w-4" aria-hidden="true" />
               <span className="text-sm font-medium">
-                Connecting "{pendingOptionText}" — Click a message node
+                Connecting "{pendingOptionText}" — Tab to a message node and press Enter
               </span>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={cancelConnection}
                 className="h-6 w-6 rounded-lg hover:bg-primary-foreground/20"
+                aria-label="Cancel connection"
               >
-                <X className="h-3 w-3" />
+                <X className="h-3 w-3" aria-hidden="true" />
               </Button>
-              <span className="text-xs opacity-70">or press Esc</span>
+              <span className="text-xs opacity-70" aria-hidden="true">or press Esc</span>
             </div>
           </Panel>
         )}
