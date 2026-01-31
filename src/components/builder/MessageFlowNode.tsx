@@ -97,6 +97,9 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
     }
   };
 
+  // During connection mode, disable tab navigation for internal elements
+  const internalTabIndex = isConnecting ? -1 : undefined;
+
   return (
     <TooltipProvider>
       <div
@@ -104,13 +107,14 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
           "w-[320px] rounded-2xl border-2 bg-card shadow-lg transition-all",
           selected ? "border-primary shadow-primary/20" : "border-border/50",
           isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
-          canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus-within:ring-success"
+          canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none"
         )}
         onClick={canReceiveConnection ? () => completeConnection(message.id) : undefined}
         onKeyDown={handleKeyDown}
         tabIndex={canReceiveConnection ? 0 : -1}
         role={canReceiveConnection ? "button" : undefined}
         aria-label={canReceiveConnection ? `Connect to message ${nodeNumber}: ${message.content.slice(0, 50)}` : undefined}
+        data-connection-target={canReceiveConnection ? message.id : undefined}
       >
         {/* Input handle for connections */}
         <Handle
@@ -163,6 +167,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                       <Button
                         variant={message.condition ? "secondary" : "ghost"}
                         size="icon"
+                        tabIndex={internalTabIndex}
                         className={cn(
                           "h-7 w-7 rounded-lg",
                           message.condition ? "bg-info/20 text-info hover:bg-info/30" : "text-muted-foreground hover:text-foreground"
@@ -222,6 +227,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
               variant={message.isEndpoint ? "secondary" : "ghost"}
               size="sm"
               onClick={() => toggleEndpoint(message.id)}
+              tabIndex={internalTabIndex}
               className={cn(
                 "gap-1 text-xs rounded-lg h-7 px-2",
                 message.isEndpoint && "bg-success/20 text-success hover:bg-success/30"
@@ -237,6 +243,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                   <Button
                     variant="ghost"
                     size="icon"
+                    tabIndex={internalTabIndex}
                     className="h-7 w-7 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -270,6 +277,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
             value={message.content}
             onChange={(e) => updateMessage(message.id, e.target.value)}
             placeholder="Enter the contact's message..."
+            tabIndex={internalTabIndex}
             className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag"
           />
 
@@ -297,6 +305,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                 variables={variables || {}}
                 pendingConnection={pendingConnection}
                 isConnecting={isConnecting}
+                internalTabIndex={internalTabIndex}
               />
             ))}
 
@@ -306,6 +315,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                 value={newOptionText}
                 onChange={(e) => setNewOptionText(e.target.value)}
                 placeholder="New response..."
+                tabIndex={internalTabIndex}
                 className="flex-1 h-7 text-xs border-0 bg-transparent focus-visible:ring-0 nodrag"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -319,6 +329,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                 size="sm"
                 onClick={handleAddOption}
                 disabled={!newOptionText.trim()}
+                tabIndex={internalTabIndex}
                 className="h-7 px-2 text-xs rounded-md"
               >
                 <Plus className="h-3 w-3 mr-1" />

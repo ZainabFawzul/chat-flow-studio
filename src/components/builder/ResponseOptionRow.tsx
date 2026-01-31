@@ -37,6 +37,7 @@ interface ResponseOptionRowProps {
   variables: Record<string, ScenarioVariable>;
   pendingConnection: PendingConnection | null;
   isConnecting: boolean;
+  internalTabIndex?: number;
 }
 
 export function ResponseOptionRow({
@@ -46,6 +47,7 @@ export function ResponseOptionRow({
   variables,
   pendingConnection,
   isConnecting,
+  internalTabIndex,
 }: ResponseOptionRowProps) {
   const {
     updateResponseOption,
@@ -91,6 +93,7 @@ export function ResponseOptionRow({
           value={option.text}
           onChange={(e) => updateResponseOption(messageId, option.id, e.target.value)}
           placeholder="Response text..."
+          tabIndex={internalTabIndex}
           className="flex-1 h-7 text-xs rounded-md border-border/30 bg-card nodrag"
         />
 
@@ -130,6 +133,7 @@ export function ResponseOptionRow({
                   <Button
                     variant="ghost"
                     size="icon"
+                    tabIndex={internalTabIndex}
                     className={cn(
                       "h-6 w-6 rounded text-muted-foreground hover:text-foreground",
                       (option.setsVariable || option.condition) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
@@ -233,6 +237,7 @@ export function ResponseOptionRow({
                 variant="ghost"
                 size="icon"
                 onClick={() => startConnection(messageId, option.id)}
+                tabIndex={internalTabIndex}
                 className="h-6 w-6 rounded text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100 focus:opacity-100"
                 aria-label={`Link "${option.text || 'response'}" to another message`}
               >
@@ -253,6 +258,7 @@ export function ResponseOptionRow({
                 variant="ghost"
                 size="icon"
                 onClick={() => disconnectOption(messageId, option.id)}
+                tabIndex={internalTabIndex}
                 className="h-6 w-6 rounded text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100"
               >
                 <Unlink className="h-3 w-3" />
@@ -268,6 +274,7 @@ export function ResponseOptionRow({
           variant="ghost"
           size="icon"
           onClick={() => deleteResponseOption(messageId, option.id)}
+          tabIndex={internalTabIndex}
           className="h-6 w-6 rounded text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100"
         >
           <Trash2 className="h-3 w-3" />

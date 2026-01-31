@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useEffect } from "react";
+import { useCallback, useMemo, useEffect, useRef } from "react";
 import {
   ReactFlow,
   Background,
@@ -41,17 +41,59 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
     cancelConnection,
   } = useScenario();
 
-  // Handle Escape key to cancel connection mode
+  const containerRef = useRef<HTMLDivElement>(null);
+  const focusedNodeIndexRef = useRef<number>(0);
+
+  // Get list of valid target node IDs (all nodes except the source)
+  const targetNodeIds = useMemo(() => {
+    if (!pendingConnection) return [];
+    return Object.keys(scenario.messages).filter(
+      (id) => id !== pendingConnection.sourceMessageId
+    );
+  }, [pendingConnection, scenario.messages]);
+
+  // Handle keyboard navigation during connection mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Cancel on Escape
       if (e.key === "Escape" && pendingConnection) {
         cancelConnection();
+        return;
+      }
+
+      // Tab navigation only during connection mode
+      if (pendingConnection && e.key === "Tab" && targetNodeIds.length > 0) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Cycle through target nodes
+        if (e.shiftKey) {
+          focusedNodeIndexRef.current =
+            (focusedNodeIndexRef.current - 1 + targetNodeIds.length) % targetNodeIds.length;
+        } else {
+          focusedNodeIndexRef.current =
+            (focusedNodeIndexRef.current + 1) % targetNodeIds.length;
+        }
+
+        // Focus the target node element
+        const targetId = targetNodeIds[focusedNodeIndexRef.current];
+        const nodeElement = containerRef.current?.querySelector(
+          `[data-connection-target="${targetId}"]`
+        ) as HTMLElement;
+        nodeElement?.focus();
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [pendingConnection, cancelConnection]);
+    window.addEventListener("keydown", handleKeyDown, true);
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
+  }, [pendingConnection, cancelConnection, targetNodeIds]);
+
+  // Reset focused index when entering connection mode
+  useEffect(() => {
+    if (pendingConnection) {
+      focusedNodeIndexRef.current = -1; // Start at -1 so first Tab goes to index 0
+    }
+  }, [pendingConnection]);
 
   // Get the pending option text for the banner
   const pendingOptionText = useMemo(() => {
@@ -128,7 +170,10 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   );
 
   return (
-    <div className={`${isExpanded ? "fixed inset-0 z-50 bg-background" : "h-full"}`}>
+    <div 
+      ref={containerRef}
+      className={`${isExpanded ? "fixed inset-0 z-50 bg-background" : "h-full"}`}
+    >
       <ReactFlow
         nodes={nodes}
         edges={edges}
