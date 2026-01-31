@@ -204,10 +204,7 @@ export function ChatPreview() {
                   </Avatar>
                 )}
                 <div
-                  className={cn(
-                    "max-w-[75%] rounded-2xl px-4 py-2.5 shadow-sm",
-                    bubble.isUser ? "rounded-tr-md" : "rounded-tl-md"
-                  )}
+                  className="max-w-[75%] px-4 py-2.5 shadow-sm"
                   style={{
                     backgroundColor: bubble.isUser
                       ? `hsl(${theme.senderBubbleColor})`
@@ -215,6 +212,10 @@ export function ChatPreview() {
                     color: bubble.isUser
                       ? `hsl(${theme.senderTextColor})`
                       : `hsl(${theme.receiverTextColor})`,
+                    borderTopLeftRadius: `${bubble.isUser ? theme.senderBorderRadius.topLeft : theme.receiverBorderRadius.topLeft}px`,
+                    borderTopRightRadius: `${bubble.isUser ? theme.senderBorderRadius.topRight : theme.receiverBorderRadius.topRight}px`,
+                    borderBottomRightRadius: `${bubble.isUser ? theme.senderBorderRadius.bottomRight : theme.receiverBorderRadius.bottomRight}px`,
+                    borderBottomLeftRadius: `${bubble.isUser ? theme.senderBorderRadius.bottomLeft : theme.receiverBorderRadius.bottomLeft}px`,
                   }}
                 >
                   {bubble.content || (

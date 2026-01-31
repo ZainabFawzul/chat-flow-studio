@@ -39,13 +39,22 @@ export interface ChatMessage {
   condition?: VariableCondition; // Message only shown if condition is met
 }
 
+export interface BubbleBorderRadius {
+  topLeft: number;
+  topRight: number;
+  bottomRight: number;
+  bottomLeft: number;
+}
+
 export interface ChatTheme {
   contactName: string;
   contactAvatar: string | null; // Base64 image or null for initials
   senderBubbleColor: string;
   senderTextColor: string;
+  senderBorderRadius: BubbleBorderRadius;
   receiverBubbleColor: string;
   receiverTextColor: string;
+  receiverBorderRadius: BubbleBorderRadius;
   chatBackground: string;
   fontSize: number; // in pixels
   fontFamily: string;
@@ -63,13 +72,22 @@ export interface ScenarioData {
 }
 
 // Default values
+export const DEFAULT_BORDER_RADIUS: BubbleBorderRadius = {
+  topLeft: 16,
+  topRight: 16,
+  bottomRight: 16,
+  bottomLeft: 16,
+};
+
 export const DEFAULT_THEME: ChatTheme = {
   contactName: "Contact",
   contactAvatar: null,
   senderBubbleColor: "214 100% 65%", // Primary blue
   senderTextColor: "0 0% 100%",
+  senderBorderRadius: { topLeft: 16, topRight: 4, bottomRight: 16, bottomLeft: 16 },
   receiverBubbleColor: "40 14% 94%", // Secondary gray
   receiverTextColor: "230 100% 28%", // Foreground
+  receiverBorderRadius: { topLeft: 4, topRight: 16, bottomRight: 16, bottomLeft: 16 },
   chatBackground: "40 23% 97%", // Background
   fontSize: 14,
   fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif",

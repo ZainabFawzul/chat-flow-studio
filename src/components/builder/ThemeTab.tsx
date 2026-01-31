@@ -9,6 +9,47 @@ import { Upload, X, User, Palette, MessageCircle, Type } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
+import { BubbleBorderRadius } from "@/types/scenario";
+
+interface BorderRadiusControlProps {
+  label: string;
+  value: BubbleBorderRadius;
+  onChange: (value: BubbleBorderRadius) => void;
+}
+
+function BorderRadiusControl({ label, value, onChange }: BorderRadiusControlProps) {
+  const corners = [
+    { key: "topLeft" as const, label: "TL" },
+    { key: "topRight" as const, label: "TR" },
+    { key: "bottomRight" as const, label: "BR" },
+    { key: "bottomLeft" as const, label: "BL" },
+  ];
+
+  return (
+    <div>
+      <Label className="mb-2 block text-sm font-medium">{label}</Label>
+      <div className="grid grid-cols-4 gap-2">
+        {corners.map(({ key, label: cornerLabel }) => (
+          <div key={key} className="flex flex-col items-center gap-1">
+            <span className="text-[10px] text-muted-foreground font-medium">{cornerLabel}</span>
+            <Input
+              type="number"
+              min={0}
+              max={32}
+              value={value[key]}
+              onChange={(e) => onChange({ ...value, [key]: Number(e.target.value) })}
+              className="h-8 w-full text-center text-sm rounded-lg border-border/50 bg-secondary/30"
+            />
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5">
+        <span>0 = sharp</span>
+        <span>32 = round</span>
+      </div>
+    </div>
+  );
+}
 
 interface SectionProps {
   icon: React.ReactNode;
@@ -146,14 +187,23 @@ export function ThemeTab() {
               value={theme.senderTextColor}
               onChange={(value) => updateTheme({ senderTextColor: value })}
             />
+            <BorderRadiusControl
+              label="Corner Radius (px)"
+              value={theme.senderBorderRadius}
+              onChange={(value) => updateTheme({ senderBorderRadius: value })}
+            />
             
             {/* Preview */}
             <div className="mt-2 flex justify-end">
               <div
-                className="max-w-[80%] rounded-2xl rounded-tr-md px-4 py-2.5 shadow-sm"
+                className="max-w-[80%] px-4 py-2.5 shadow-sm"
                 style={{
                   backgroundColor: `hsl(${theme.senderBubbleColor})`,
                   color: `hsl(${theme.senderTextColor})`,
+                  borderTopLeftRadius: `${theme.senderBorderRadius.topLeft}px`,
+                  borderTopRightRadius: `${theme.senderBorderRadius.topRight}px`,
+                  borderBottomRightRadius: `${theme.senderBorderRadius.bottomRight}px`,
+                  borderBottomLeftRadius: `${theme.senderBorderRadius.bottomLeft}px`,
                 }}
               >
                 <span className="text-sm">Preview message</span>
@@ -177,14 +227,23 @@ export function ThemeTab() {
               value={theme.receiverTextColor}
               onChange={(value) => updateTheme({ receiverTextColor: value })}
             />
+            <BorderRadiusControl
+              label="Corner Radius (px)"
+              value={theme.receiverBorderRadius}
+              onChange={(value) => updateTheme({ receiverBorderRadius: value })}
+            />
             
             {/* Preview */}
             <div className="mt-2 flex justify-start">
               <div
-                className="max-w-[80%] rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm"
+                className="max-w-[80%] px-4 py-2.5 shadow-sm"
                 style={{
                   backgroundColor: `hsl(${theme.receiverBubbleColor})`,
                   color: `hsl(${theme.receiverTextColor})`,
+                  borderTopLeftRadius: `${theme.receiverBorderRadius.topLeft}px`,
+                  borderTopRightRadius: `${theme.receiverBorderRadius.topRight}px`,
+                  borderBottomRightRadius: `${theme.receiverBorderRadius.bottomRight}px`,
+                  borderBottomLeftRadius: `${theme.receiverBorderRadius.bottomLeft}px`,
                 }}
               >
                 <span className="text-sm">Preview message</span>

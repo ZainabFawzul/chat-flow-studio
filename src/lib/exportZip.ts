@@ -225,20 +225,25 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     .message-bubble {
       max-width: 75%;
       padding: 10px 16px;
-      border-radius: 16px;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
     .message-bubble.contact {
       background: hsl(${theme.receiverBubbleColor});
       color: hsl(${theme.receiverTextColor});
-      border-top-left-radius: 4px;
+      border-top-left-radius: ${theme.receiverBorderRadius?.topLeft ?? 4}px;
+      border-top-right-radius: ${theme.receiverBorderRadius?.topRight ?? 16}px;
+      border-bottom-right-radius: ${theme.receiverBorderRadius?.bottomRight ?? 16}px;
+      border-bottom-left-radius: ${theme.receiverBorderRadius?.bottomLeft ?? 16}px;
     }
 
     .message-bubble.user {
       background: hsl(${theme.senderBubbleColor});
       color: hsl(${theme.senderTextColor});
-      border-top-right-radius: 4px;
+      border-top-left-radius: ${theme.senderBorderRadius?.topLeft ?? 16}px;
+      border-top-right-radius: ${theme.senderBorderRadius?.topRight ?? 4}px;
+      border-bottom-right-radius: ${theme.senderBorderRadius?.bottomRight ?? 16}px;
+      border-bottom-left-radius: ${theme.senderBorderRadius?.bottomLeft ?? 16}px;
     }
 
     .end-indicator {
