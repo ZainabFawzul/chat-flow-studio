@@ -1,21 +1,23 @@
-# Workflow Builder: Conditional Variables & Click-to-Connect
+
+# Conditional Variables & Click-to-Connect Implementation
 
 ## Overview
 
-This plan adds two major features to the workflow builder:
-1. **Conditional Variables** - Boolean flags that responses can set and that responses/messages can require
-2. **Click-to-Connect** - An alternative to drag-and-drop for connecting responses to messages
+This plan implements three features for the flowchart builder:
+1. **Link button** on response options for click-to-connect (alternative to drag-and-drop)
+2. **Variables panel** inside the canvas for managing boolean conditional variables
+3. **Visual indicators** on responses that set or require variables
 
 ---
 
-## Feature 1: Conditional Variables
-
-### Data Model Changes
+## 1. Data Model Updates
 
 **File: `src/types/scenario.ts`**
 
-Add new types:
+Add new types for variables and conditions:
+
 ```typescript
+// New types to add
 export interface ScenarioVariable {
   id: string;
   name: string;
@@ -33,7 +35,8 @@ export interface VariableAssignment {
 }
 ```
 
-Update `ResponseOption`:
+Update existing types:
+
 ```typescript
 export interface ResponseOption {
   id: string;
@@ -42,168 +45,196 @@ export interface ResponseOption {
   setsVariable?: VariableAssignment;  // NEW: When chosen, set this variable
   condition?: VariableCondition;       // NEW: Only show if condition is met
 }
-```
 
-Update `ChatMessage`:
-```typescript
 export interface ChatMessage {
-  id: string;
-  content: string;
-  isEndpoint: boolean;
-  responseOptions: ResponseOption[];
-  position: NodePosition;
+  // ... existing fields
   condition?: VariableCondition;  // NEW: Message only shown if condition is met
 }
-```
 
-Update `ScenarioData`:
-```typescript
 export interface ScenarioData {
   // ... existing fields
   variables: Record<string, ScenarioVariable>;  // NEW
 }
 ```
 
-### Context Changes
-
-**File: `src/context/ScenarioContext.tsx`**
-
-Add new actions:
-- `ADD_VARIABLE` - Create a new boolean variable
-- `UPDATE_VARIABLE` - Rename a variable
-- `DELETE_VARIABLE` - Remove a variable (and clear references)
-- `SET_RESPONSE_VARIABLE_ASSIGNMENT` - Set what variable a response sets when chosen
-- `CLEAR_RESPONSE_VARIABLE_ASSIGNMENT` - Remove variable assignment from response
-- `SET_RESPONSE_CONDITION` - Set condition on a response
-- `CLEAR_RESPONSE_CONDITION` - Remove condition from response
-- `SET_MESSAGE_CONDITION` - Set condition on a message
-- `CLEAR_MESSAGE_CONDITION` - Remove condition from message
-
-### UI Components
-
-**New File: `src/components/builder/VariablesPanel.tsx`**
-
-A panel in the Canvas toolbar to manage variables:
-- List all scenario variables
-- Add new variable with name input
-- Delete variables
-- Shows where each variable is used
-
-**Update: `src/components/builder/MessageFlowNode.tsx`**
-
-For each response option, add:
-- Dropdown to set "When chosen, set [variable] to [true/false]"
-- Dropdown to set "Show only if [variable] is [true/false]"
-
-For the message itself, add:
-- Optional condition badge in header
-- Dropdown to set message condition
-
-### Visual Indicators
-
-- Response with condition: Show a small filter/condition icon
-- Response that sets variable: Show a small toggle/variable icon
-- Message with condition: Show condition badge in header
-- Conditional elements use a subtle accent color to distinguish them
+Update factory functions to include variables in empty scenario.
 
 ---
 
-## Feature 2: Click-to-Connect
-
-### State Management
+## 2. Context Updates
 
 **File: `src/context/ScenarioContext.tsx`**
 
-Add connection mode state:
+### New Action Types
+```typescript
+| { type: "ADD_VARIABLE"; payload: { name: string } }
+| { type: "UPDATE_VARIABLE"; payload: { id: string; name: string } }
+| { type: "DELETE_VARIABLE"; payload: string }
+| { type: "SET_RESPONSE_VARIABLE_ASSIGNMENT"; payload: { messageId: string; optionId: string; assignment: VariableAssignment | null } }
+| { type: "SET_RESPONSE_CONDITION"; payload: { messageId: string; optionId: string; condition: VariableCondition | null } }
+| { type: "SET_MESSAGE_CONDITION"; payload: { messageId: string; condition: VariableCondition | null } }
+| { type: "START_CONNECTION"; payload: { sourceMessageId: string; optionId: string } }
+| { type: "CANCEL_CONNECTION" }
+| { type: "COMPLETE_CONNECTION"; payload: { targetMessageId: string } }
+```
+
+### New State
+Add `pendingConnection` state for click-to-connect:
 ```typescript
 interface PendingConnection {
   sourceMessageId: string;
   optionId: string;
 }
 
-// Add to context:
+// Add to context type
 pendingConnection: PendingConnection | null;
 startConnection: (sourceMessageId: string, optionId: string) => void;
 cancelConnection: () => void;
 completeConnection: (targetMessageId: string) => void;
 ```
 
-### UI Flow
+### New Context Methods
+- `addVariable(name: string)` - Create a new boolean variable
+- `updateVariable(id: string, name: string)` - Rename a variable
+- `deleteVariable(id: string)` - Remove variable and clear all references
+- `setResponseVariableAssignment(messageId, optionId, assignment)` - Set/clear what a response sets
+- `setResponseCondition(messageId, optionId, condition)` - Set/clear condition on response
+- `setMessageCondition(messageId, condition)` - Set/clear condition on message
+- `startConnection(sourceMessageId, optionId)` - Begin click-to-connect mode
+- `cancelConnection()` - Exit connection mode
+- `completeConnection(targetMessageId)` - Complete the connection
 
-1. **Start Connection**: User clicks a "link" button on a response option
-2. **Visual Feedback**: 
-   - The source response highlights with a pulsing border
-   - A toast/banner appears: "Click a message to connect, or press Escape to cancel"
-   - All message nodes show a clickable target indicator
-3. **Complete Connection**: User clicks on any message node header
-4. **Cancel**: User presses Escape or clicks the cancel button
+---
 
-### Component Changes
+## 3. Variables Panel Component
 
-**Update: `src/components/builder/MessageFlowNode.tsx`**
+**New File: `src/components/builder/VariablesPanel.tsx`**
 
-- Add "Link" button next to each response option (appears alongside existing Unlink button)
-- When `pendingConnection` is set and matches this option, show highlighted state
-- When `pendingConnection` is set and this is a different message, show "click to connect" target indicator in header
-- Handle click on header to complete connection
+A collapsible panel in the canvas toolbar area for managing scenario variables:
 
-**Update: `src/components/builder/FlowCanvas.tsx`**
+```text
++------------------------------------------+
+| Variables                          [+ Add] |
++------------------------------------------+
+| [x] interested                    [trash] |
+| [x] has_pricing                   [trash] |
+| [x] is_qualified                  [trash] |
++------------------------------------------+
+| + New variable name...            [Add]   |
++------------------------------------------+
+```
 
-- Pass `pendingConnection` state down to nodes
-- Handle Escape key to cancel connection
-- Show connection mode indicator/toast
+Features:
+- List all scenario variables with their names
+- Add new variable with inline input
+- Delete variable (with confirmation if in use)
+- Collapsible to save space
+
+---
+
+## 4. Canvas Toolbar Updates
+
+**File: `src/components/builder/CanvasToolbar.tsx`**
+
+Add the VariablesPanel as a popover/collapsible section in the toolbar, accessible via a "Variables" button with a `ToggleLeft` icon.
+
+---
+
+## 5. Message Flow Node Updates
+
+**File: `src/components/builder/MessageFlowNode.tsx`**
+
+### Add Link Button to Response Options
+Currently responses have Unlink and Delete buttons. Add a Link button (Link2 icon) that:
+- Only shows when the option is NOT connected (`!option.nextMessageId`)
+- Clicking starts connection mode via `startConnection(messageId, optionId)`
+
+### Visual Indicators for Variables
+Add icons/badges to responses that have variable features:
+
+```text
+Response option row:
++-------------------------------------------------------+
+| [1] "Yes, I'm interested"  [⚡] [👁]  [🔗] [✕] [🗑]   |
++-------------------------------------------------------+
+```
+
+- **⚡ (Zap icon)**: Shows if response sets a variable - tooltip shows "Sets: variableName = true/false"
+- **👁 (Eye icon)**: Shows if response has a condition - tooltip shows "Requires: variableName = true/false"
+- **🔗 (Link icon)**: Click to start connection mode (only when unconnected)
+- **✕ (Unlink icon)**: Disconnect (only when connected)
+- **🗑 (Trash icon)**: Delete response
+
+### Connection Mode Visual Feedback
+When `pendingConnection` is active:
+- The source response option shows a pulsing/highlighted border
+- Other message node headers show a "Click to connect" indicator
+- Clicking a message header completes the connection
+
+### Message Header Condition Badge
+If a message has a condition, show a small badge in the header:
+```text
+| [3] Message | 👁 If: variableName |
+```
+
+---
+
+## 6. Flow Canvas Updates
+
+**File: `src/components/builder/FlowCanvas.tsx`**
+
+- Pass `pendingConnection` state to nodes via data
+- Handle Escape key to cancel connection mode
+- Show a connection mode banner/toast when active:
+  "Connecting response — Click a message node or press Escape to cancel"
 
 ---
 
 ## Files to Create/Modify
 
-| File | Action | Changes |
+| File | Action | Summary |
 |------|--------|---------|
 | `src/types/scenario.ts` | Modify | Add Variable types, update ResponseOption, ChatMessage, ScenarioData |
-| `src/context/ScenarioContext.tsx` | Modify | Add variable actions, connection mode state |
-| `src/components/builder/VariablesPanel.tsx` | Create | Variable management UI |
-| `src/components/builder/MessageFlowNode.tsx` | Modify | Add condition/variable UI, click-to-connect handling |
-| `src/components/builder/FlowCanvas.tsx` | Modify | Connection mode state, Escape key handler |
-| `src/components/builder/CanvasToolbar.tsx` | Modify | Add Variables button/panel |
+| `src/context/ScenarioContext.tsx` | Modify | Add variable actions, pendingConnection state, new methods |
+| `src/components/builder/VariablesPanel.tsx` | Create | Variable management UI panel |
+| `src/components/builder/CanvasToolbar.tsx` | Modify | Add Variables button with popover |
+| `src/components/builder/MessageFlowNode.tsx` | Modify | Add Link button, variable indicators, connection mode handling |
+| `src/components/builder/FlowCanvas.tsx` | Modify | Pass pendingConnection, Escape handler, connection banner |
 
 ---
 
 ## Implementation Order
 
-1. **Phase 1: Data Model** - Update types and context
-2. **Phase 2: Variables UI** - Create VariablesPanel, add to toolbar
-3. **Phase 3: Condition UI** - Add condition/assignment UI to nodes
-4. **Phase 4: Click-to-Connect** - Implement connection mode
+1. **Phase 1: Data Model** - Update types in `scenario.ts`
+2. **Phase 2: Context** - Add all new actions and state to context
+3. **Phase 3: Variables Panel** - Create panel and add to toolbar
+4. **Phase 4: Response Link Button** - Add click-to-connect to MessageFlowNode
+5. **Phase 5: Variable Indicators** - Add visual badges for conditions/assignments
+6. **Phase 6: Connection Mode UX** - Escape key, banner, visual feedback
 
 ---
 
-## Visual Mockup
+## Visual Examples
 
-### Response Option with Conditions:
-```
-┌─────────────────────────────────────────────┐
-│ [1] "Yes, I'm interested"                   │
-│     ⚡ Sets: interested = true              │
-│     🔗 ✕                                    │
-├─────────────────────────────────────────────┤
-│ [2] "Tell me more about pricing"            │
-│     👁 Requires: interested = true          │
-│     🔗 ✕                                    │
-└─────────────────────────────────────────────┘
+### Response with Link Button (not connected):
+```text
+[1] "Tell me more"    [🔗 Link] [🗑]
 ```
 
-### Message with Condition:
-```
-┌─────────────────────────────────────────────┐
-│ [3] Message  │ 👁 If: interested = true     │
-├─────────────────────────────────────────────┤
-│ ...                                         │
-└─────────────────────────────────────────────┘
+### Response with Connection + Variables:
+```text
+[2] "Yes, I'm interested"  ⚡Sets: interested  [Unlink] [🗑]
 ```
 
-### Click-to-Connect Mode:
+### Response with Condition:
+```text
+[3] "Show me pricing"  👁Needs: interested  [🔗 Link] [🗑]
 ```
-Banner: "🔗 Connecting response 'Yes, I'm interested' — Click a message or press Escape"
 
-All message headers show: "Click to connect →"
+### Connection Mode Active:
+```text
+Banner: "🔗 Connecting 'Tell me more' — Click a message or Escape"
+
+All message headers show clickable indicator
+Source response has pulsing blue border
 ```
