@@ -147,7 +147,7 @@ export function ResponseOptionRow({
             <Tooltip>
               <TooltipTrigger asChild>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" tabIndex={internalTabIndex} className={cn("h-6 w-6 rounded text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]", option.setsVariable || option.condition ? "opacity-100" : "opacity-0 group-hover:opacity-100")}>
+                  <Button variant="ghost" size="icon" tabIndex={internalTabIndex} className={cn("h-6 w-6 rounded text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]", option.setsVariable || option.condition ? "opacity-100" : "opacity-0 group-hover:opacity-100")}>
                     <Zap className="h-3 w-3" />
                   </Button>
                 </PopoverTrigger>
@@ -290,7 +290,7 @@ export function ResponseOptionRow({
         {/* Link button (only when not connected) */}
         {!option.nextMessageId && !isConnecting && <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => startConnection(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F] opacity-0 group-hover:opacity-100 focus:opacity-100" aria-label={`Link "${option.text || 'response'}" to another message`}>
+              <Button variant="ghost" size="icon" onClick={() => startConnection(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F] opacity-0 group-hover:opacity-100 focus:opacity-100" aria-label={`Link "${option.text || 'response'}" to another message`}>
                 <Link2 className="h-3 w-3" aria-hidden="true" />
               </Button>
             </TooltipTrigger>
