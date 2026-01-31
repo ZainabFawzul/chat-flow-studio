@@ -108,7 +108,7 @@ export function ResponseOptionRow({
 
         {option.condition && variables[option.condition.variableId] && <Tooltip>
             <TooltipTrigger asChild>
-              <span className="flex items-center gap-0.5 text-[10px] bg-info/20 text-info px-1.5 py-0.5 rounded font-medium">
+              <span className="flex items-center gap-0.5 text-[10px] bg-info/20 text-info px-1.5 py-1.5 rounded font-medium">
                 <Eye className="h-2.5 w-2.5" />
               </span>
             </TooltipTrigger>
