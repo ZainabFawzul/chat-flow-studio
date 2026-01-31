@@ -1,7 +1,7 @@
 import { memo, useState } from "react";
 import { Handle, Position, NodeProps } from "@xyflow/react";
 import { useScenario, PendingConnection } from "@/context/ScenarioContext";
-import { ChatMessage, ScenarioVariable } from "@/types/scenario";
+import { ChatMessage, ScenarioVariable, VariableValue } from "@/types/scenario";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,12 +81,42 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
 
   const variableList = Object.values(variables || {});
 
-  const handleMessageCondition = (variableId: string | null, requiredValue: boolean) => {
+  const handleMessageCondition = (variableId: string | null, requiredValue: VariableValue) => {
     if (variableId) {
       setMessageCondition(message.id, { variableId, requiredValue });
     } else {
       setMessageCondition(message.id, null);
     }
+  };
+
+  const handleMessageConditionValueChange = (requiredValue: VariableValue) => {
+    if (message.condition) {
+      setMessageCondition(message.id, {
+        variableId: message.condition.variableId,
+        requiredValue
+      });
+    }
+  };
+
+  const getMessageConditionVariable = () => {
+    if (!message.condition) return null;
+    return variables?.[message.condition.variableId] || null;
+  };
+
+  const messageConditionVariable = getMessageConditionVariable();
+
+  const getDefaultValueForType = (type: string): VariableValue => {
+    switch (type) {
+      case "text": return "";
+      case "number": return 0;
+      default: return true;
+    }
+  };
+
+  const formatDisplayValue = (value: VariableValue): string => {
+    if (typeof value === "boolean") return value ? "true" : "false";
+    if (typeof value === "string") return value || '""';
+    return String(value);
   };
 
   // Handle keyboard activation for connection targets
@@ -143,7 +173,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="top">
-                  <p>Requires: {variables[message.condition.variableId].name} = {message.condition.requiredValue ? "true" : "false"}</p>
+                  <p>Requires: {variables[message.condition.variableId].name} = {formatDisplayValue(message.condition.requiredValue)}</p>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -189,7 +219,15 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                     <div className="flex gap-2">
                       <Select
                         value={message.condition?.variableId || "none"}
-                        onValueChange={(val) => handleMessageCondition(val === "none" ? null : val, true)}
+                        onValueChange={(val) => {
+                          if (val === "none") {
+                            handleMessageCondition(null, true);
+                          } else {
+                            const selectedVar = variables?.[val];
+                            const defaultVal = selectedVar ? getDefaultValueForType(selectedVar.type) : true;
+                            handleMessageCondition(val, defaultVal);
+                          }
+                        }}
                       >
                         <SelectTrigger className="h-8 text-xs flex-1">
                           <SelectValue placeholder="Always visible" />
@@ -198,24 +236,43 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                           <SelectItem value="none">Always visible</SelectItem>
                           {variableList.map((v) => (
                             <SelectItem key={v.id} value={v.id}>
-                              {v.name}
+                              {v.name} ({v.type})
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                      {message.condition && (
-                        <Select
-                          value={message.condition.requiredValue ? "true" : "false"}
-                          onValueChange={(val) => handleMessageCondition(message.condition!.variableId, val === "true")}
-                        >
-                          <SelectTrigger className="h-8 text-xs w-20">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="true">= true</SelectItem>
-                            <SelectItem value="false">= false</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      
+                      {/* Condition value input based on variable type */}
+                      {message.condition && messageConditionVariable && (
+                        messageConditionVariable.type === "boolean" ? (
+                          <Select
+                            value={message.condition.requiredValue === true ? "true" : "false"}
+                            onValueChange={(val) => handleMessageConditionValueChange(val === "true")}
+                          >
+                            <SelectTrigger className="h-8 text-xs w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="true">= true</SelectItem>
+                              <SelectItem value="false">= false</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        ) : messageConditionVariable.type === "text" ? (
+                          <Input
+                            value={String(message.condition.requiredValue)}
+                            onChange={(e) => handleMessageConditionValueChange(e.target.value)}
+                            placeholder="Value..."
+                            className="h-8 text-xs w-24"
+                          />
+                        ) : messageConditionVariable.type === "number" ? (
+                          <Input
+                            type="number"
+                            value={String(message.condition.requiredValue)}
+                            onChange={(e) => handleMessageConditionValueChange(Number(e.target.value) || 0)}
+                            placeholder="0"
+                            className="h-8 text-xs w-20"
+                          />
+                        ) : null
                       )}
                     </div>
                   </div>
