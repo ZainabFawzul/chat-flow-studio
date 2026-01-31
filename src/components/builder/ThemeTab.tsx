@@ -246,18 +246,20 @@ export function ThemeTab() {
         {/* Sender Bubbles */}
         <Section icon={<MessageCircle className="h-4 w-4" />} title="Your Messages" id="sender-heading">
           <div className="flex flex-col gap-4">
-            <ColorPicker
-              id="sender-bg"
-              label="Bubble Color"
-              value={theme.senderBubbleColor}
-              onChange={(value) => updateTheme({ senderBubbleColor: value })}
-            />
-            <ColorPicker
-              id="sender-text"
-              label="Text Color"
-              value={theme.senderTextColor}
-              onChange={(value) => updateTheme({ senderTextColor: value })}
-            />
+            <div className="flex gap-4">
+              <ColorPicker
+                id="sender-bg"
+                label="Bubble"
+                value={theme.senderBubbleColor}
+                onChange={(value) => updateTheme({ senderBubbleColor: value })}
+              />
+              <ColorPicker
+                id="sender-text"
+                label="Text"
+                value={theme.senderTextColor}
+                onChange={(value) => updateTheme({ senderTextColor: value })}
+              />
+            </div>
             <BorderRadiusControl
               label="Corner Radius (px)"
               value={senderRadius}
@@ -286,18 +288,20 @@ export function ThemeTab() {
         {/* Receiver Bubbles */}
         <Section icon={<MessageCircle className="h-4 w-4" />} title="Contact Messages" id="receiver-heading">
           <div className="flex flex-col gap-4">
-            <ColorPicker
-              id="receiver-bg"
-              label="Bubble Color"
-              value={theme.receiverBubbleColor}
-              onChange={(value) => updateTheme({ receiverBubbleColor: value })}
-            />
-            <ColorPicker
-              id="receiver-text"
-              label="Text Color"
-              value={theme.receiverTextColor}
-              onChange={(value) => updateTheme({ receiverTextColor: value })}
-            />
+            <div className="flex gap-4">
+              <ColorPicker
+                id="receiver-bg"
+                label="Bubble"
+                value={theme.receiverBubbleColor}
+                onChange={(value) => updateTheme({ receiverBubbleColor: value })}
+              />
+              <ColorPicker
+                id="receiver-text"
+                label="Text"
+                value={theme.receiverTextColor}
+                onChange={(value) => updateTheme({ receiverTextColor: value })}
+              />
+            </div>
             <BorderRadiusControl
               label="Corner Radius (px)"
               value={receiverRadius}
