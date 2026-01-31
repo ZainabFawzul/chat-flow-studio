@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Play, ChevronLeft } from "lucide-react";
+import { RotateCcw, Play, Phone, MoreVertical } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
@@ -106,31 +106,40 @@ export function ChatPreview() {
         fontSize: `${theme.fontSize}px`,
       }}
     >
-      {/* Chat Header */}
-      <header className="flex items-center gap-md border-b border-border bg-card px-md py-sm">
-        <Avatar className="h-10 w-10">
+      {/* Chat Header - Modern messaging app style */}
+      <header className="flex items-center gap-4 border-b border-border/30 bg-card/90 backdrop-blur-xl px-5 py-3.5">
+        <Avatar className="h-11 w-11 ring-2 ring-border/50 ring-offset-2 ring-offset-card">
           {theme.contactAvatar && (
             <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
           )}
           <AvatarFallback
-            className="text-small"
+            className="text-sm font-semibold"
             style={{
-              backgroundColor: `hsl(${theme.senderBubbleColor})`,
+              background: `linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7))`,
               color: `hsl(${theme.senderTextColor})`,
             }}
           >
             {getInitials(theme.contactName)}
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1">
-          <h2 className="font-semibold text-foreground">{theme.contactName}</h2>
-          <p className="text-small text-muted-foreground">
-            {isPlaying ? "Online" : "Preview"}
+        <div className="flex-1 min-w-0">
+          <h2 className="font-semibold text-foreground truncate">{theme.contactName}</h2>
+          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+            <span className={cn(
+              "inline-block h-2 w-2 rounded-full",
+              isPlaying ? "bg-success animate-pulse" : "bg-muted-foreground/30"
+            )} />
+            {isPlaying ? "Active now" : "Preview mode"}
           </p>
         </div>
-        <div className="flex items-center gap-xs">
+        <div className="flex items-center gap-2">
           {isPlaying ? (
-            <Button variant="outline" size="sm" onClick={handleReset} className="gap-xs">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleReset} 
+              className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80"
+            >
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
               Reset
             </Button>
@@ -140,29 +149,36 @@ export function ChatPreview() {
               size="sm"
               onClick={handleStart}
               disabled={!rootMessage}
-              className="gap-xs"
+              className="gap-2 rounded-xl shadow-lg shadow-primary/25"
             >
               <Play className="h-4 w-4" aria-hidden="true" />
-              Start Preview
+              Preview
             </Button>
           )}
         </div>
       </header>
 
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 p-md">
+      <ScrollArea className="flex-1 px-5 py-4">
         {!isPlaying ? (
           <div className="flex h-full items-center justify-center">
-            <div className="text-center text-muted-foreground">
-              {rootMessage ? (
-                <p>Click "Start Preview" to test your scenario</p>
-              ) : (
-                <p>Add messages in the Messages tab to see a preview</p>
-              )}
+            <div className="text-center max-w-sm">
+              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-secondary/50 mx-auto mb-4">
+                <Play className="h-10 w-10 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                {rootMessage ? "Ready to Preview" : "No Messages Yet"}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {rootMessage 
+                  ? "Click Preview to test your conversation flow"
+                  : "Add messages in the Messages tab to get started"
+                }
+              </p>
             </div>
           </div>
         ) : (
-          <div className="space-y-md" role="log" aria-label="Chat messages">
+          <div className="space-y-4" role="log" aria-label="Chat messages">
             {chatHistory.map((bubble, index) => (
               <div
                 key={bubble.id}
@@ -172,14 +188,14 @@ export function ChatPreview() {
                 )}
               >
                 {!bubble.isUser && (
-                  <Avatar className="mr-sm h-8 w-8 shrink-0">
+                  <Avatar className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
                     {theme.contactAvatar && (
                       <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
                     )}
                     <AvatarFallback
-                      className="text-small"
+                      className="text-xs font-semibold"
                       style={{
-                        backgroundColor: `hsl(${theme.senderBubbleColor})`,
+                        background: `linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7))`,
                         color: `hsl(${theme.senderTextColor})`,
                       }}
                     >
@@ -189,8 +205,8 @@ export function ChatPreview() {
                 )}
                 <div
                   className={cn(
-                    "max-w-[75%] rounded-2xl px-md py-sm",
-                    bubble.isUser ? "rounded-tr-sm" : "rounded-tl-sm"
+                    "max-w-[75%] rounded-2xl px-4 py-2.5 shadow-sm",
+                    bubble.isUser ? "rounded-tr-md" : "rounded-tl-md"
                   )}
                   style={{
                     backgroundColor: bubble.isUser
@@ -210,8 +226,9 @@ export function ChatPreview() {
 
             {/* End state messages */}
             {(isConversationEnded || isDeadEnd) && (
-              <div className="mt-lg text-center">
-                <span className="inline-block rounded-full bg-success/20 px-md py-xs text-small text-success-foreground">
+              <div className="flex justify-center pt-4">
+                <span className="inline-flex items-center gap-2 rounded-full bg-success/15 px-4 py-2 text-sm font-medium text-success">
+                  <span className="h-2 w-2 rounded-full bg-success" />
                   {isConversationEnded ? "Conversation Complete" : "End of Branch"}
                 </span>
               </div>
@@ -222,16 +239,18 @@ export function ChatPreview() {
 
       {/* Response Options */}
       {isPlaying && currentMessage && !currentMessage.isEndpoint && (
-        <div className="border-t border-border bg-card p-md" role="group" aria-label="Response options">
-          <p className="mb-sm text-small text-muted-foreground">Choose a response:</p>
-          <div className="flex flex-wrap gap-sm">
+        <div className="border-t border-border/30 bg-card/90 backdrop-blur-xl p-4" role="group" aria-label="Response options">
+          <p className="mb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Choose a response
+          </p>
+          <div className="flex flex-wrap gap-2">
             {currentMessage.responseOptions.map((option) => (
               <Button
                 key={option.id}
                 variant="outline"
                 size="sm"
                 onClick={() => handleSelectOption(option.id, option.text)}
-                className="text-body"
+                className="rounded-xl border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
                 disabled={!option.text}
               >
                 {option.text || "Empty option"}
