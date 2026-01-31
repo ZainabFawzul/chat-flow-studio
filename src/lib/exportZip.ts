@@ -88,7 +88,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
     body {
       font-family: ${theme.fontFamily};
-      font-size: ${theme.fontSize}px;
+      font-size: clamp(0.875rem, 1rem, 1.125rem);
       line-height: 1.5;
       background-color: hsl(${theme.chatBackground});
       height: 100vh;
@@ -96,35 +96,48 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       flex-direction: column;
     }
 
+    /* Screen reader only utility */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     .chat-container {
       display: flex;
       flex-direction: column;
       height: 100%;
-      max-width: 600px;
+      max-width: 37.5rem;
       margin: 0 auto;
       width: 100%;
       background: white;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      box-shadow: 0 0 1.25rem rgba(0,0,0,0.1);
     }
 
     .chat-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
       background: white;
       border-bottom: 1px solid #e5e7eb;
     }
 
     .avatar {
-      width: 44px;
-      height: 44px;
+      width: 2.75rem;
+      height: 2.75rem;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 14px;
+      font-size: 0.875rem;
       background: linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7));
       color: hsl(${theme.senderTextColor});
       flex-shrink: 0;
@@ -147,16 +160,16 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     }
 
     .header-status {
-      font-size: 12px;
+      font-size: 0.75rem;
       color: #6b7280;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 0.375rem;
     }
 
     .status-dot {
-      width: 8px;
-      height: 8px;
+      width: 0.5rem;
+      height: 0.5rem;
       border-radius: 50%;
       background: #10b981;
       animation: pulse 2s infinite;
@@ -168,12 +181,12 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     }
 
     .reset-btn {
-      padding: 8px 16px;
-      border-radius: 12px;
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
       border: 1px solid #e5e7eb;
       background: white;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 500;
       transition: all 0.2s;
     }
@@ -182,13 +195,18 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       background: #f3f4f6;
     }
 
+    .reset-btn:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 16px;
+      padding: 1rem;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 1rem;
     }
 
     .message-row {
@@ -197,7 +215,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(0.625rem); }
       to { opacity: 1; transform: translateY(0); }
     }
 
@@ -210,16 +228,16 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     }
 
     .message-avatar {
-      width: 32px;
-      height: 32px;
+      width: 2rem;
+      height: 2rem;
       border-radius: 50%;
-      margin-right: 12px;
+      margin-right: 0.75rem;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 11px;
+      font-size: 0.6875rem;
       background: linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7));
       color: hsl(${theme.senderTextColor});
     }
@@ -233,38 +251,38 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
     .message-bubble {
       max-width: 75%;
-      padding: 10px 16px;
+      padding: 0.625rem 1rem;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
     .message-bubble.contact {
       background: hsl(${theme.receiverBubbleColor});
       color: hsl(${theme.receiverTextColor});
-      border-top-left-radius: ${theme.receiverBorderRadius?.topLeft ?? 4}px;
-      border-top-right-radius: ${theme.receiverBorderRadius?.topRight ?? 16}px;
-      border-bottom-right-radius: ${theme.receiverBorderRadius?.bottomRight ?? 16}px;
-      border-bottom-left-radius: ${theme.receiverBorderRadius?.bottomLeft ?? 16}px;
+      border-top-left-radius: ${(theme.receiverBorderRadius?.topLeft ?? 4) / 16}rem;
+      border-top-right-radius: ${(theme.receiverBorderRadius?.topRight ?? 16) / 16}rem;
+      border-bottom-right-radius: ${(theme.receiverBorderRadius?.bottomRight ?? 16) / 16}rem;
+      border-bottom-left-radius: ${(theme.receiverBorderRadius?.bottomLeft ?? 16) / 16}rem;
     }
 
     .message-bubble.user {
       background: hsl(${theme.senderBubbleColor});
       color: hsl(${theme.senderTextColor});
-      border-top-left-radius: ${theme.senderBorderRadius?.topLeft ?? 16}px;
-      border-top-right-radius: ${theme.senderBorderRadius?.topRight ?? 4}px;
-      border-bottom-right-radius: ${theme.senderBorderRadius?.bottomRight ?? 16}px;
-      border-bottom-left-radius: ${theme.senderBorderRadius?.bottomLeft ?? 16}px;
+      border-top-left-radius: ${(theme.senderBorderRadius?.topLeft ?? 16) / 16}rem;
+      border-top-right-radius: ${(theme.senderBorderRadius?.topRight ?? 4) / 16}rem;
+      border-bottom-right-radius: ${(theme.senderBorderRadius?.bottomRight ?? 16) / 16}rem;
+      border-bottom-left-radius: ${(theme.senderBorderRadius?.bottomLeft ?? 16) / 16}rem;
     }
 
     .typing-indicator {
       display: flex;
       align-items: center;
-      gap: 4px;
-      padding: 12px 16px;
+      gap: 0.25rem;
+      padding: 0.75rem 1rem;
     }
 
     .typing-dot {
-      width: 8px;
-      height: 8px;
+      width: 0.5rem;
+      height: 0.5rem;
       border-radius: 50%;
       background: hsl(${theme.receiverTextColor} / 0.5);
       animation: typingBounce 0.6s infinite;
@@ -275,62 +293,62 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
     @keyframes typingBounce {
       0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+      50% { transform: translateY(-0.25rem); }
     }
 
     .end-indicator {
       display: flex;
       justify-content: center;
-      padding-top: 16px;
+      padding-top: 1rem;
     }
 
     .end-badge {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 16px;
-      border-radius: 20px;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 1.25rem;
       background: rgba(16, 185, 129, 0.15);
       color: #10b981;
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 500;
     }
 
     .end-badge-dot {
-      width: 8px;
-      height: 8px;
+      width: 0.5rem;
+      height: 0.5rem;
       border-radius: 50%;
       background: #10b981;
     }
 
     .response-options {
       border-top: 1px solid #e5e7eb;
-      padding: 16px;
+      padding: 1rem;
       background: white;
     }
 
     .options-label {
-      font-size: 11px;
+      font-size: 0.6875rem;
       font-weight: 500;
       color: #6b7280;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      margin-bottom: 12px;
+      margin-bottom: 0.75rem;
     }
 
     .options-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 0.5rem;
     }
 
     .option-btn {
-      padding: 8px 16px;
-      border-radius: 12px;
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
       border: 1px solid #e5e7eb;
       background: white;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 0.875rem;
       transition: all 0.2s;
     }
 
@@ -338,6 +356,11 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       background: hsl(${theme.senderBubbleColor});
       color: hsl(${theme.senderTextColor});
       border-color: hsl(${theme.senderBubbleColor});
+    }
+
+    .option-btn:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
     }
 
     .option-btn:disabled {
@@ -354,58 +377,63 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
     .start-content {
       text-align: center;
-      max-width: 280px;
+      max-width: 17.5rem;
     }
 
     .start-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 24px;
+      width: 5rem;
+      height: 5rem;
+      border-radius: 1.5rem;
       background: #f3f4f6;
-      margin: 0 auto 16px;
+      margin: 0 auto 1rem;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .start-icon svg {
-      width: 40px;
-      height: 40px;
+      width: 2.5rem;
+      height: 2.5rem;
       color: #9ca3af;
     }
 
     .start-title {
-      font-size: 18px;
+      font-size: 1.125rem;
       font-weight: 600;
       color: #1f2937;
-      margin-bottom: 8px;
+      margin-bottom: 0.5rem;
     }
 
     .start-text {
-      font-size: 14px;
+      font-size: 0.875rem;
       color: #6b7280;
-      margin-bottom: 20px;
+      margin-bottom: 1.25rem;
     }
 
     .start-btn {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 20px;
-      border-radius: ${startButtonBorderRadius}px;
+      gap: 0.5rem;
+      padding: 0.625rem 1.25rem;
+      border-radius: ${startButtonBorderRadius / 16}rem;
       border: none;
       background: hsl(${startButtonColor});
       color: hsl(${startButtonTextColor});
-      font-size: 14px;
+      font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
-      box-shadow: 0 4px 12px hsl(${startButtonColor} / 0.25);
+      box-shadow: 0 0.25rem 0.75rem hsl(${startButtonColor} / 0.25);
       transition: all 0.2s;
     }
 
     .start-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px hsl(${startButtonColor} / 0.3);
+      box-shadow: 0 0.375rem 1rem hsl(${startButtonColor} / 0.3);
+    }
+
+    .start-btn:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
     }
 
     .start-btn:disabled {
@@ -416,7 +444,9 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
   </style>
 </head>
 <body>
-  <div class="chat-container" id="app"></div>
+  <div class="chat-container" id="app" role="region" aria-label="Chat conversation"></div>
+  <!-- Hidden live region for screen reader announcements -->
+  <div aria-live="assertive" aria-atomic="true" class="sr-only" id="status-announcer"></div>
 
   <script>
     (function() {
@@ -460,6 +490,32 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
         return message.responseOptions.filter(opt => checkCondition(opt.condition));
       }
 
+      // Announce status changes to screen readers
+      function announceStatus(message) {
+        const announcer = document.getElementById('status-announcer');
+        if (announcer) {
+          announcer.textContent = '';
+          setTimeout(function() { announcer.textContent = message; }, 50);
+        }
+      }
+
+      // Focus management helper
+      function focusElement(selector, fallbackSelector) {
+        setTimeout(function() {
+          const el = document.querySelector(selector);
+          if (el) {
+            el.focus();
+          } else if (fallbackSelector) {
+            const fallback = document.querySelector(fallbackSelector);
+            if (fallback) fallback.focus();
+          }
+        }, 100);
+      }
+
+      function escapeForAriaLabel(str) {
+        return str.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
       function render() {
         const app = document.getElementById('app');
         const currentMessage = currentMessageId ? messages[currentMessageId] : null;
@@ -470,47 +526,54 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
           (currentMessage.isEndpoint || visibleOptions.length === 0);
         const isDeadEnd = isPlaying && !currentMessageId && chatHistory.length > 0 && !isTyping;
 
+        // Update aria-label with contact name
+        app.setAttribute('aria-label', 'Chat conversation with ' + theme.contactName);
+
         let html = '';
 
         // Header
-        html += '<div class="chat-header">';
-        html += '<div class="avatar">';
+        html += '<header class="chat-header">';
+        html += '<div class="avatar" aria-hidden="true">';
         if (theme.contactAvatar) {
-          html += '<img src="' + theme.contactAvatar + '" alt="' + theme.contactName + '">';
+          html += '<img src="' + theme.contactAvatar + '" alt="">';
         } else {
           html += getInitials(theme.contactName);
         }
         html += '</div>';
         html += '<div class="header-info">';
         html += '<div class="header-name">' + theme.contactName + '</div>';
-        html += '<div class="header-status">';
-        html += '<span class="status-dot"></span>';
-        html += isPlaying ? 'Active now' : 'Click Start to begin';
+        html += '<div class="header-status" aria-live="polite">';
+        html += '<span class="status-dot" aria-hidden="true"></span>';
+        html += '<span>' + (isPlaying ? 'Active now' : 'Click Start to begin') + '</span>';
         html += '</div></div>';
         if (isPlaying && showResetButton) {
-          html += '<button class="reset-btn" onclick="handleReset()">↻ Reset</button>';
+          html += '<button class="reset-btn" onclick="handleReset()" aria-label="Reset conversation">↻ Reset</button>';
         }
-        html += '</div>';
+        html += '</header>';
 
         if (!isPlaying) {
           // Start screen
-          html += '<div class="start-screen"><div class="start-content">';
-          html += '<div class="start-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>';
-          html += '<div class="start-title">' + (rootMessage ? startTitle : 'No Messages') + '</div>';
-          html += '<div class="start-text">' + (rootMessage ? startSubtitle : 'This scenario has no messages') + '</div>';
-          html += '<button class="start-btn" onclick="handleStart()"' + (!rootMessage ? ' disabled' : '') + '>';
-          html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+          html += '<main class="start-screen"><div class="start-content">';
+          html += '<div class="start-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></div>';
+          html += '<h1 class="start-title">' + (rootMessage ? startTitle : 'No Messages') + '</h1>';
+          html += '<p class="start-text">' + (rootMessage ? startSubtitle : 'This scenario has no messages') + '</p>';
+          html += '<button class="start-btn" id="start-btn" onclick="handleStart()" aria-label="Start conversation"' + (!rootMessage ? ' disabled aria-disabled="true"' : '') + '>';
+          html += '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
           html += startButtonText;
-          html += '</button></div></div>';
+          html += '</button></div></main>';
         } else {
-          // Messages
-          html += '<div class="chat-messages">';
-          chatHistory.forEach(bubble => {
-            html += '<div class="message-row ' + (bubble.isUser ? 'user' : 'contact') + '">';
+          // Messages area with log role for screen readers
+          html += '<main class="chat-messages" role="log" aria-live="polite" aria-atomic="false" aria-label="Conversation messages" tabindex="-1" id="messages-area">';
+          chatHistory.forEach(function(bubble) {
+            const senderName = bubble.isUser ? 'You' : theme.contactName;
+            const bubbleContent = bubble.content || 'Empty message';
+            const ariaLabel = senderName + ' said: ' + escapeForAriaLabel(bubbleContent);
+            
+            html += '<div class="message-row ' + (bubble.isUser ? 'user' : 'contact') + '" role="article" aria-label="' + ariaLabel + '">';
             if (!bubble.isUser) {
-              html += '<div class="message-avatar">';
+              html += '<div class="message-avatar" aria-hidden="true">';
               if (theme.contactAvatar) {
-                html += '<img src="' + theme.contactAvatar + '" alt="' + theme.contactName + '">';
+                html += '<img src="' + theme.contactAvatar + '" alt="">';
               } else {
                 html += getInitials(theme.contactName);
               }
@@ -521,42 +584,43 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
             html += '</div></div>';
           });
 
-          // Typing indicator
+          // Typing indicator with screen reader announcement
           if (isTyping) {
-            html += '<div class="message-row contact">';
-            html += '<div class="message-avatar">';
+            html += '<div class="message-row contact" role="status" aria-label="' + theme.contactName + ' is typing">';
+            html += '<div class="message-avatar" aria-hidden="true">';
             if (theme.contactAvatar) {
-              html += '<img src="' + theme.contactAvatar + '" alt="' + theme.contactName + '">';
+              html += '<img src="' + theme.contactAvatar + '" alt="">';
             } else {
               html += getInitials(theme.contactName);
             }
             html += '</div>';
-            html += '<div class="message-bubble contact"><div class="typing-indicator">';
+            html += '<div class="message-bubble contact"><div class="typing-indicator" aria-hidden="true">';
             html += '<span class="typing-dot"></span>';
             html += '<span class="typing-dot"></span>';
             html += '<span class="typing-dot"></span>';
-            html += '</div></div></div>';
+            html += '</div><span class="sr-only">' + theme.contactName + ' is typing</span></div></div>';
           }
 
           if (isEnded || isDeadEnd) {
-            html += '<div class="end-indicator"><span class="end-badge">';
-            html += '<span class="end-badge-dot"></span>';
+            html += '<div class="end-indicator" role="status"><span class="end-badge">';
+            html += '<span class="end-badge-dot" aria-hidden="true"></span>';
             html += isEnded ? 'Conversation Complete' : 'End of Branch';
             html += '</span></div>';
           }
-          html += '</div>';
+          html += '</main>';
 
           // Response options (hide while typing)
           if (currentMessage && !currentMessage.isEndpoint && visibleOptions.length > 0 && !isTyping) {
-            html += '<div class="response-options">';
-            html += '<div class="options-label">Choose a response</div>';
+            html += '<nav class="response-options" role="group" aria-label="Response options">';
+            html += '<div class="options-label" id="options-label" aria-hidden="true">Choose a response</div>';
             html += '<div class="options-container">';
-            visibleOptions.forEach(opt => {
-              html += '<button class="option-btn" onclick="handleSelect(\\'' + opt.id + '\\')"' + (!opt.text ? ' disabled' : '') + '>';
+            visibleOptions.forEach(function(opt, index) {
+              const isFirst = index === 0;
+              html += '<button class="option-btn" id="option-' + opt.id + '" onclick="handleSelect(\\'' + opt.id + '\\')"' + (!opt.text ? ' disabled aria-disabled="true"' : '') + ' aria-label="Respond: ' + escapeForAriaLabel(opt.text || 'Empty option') + '">';
               html += opt.text || 'Empty option';
               html += '</button>';
             });
-            html += '</div></div>';
+            html += '</div></nav>';
           }
         }
 
@@ -565,6 +629,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
       function addContactMessage(messageId, content, callback) {
         isTyping = true;
+        announceStatus(theme.contactName + ' is typing');
         render();
         
         setTimeout(function() {
@@ -574,8 +639,12 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
             isUser: false
           });
           isTyping = false;
+          announceStatus('New message from ' + theme.contactName);
           if (callback) callback();
           render();
+          
+          // Focus first option if available, otherwise focus messages area
+          focusElement('.option-btn', '#messages-area');
         }, 1000);
       }
 
@@ -583,13 +652,15 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
         if (!rootMessageId || !messages[rootMessageId]) return;
         
         // Reset variable state
-        Object.values(variables || {}).forEach(v => {
+        Object.values(variables || {}).forEach(function(v) {
           variableState[v.id] = v.defaultValue;
         });
 
         isPlaying = true;
         chatHistory = [];
         currentMessageId = rootMessageId;
+        
+        announceStatus('Conversation started with ' + theme.contactName);
         
         // Show typing indicator, then message
         addContactMessage(rootMessageId, messages[rootMessageId].content);
@@ -602,18 +673,22 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
         currentMessageId = null;
         
         // Reset variable state
-        Object.values(variables || {}).forEach(v => {
+        Object.values(variables || {}).forEach(function(v) {
           variableState[v.id] = v.defaultValue;
         });
         
+        announceStatus('Conversation reset');
         render();
+        
+        // Focus start button after reset
+        focusElement('#start-btn');
       };
 
       window.handleSelect = function(optionId) {
         const currentMessage = messages[currentMessageId];
         if (!currentMessage) return;
 
-        const option = currentMessage.responseOptions.find(o => o.id === optionId);
+        const option = currentMessage.responseOptions.find(function(o) { return o.id === optionId; });
         if (!option) return;
 
         // Apply variable assignment
@@ -625,6 +700,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
           content: option.text,
           isUser: true
         });
+        announceStatus('You said: ' + option.text);
         render();
 
         // Add next message with typing indicator if exists
@@ -636,15 +712,20 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
             addContactMessage(option.nextMessageId, nextMsg.content);
           } else {
             currentMessageId = null;
+            announceStatus('End of conversation branch');
             render();
           }
         } else {
           currentMessageId = null;
+          announceStatus('Conversation complete');
           render();
         }
       };
 
       render();
+      
+      // Set initial focus to start button
+      focusElement('#start-btn');
     })();
   </script>
 </body>
