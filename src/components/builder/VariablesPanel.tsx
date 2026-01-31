@@ -124,6 +124,34 @@ export function VariablesPanel({ isOpen, onClose }: VariablesPanelProps) {
         </div>
       </div>
 
+      {/* Add New Variable */}
+      <div className="p-3 border-b border-border">
+        <div className="flex items-center gap-2">
+          <Input
+            value={newVariableName}
+            onChange={(e) => setNewVariableName(e.target.value)}
+            placeholder="New variable name..."
+            className="flex-1 h-9 text-sm"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleAddVariable();
+              }
+            }}
+          />
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleAddVariable}
+            disabled={!newVariableName.trim()}
+            className="h-9 px-4 rounded-lg"
+          >
+            <Plus className="h-3.5 w-3.5 mr-1.5" />
+            Add
+          </Button>
+        </div>
+      </div>
+
       {/* Variables List */}
       <div className="max-h-[280px] overflow-y-auto p-2 space-y-1">
         {variables.length === 0 && (
@@ -242,34 +270,6 @@ export function VariablesPanel({ isOpen, onClose }: VariablesPanelProps) {
             </div>
           );
         })}
-      </div>
-
-      {/* Add New Variable */}
-      <div className="p-3 border-t border-border">
-        <div className="flex items-center gap-2">
-          <Input
-            value={newVariableName}
-            onChange={(e) => setNewVariableName(e.target.value)}
-            placeholder="New variable name..."
-            className="flex-1 h-9 text-sm"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddVariable();
-              }
-            }}
-          />
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleAddVariable}
-            disabled={!newVariableName.trim()}
-            className="h-9 px-4 rounded-lg"
-          >
-            <Plus className="h-3.5 w-3.5 mr-1.5" />
-            Add
-          </Button>
-        </div>
       </div>
     </FloatingPanel>
   );
