@@ -147,7 +147,13 @@ export function ThemeTab() {
                 <div className="relative group">
                   <Avatar className="h-14 w-14 ring-2 ring-border/50 ring-offset-2 ring-offset-background transition-all group-hover:ring-primary/50">
                     {theme.contactAvatar ? <AvatarImage src={theme.contactAvatar} alt={theme.contactName} /> : null}
-                    <AvatarFallback className="bg-gradient-to-br from-primary to-primary/70 text-primary-foreground font-semibold">
+                    <AvatarFallback 
+                      className="font-semibold"
+                      style={{
+                        backgroundColor: `hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'})`,
+                        color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
+                      }}
+                    >
                       {getInitials(theme.contactName)}
                     </AvatarFallback>
                   </Avatar>
@@ -169,6 +175,30 @@ export function ThemeTab() {
                 </div>
               </div>
             </div>
+            
+            {/* Avatar Colors (only shown when no custom image) */}
+            {!theme.contactAvatar && (
+              <>
+                <div className="flex gap-md">
+                  <ColorPicker
+                    id="avatar-bg"
+                    label="Avatar Background"
+                    value={theme.avatarBackgroundColor ?? "214 100% 65%"}
+                    onChange={value => updateTheme({ avatarBackgroundColor: value })}
+                  />
+                  <ColorPicker
+                    id="avatar-text"
+                    label="Avatar Text"
+                    value={theme.avatarTextColor ?? "0 0% 100%"}
+                    onChange={value => updateTheme({ avatarTextColor: value })}
+                  />
+                </div>
+                <ContrastWarning
+                  bgColor={theme.avatarBackgroundColor ?? "214 100% 65%"}
+                  textColor={theme.avatarTextColor ?? "0 0% 100%"}
+                />
+              </>
+            )}
           </div>
         </Section>
 
@@ -369,6 +399,12 @@ export function ThemeTab() {
                 onChange={value => updateTheme({ responsePanelLabelColor: value })}
               />
             </div>
+
+            {/* Contrast Warning for Panel Label */}
+            <ContrastWarning
+              bgColor={theme.responsePanelBackground ?? "0 0% 100%"}
+              textColor={theme.responsePanelLabelColor ?? "220 9% 46%"}
+            />
 
             {/* Option Bubble & Text */}
             <div className="flex gap-md">

@@ -191,8 +191,8 @@ export function ChatPreview() {
           <AvatarFallback
             className="text-sm font-semibold"
             style={{
-              background: `linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7))`,
-              color: `hsl(${theme.senderTextColor})`,
+              background: `linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'}), hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'} / 0.7))`,
+              color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
             }}
           >
             {getInitials(theme.contactName)}
@@ -277,8 +277,8 @@ export function ChatPreview() {
                     <AvatarFallback
                       className="text-xs font-semibold"
                       style={{
-                        background: `linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7))`,
-                        color: `hsl(${theme.senderTextColor})`,
+                        background: `linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'}), hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'} / 0.7))`,
+                        color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
                       }}
                     >
                       {getInitials(theme.contactName)}
@@ -317,8 +317,8 @@ export function ChatPreview() {
                   <AvatarFallback
                     className="text-xs font-semibold"
                     style={{
-                      background: `linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7))`,
-                      color: `hsl(${theme.senderTextColor})`,
+                      background: `linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'}), hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'} / 0.7))`,
+                      color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
                     }}
                   >
                     {getInitials(theme.contactName)}
