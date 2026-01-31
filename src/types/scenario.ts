@@ -70,6 +70,13 @@ export interface ChatTheme {
   startButtonColor: string;
   startButtonTextColor: string;
   startButtonBorderRadius: number; // 0-24px
+  // Response panel customization
+  responsePanelBackground: string;
+  responsePanelLabelText: string;
+  responsePanelLabelColor: string;
+  responseOptionBackground: string;
+  responseOptionTextColor: string;
+  responseOptionBorderRadius: number;
   // Controls
   showResetButton: boolean;
 }
@@ -112,6 +119,13 @@ export const DEFAULT_THEME: ChatTheme = {
   startButtonColor: "214 100% 65%", // Primary blue
   startButtonTextColor: "0 0% 100%", // White
   startButtonBorderRadius: 12,
+  // Response panel customization
+  responsePanelBackground: "0 0% 100%", // White
+  responsePanelLabelText: "Choose a response",
+  responsePanelLabelColor: "220 9% 46%", // Muted foreground
+  responseOptionBackground: "0 0% 100%", // White
+  responseOptionTextColor: "220 9% 20%", // Foreground
+  responseOptionBorderRadius: 12,
   // Controls
   showResetButton: true,
 };

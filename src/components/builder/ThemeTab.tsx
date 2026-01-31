@@ -5,7 +5,7 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, MessageCircle, Play, Settings, AlertTriangle } from "lucide-react";
+import { Upload, X, User, MessageCircle, Play, Settings, AlertTriangle, MousePointerClick } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
@@ -323,6 +323,127 @@ export function ThemeTab() {
               borderBottomLeftRadius: `${receiverRadius.bottomLeft}px`
             }}>
                 <span className="text-sm">Preview message</span>
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        {/* Response Panel */}
+        <Section icon={<MousePointerClick className="h-4 w-4" />} title="Response Panel" id="response-panel-heading">
+          <div className="flex flex-col gap-5">
+            {/* Label Text */}
+            <div>
+              <Label htmlFor="response-label" className="mb-2 block text-sm font-medium">
+                Label Text
+              </Label>
+              <Input
+                id="response-label"
+                value={theme.responsePanelLabelText ?? "Choose a response"}
+                onChange={e => updateTheme({ responsePanelLabelText: e.target.value })}
+                placeholder="Choose a response"
+                className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+              />
+            </div>
+
+            {/* Panel Background & Label Color */}
+            <div className="flex gap-md">
+              <ColorPicker
+                id="response-panel-bg"
+                label="Panel Background"
+                value={theme.responsePanelBackground ?? "0 0% 100%"}
+                onChange={value => updateTheme({ responsePanelBackground: value })}
+              />
+              <ColorPicker
+                id="response-label-color"
+                label="Label Color"
+                value={theme.responsePanelLabelColor ?? "220 9% 46%"}
+                onChange={value => updateTheme({ responsePanelLabelColor: value })}
+              />
+            </div>
+
+            {/* Option Bubble & Text */}
+            <div className="flex gap-md">
+              <ColorPicker
+                id="response-option-bg"
+                label="Option Background"
+                value={theme.responseOptionBackground ?? "0 0% 100%"}
+                onChange={value => updateTheme({ responseOptionBackground: value })}
+              />
+              <ColorPicker
+                id="response-option-text"
+                label="Option Text"
+                value={theme.responseOptionTextColor ?? "220 9% 20%"}
+                onChange={value => updateTheme({ responseOptionTextColor: value })}
+              />
+            </div>
+
+            {/* Contrast Warning */}
+            <ContrastWarning
+              bgColor={theme.responseOptionBackground ?? "0 0% 100%"}
+              textColor={theme.responseOptionTextColor ?? "220 9% 20%"}
+            />
+
+            {/* Option Border Radius */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label htmlFor="response-option-radius" className="text-sm font-medium">
+                  Option Corner Radius
+                </Label>
+                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
+                  {theme.responseOptionBorderRadius ?? 12}px
+                </span>
+              </div>
+              <Slider
+                id="response-option-radius"
+                min={0}
+                max={24}
+                step={1}
+                value={[theme.responseOptionBorderRadius ?? 12]}
+                onValueChange={([value]) => updateTheme({ responseOptionBorderRadius: value })}
+                aria-label="Response option border radius"
+                className="py-2"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>Square</span>
+                <span>Round</span>
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div
+              className="mt-2 p-4 border border-border/30"
+              style={{
+                backgroundColor: `hsl(${theme.responsePanelBackground ?? '0 0% 100%'})`,
+                borderRadius: '12px',
+              }}
+            >
+              <p
+                className="mb-3 text-xs font-medium uppercase tracking-wide"
+                style={{ color: `hsl(${theme.responsePanelLabelColor ?? '220 9% 46%'})` }}
+              >
+                {theme.responsePanelLabelText ?? "Choose a response"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span
+                  className="px-3 py-1.5 text-sm font-medium border border-border/50"
+                  style={{
+                    backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
+                    color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
+                    borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
+                  }}
+                >
+                  Option 1
+                </span>
+                <span
+                  className="px-3 py-1.5 text-sm font-medium border border-border/50"
+                  style={{
+                    backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
+                    color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
+                    borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
+                  }}
+                >
+                  Option 2
+                </span>
               </div>
             </div>
           </div>
