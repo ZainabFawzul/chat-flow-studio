@@ -90,6 +90,22 @@ type ScenarioAction =
   | { type: "SET_RESPONSE_CONDITION"; payload: { messageId: string; optionId: string; condition: VariableCondition | null } }
   | { type: "SET_MESSAGE_CONDITION"; payload: { messageId: string; condition: VariableCondition | null } };
 
+// Helper function to count incoming connections to a message
+function countIncomingConnections(
+  messages: Record<string, ChatMessage>,
+  targetId: string,
+  excludeMessageIds: Set<string> = new Set()
+): number {
+  let count = 0;
+  Object.entries(messages).forEach(([msgId, msg]) => {
+    if (excludeMessageIds.has(msgId)) return;
+    msg.responseOptions.forEach((opt) => {
+      if (opt.nextMessageId === targetId) count++;
+    });
+  });
+  return count;
+}
+
 // Reducer
 function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioData {
   const now = new Date().toISOString();
@@ -165,33 +181,47 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
     case "DELETE_MESSAGE": {
       const messageId = action.payload;
       const newMessages = { ...state.messages };
+      const deletedIds = new Set<string>();
       
-      // Recursively delete all child messages
-      const deleteRecursive = (id: string) => {
+      // Recursively delete messages that have no other incoming connections
+      const deleteIfOrphaned = (id: string) => {
         const message = newMessages[id];
-        if (message) {
-          message.responseOptions.forEach((opt) => {
-            if (opt.nextMessageId) {
-              deleteRecursive(opt.nextMessageId);
+        if (!message || deletedIds.has(id)) return;
+        
+        // Mark this message as "being deleted" for reference counting
+        deletedIds.add(id);
+        delete newMessages[id];
+        
+        // Check each child - only delete if it has no other incoming connections
+        message.responseOptions.forEach((opt) => {
+          if (opt.nextMessageId && newMessages[opt.nextMessageId]) {
+            const otherConnections = countIncomingConnections(
+              newMessages, 
+              opt.nextMessageId,
+              deletedIds
+            );
+            if (otherConnections === 0) {
+              deleteIfOrphaned(opt.nextMessageId);
             }
-          });
-          delete newMessages[id];
-        }
+          }
+        });
       };
       
-      deleteRecursive(messageId);
+      deleteIfOrphaned(messageId);
       
-      // Update any parent references
+      // Update any remaining parent references to deleted messages
       Object.values(newMessages).forEach((msg) => {
         msg.responseOptions = msg.responseOptions.map((opt) =>
-          opt.nextMessageId === messageId ? { ...opt, nextMessageId: null } : opt
+          deletedIds.has(opt.nextMessageId || '') 
+            ? { ...opt, nextMessageId: null } 
+            : opt
         );
       });
       
       return {
         ...state,
         messages: newMessages,
-        rootMessageId: state.rootMessageId === messageId ? null : state.rootMessageId,
+        rootMessageId: deletedIds.has(state.rootMessageId || '') ? null : state.rootMessageId,
         updatedAt: now,
       };
     }
@@ -251,26 +281,35 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
       const option = state.messages[messageId].responseOptions.find((o) => o.id === optionId);
       const newMessages = { ...state.messages };
       
-      // Delete the follow-up message chain if exists
-      if (option?.nextMessageId) {
-        const deleteRecursive = (id: string) => {
-          const message = newMessages[id];
-          if (message) {
-            message.responseOptions.forEach((opt) => {
-              if (opt.nextMessageId) {
-                deleteRecursive(opt.nextMessageId);
-              }
-            });
-            delete newMessages[id];
-          }
-        };
-        deleteRecursive(option.nextMessageId);
-      }
-      
+      // Remove the option first
       newMessages[messageId] = {
         ...newMessages[messageId],
         responseOptions: newMessages[messageId].responseOptions.filter((o) => o.id !== optionId),
       };
+      
+      // Only delete the follow-up chain if the target has no other incoming connections
+      if (option?.nextMessageId && newMessages[option.nextMessageId]) {
+        const deletedIds = new Set<string>();
+        
+        const deleteIfOrphaned = (id: string) => {
+          const message = newMessages[id];
+          if (!message || deletedIds.has(id)) return;
+          
+          const otherConnections = countIncomingConnections(newMessages, id, deletedIds);
+          if (otherConnections > 0) return; // Has other parents, don't delete
+          
+          deletedIds.add(id);
+          delete newMessages[id];
+          
+          message.responseOptions.forEach((opt) => {
+            if (opt.nextMessageId && newMessages[opt.nextMessageId]) {
+              deleteIfOrphaned(opt.nextMessageId);
+            }
+          });
+        };
+        
+        deleteIfOrphaned(option.nextMessageId);
+      }
       
       return {
         ...state,
