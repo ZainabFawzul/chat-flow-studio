@@ -1,223 +1,179 @@
 
-# Functional Enhancements Plan
+
+# Replace Browser Color Picker with react-colorful
 
 ## Overview
 
-This plan implements four functional changes:
-1. Replace corner radius abbreviations (TL, TR, BR, BL) with full text (TOP LEFT, TOP RIGHT, etc.)
-2. Add a typing indicator ("...") before contact messages appear
-3. Allow customization of the start screen content in the theme
-4. Make the Reset button optional via a theme toggle
+This plan replaces the native browser `<input type="color">` with the `react-colorful` library's `HexColorPicker` component. This provides a modern, consistent, and customizable color picking experience across all browsers.
 
 ---
 
-## 1. Corner Radius Label Updates
+## Why react-colorful?
 
-**File: `src/components/builder/ThemeTab.tsx`**
+- Lightweight (~2KB gzipped)
+- No dependencies
+- Consistent appearance across all browsers (unlike native color picker)
+- Beautiful, modern UI with saturation/brightness area + hue slider
+- Works with hex colors (matches our existing hex conversion logic)
+- Touch-friendly and accessible
 
-Update the `corners` array in `BorderRadiusControl` to use full labels:
+---
 
-```typescript
-const corners = [
-  { key: "topLeft" as const, label: "TOP LEFT" },
-  { key: "topRight" as const, label: "TOP RIGHT" },
-  { key: "bottomRight" as const, label: "BOTTOM RIGHT" },
-  { key: "bottomLeft" as const, label: "BOTTOM LEFT" },
-];
+## Implementation Steps
+
+### Step 1: Install react-colorful
+
+Install the npm package (no need to use the uploaded zip file since it's available on npm):
+
+```bash
+npm install react-colorful
 ```
 
-Adjust layout to accommodate longer labels with a 2x2 grid instead of 4-column.
+### Step 2: Update ColorPicker Component
 
----
+**File: `src/components/ui/color-picker.tsx`**
 
-## 2. Typing Indicator for Contact Messages
-
-**File: `src/components/builder/ChatPreview.tsx`**
-
-Add state to track a "typing" phase before showing contact messages:
+Replace the native `<input type="color">` with `HexColorPicker` from react-colorful:
 
 ```typescript
-const [isTyping, setIsTyping] = useState(false);
+import { HexColorPicker } from "react-colorful";
 ```
 
-When a contact message is added:
-1. Show a "..." bubble in the contact's style
-2. After a short delay (e.g., 800-1200ms), replace with the actual message
+Changes to make:
+1. Import `HexColorPicker` from react-colorful
+2. Replace the native color input with:
+   ```tsx
+   <HexColorPicker 
+     color={hexValue} 
+     onChange={(newHex) => onChange(hexToHsl(newHex))} 
+   />
+   ```
+3. Add custom CSS to size and style the picker to match the current design
 
-This creates the illusion of a live chat where the contact is composing their response.
+### Step 3: Add Custom Styling
 
-**File: `src/lib/exportZip.ts`**
+The react-colorful picker can be styled via CSS. Add styles to make it match the current aesthetic:
 
-Add the same typing indicator logic to the exported standalone HTML so the finalized interactive also shows the "..." bubble.
+```css
+.react-colorful {
+  width: 200px;
+  height: 150px;
+}
 
----
+.react-colorful__saturation {
+  border-radius: 8px 8px 0 0;
+}
 
-## 3. Start Screen Customization
+.react-colorful__hue {
+  height: 16px;
+  border-radius: 0 0 8px 8px;
+}
 
-**File: `src/types/scenario.ts`**
-
-Add new fields to `ChatTheme`:
-
-```typescript
-export interface ChatTheme {
-  // ... existing fields
-  startScreenTitle: string;       // e.g., "Ready to Start"
-  startScreenSubtitle: string;    // e.g., "Begin the conversation"
-  startButtonText: string;        // e.g., "Start"
+.react-colorful__saturation-pointer,
+.react-colorful__hue-pointer {
+  width: 20px;
+  height: 20px;
 }
 ```
 
-Update `DEFAULT_THEME`:
-
-```typescript
-startScreenTitle: "Ready to Start",
-startScreenSubtitle: "Begin the conversation",
-startButtonText: "Start",
-```
-
-**File: `src/components/builder/ThemeTab.tsx`**
-
-Add a new "Start Screen" section with three text inputs:
-- Title (e.g., "Ready to Start")
-- Subtitle/description (e.g., "Click to begin your conversation")
-- Button text (e.g., "Begin", "Start Conversation")
-
-**File: `src/lib/exportZip.ts`**
-
-Update the start screen HTML generation to use these theme values instead of hardcoded text.
-
-**File: `src/context/ScenarioContext.tsx`**
-
-Update the `migrateScenario` function to provide defaults for these new fields when loading legacy scenarios.
-
 ---
 
-## 4. Optional Reset Button
-
-**File: `src/types/scenario.ts`**
-
-Add to `ChatTheme`:
-
-```typescript
-showResetButton: boolean;
-```
-
-Update `DEFAULT_THEME`:
-
-```typescript
-showResetButton: true,
-```
-
-**File: `src/components/builder/ThemeTab.tsx`**
-
-Add a toggle switch in a new "Controls" section:
-
-```text
-+------------------------------------------+
-| Controls                                  |
-+------------------------------------------+
-| Show Reset Button    [toggle switch]     |
-+------------------------------------------+
-```
-
-**File: `src/components/builder/ChatPreview.tsx`**
-
-Conditionally render the Reset button based on `theme.showResetButton`.
-
-**File: `src/lib/exportZip.ts`**
-
-Conditionally include the Reset button in the exported HTML based on the theme setting.
-
----
-
-## Files to Create/Modify
+## Files to Modify
 
 | File | Action | Summary |
 |------|--------|---------|
-| `src/types/scenario.ts` | Modify | Add `startScreenTitle`, `startScreenSubtitle`, `startButtonText`, `showResetButton` to ChatTheme |
-| `src/context/ScenarioContext.tsx` | Modify | Update `migrateScenario` for new theme fields |
-| `src/components/builder/ThemeTab.tsx` | Modify | Full corner labels, Start Screen section, Controls section with Reset toggle |
-| `src/components/builder/ChatPreview.tsx` | Modify | Typing indicator, conditional Reset button |
-| `src/lib/exportZip.ts` | Modify | Typing indicator in exported JS, customizable start screen text, conditional Reset button |
+| `package.json` | Modify | Add `react-colorful` dependency |
+| `src/components/ui/color-picker.tsx` | Modify | Replace native input with HexColorPicker, add custom styling |
 
 ---
 
-## Technical Details
+## Updated ColorPicker Component
 
-### Typing Indicator Logic (ChatPreview)
+```tsx
+import * as React from "react";
+import { HexColorPicker } from "react-colorful";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
-```typescript
-// State
-const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
-
-// When adding a contact message
-const addContactMessage = (messageId: string, content: string) => {
-  // Show typing indicator first
-  setTypingMessageId(messageId);
-  
-  // After delay, show actual message
-  setTimeout(() => {
-    setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
-    setTypingMessageId(null);
-  }, 1000);
-};
-```
-
-### Typing Bubble CSS
-
-```css
-.typing-indicator {
-  display: flex;
-  gap: 4px;
-  padding: 12px 16px;
+interface ColorPickerProps {
+  label: string;
+  value: string; // HSL string like "214 100% 65%"
+  onChange: (value: string) => void;
+  id: string;
 }
 
-.typing-indicator span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.4;
-  animation: typingBounce 1.4s infinite;
+// Keep existing hslToHex and hexToHsl functions...
+
+export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const hexValue = hslToHex(value);
+
+  const handleColorChange = (newHex: string) => {
+    onChange(hexToHsl(newHex));
+  };
+
+  const handleHexInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let hex = e.target.value.replace(/[^a-fA-F0-9]/g, "");
+    if (hex.length === 6) {
+      onChange(hexToHsl(`#${hex}`));
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <Label htmlFor={id} className="text-sm font-medium text-foreground">
+        {label}
+      </Label>
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <PopoverTrigger asChild>
+          {/* Existing trigger button - no changes */}
+        </PopoverTrigger>
+        <PopoverContent 
+          className="w-auto p-4 bg-card/95 backdrop-blur-xl border-border/50 shadow-2xl rounded-2xl"
+          align="end"
+          sideOffset={8}
+        >
+          <div className="flex flex-col gap-4">
+            {/* New react-colorful picker */}
+            <HexColorPicker 
+              color={hexValue} 
+              onChange={handleColorChange}
+              style={{ width: '200px', height: '150px' }}
+            />
+            
+            {/* Keep existing hex input section */}
+            <div className="flex items-center gap-3">
+              {/* ... existing code ... */}
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
 }
-
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-4px); }
-}
-```
-
-### Start Screen Theme Section (ThemeTab)
-
-```text
-+------------------------------------------+
-| Start Screen                              |
-+------------------------------------------+
-| Title                                     |
-| [Ready to Start________________]          |
-|                                           |
-| Subtitle                                  |
-| [Begin the conversation________]          |
-|                                           |
-| Button Text                               |
-| [Start_________________________]          |
-+------------------------------------------+
 ```
 
 ---
 
-## Implementation Order
+## Visual Comparison
 
-1. Update `scenario.ts` with new theme fields
-2. Update `migrateScenario` in context for backwards compatibility
-3. Update `ThemeTab.tsx`:
-   - Change corner radius labels to full text
-   - Add Start Screen section
-   - Add Controls section with Reset toggle
-4. Update `ChatPreview.tsx`:
-   - Add typing indicator state and logic
-   - Conditionally show Reset button
-5. Update `exportZip.ts`:
-   - Add typing indicator to exported JS
-   - Use custom start screen text
-   - Conditionally include Reset button
+| Before (Native) | After (react-colorful) |
+|-----------------|------------------------|
+| Browser-specific appearance | Consistent across all browsers |
+| Square color grid | Saturation/brightness area + hue slider |
+| Basic styling | Modern, rounded corners, smooth gradients |
+
+---
+
+## Technical Notes
+
+1. **No CSS import needed**: react-colorful includes its styles inline, so no separate CSS file import is required
+
+2. **Color format**: The component works with hex colors internally. Our existing `hslToHex` and `hexToHsl` conversion functions handle the translation to/from our HSL string format
+
+3. **Inline styles vs CSS**: We'll use inline styles for sizing to keep it simple, but CSS custom properties could be used for more advanced theming if needed later
+
+4. **Accessibility**: react-colorful is accessible by default with proper ARIA attributes and keyboard navigation
+
