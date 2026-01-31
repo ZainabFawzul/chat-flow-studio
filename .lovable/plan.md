@@ -1,191 +1,237 @@
 
 
-# Accessibility Audit: Standalone Chat Export
+# Accessibility Audit: Chat Scenario Builder (AtomicA11y Landmarks & Page Structure)
 
 ## Summary
 
-The current standalone HTML export has **significant accessibility gaps** when measured against the AtomicA11y chat criteria. This audit identifies issues and proposes fixes organized by priority.
+The Chat Scenario Builder has **partial landmark compliance** with several gaps that need addressing to meet the AtomicA11y criteria for headers, footers, main landmarks, navigation, regions, and page structure.
 
 ---
 
 ## Current State Analysis
 
 ### What's Present
-- Basic HTML structure with `lang="en"`
-- Some `alt` attributes on avatar images
-- Semantic `<button>` elements for controls
-- Responsive viewport meta tag
 
-### What's Missing (Critical Issues)
+| Requirement | Implementation | Status |
+|-------------|----------------|--------|
+| **Banner landmark** | `<header role="banner">` in TopBar.tsx | ✅ Present |
+| **Main landmark** | `<main>` in BuilderLayout.tsx | ✅ Present |
+| **Navigation landmark** | `<nav aria-label="Main actions">` in TopBar.tsx | ✅ Present |
+| **Region landmarks** | `<aside aria-label="Builder panel">` in LeftPanel.tsx, sections with `aria-labelledby` in ThemeTab.tsx | ✅ Present |
+| **Page title** | "Chat Scenario Builder" in index.html | ✅ Present |
+| **Focus-visible styles** | Global CSS in index.css | ✅ Present |
+| **Proper heading hierarchy** | `<h1>` in TopBar, `<h2>` in sections | ✅ Present |
+
+### What's Missing or Needs Improvement
 
 | Requirement | Current State | Status |
 |-------------|---------------|--------|
-| Chat purpose announced | No landmark, label, or heading | Missing |
-| Controls have appropriate roles | Buttons exist but lack accessible names in some cases | Partial |
-| Status changes announced (typing) | No ARIA live region | Missing |
-| New message notifications | No live region announcements | Missing |
-| Focus management | No focus handling after state changes | Missing |
-| Text resize to 200% | Uses fixed `px` units | Partial |
+| **Footer/Contentinfo landmark** | No footer present in the application | ❌ N/A (no footer needed) |
+| **Main landmark has `aria-label`** | Has label `aria-label="Chat preview"` but this limits the main to just the preview | ⚠️ Review needed |
+| **Only one banner** | Correct - only one header with `role="banner"` | ✅ OK |
+| **Only one main** | Correct - only one `<main>` | ✅ OK |
+| **Multiple navigations labeled** | Only one nav present, correctly labeled | ✅ OK |
+| **ChatPreview header nested** | Has `<header>` inside `<main>` (chat header) - nested correctly as it's not `role="banner"` | ✅ OK |
+| **Text resizes to 200%** | Uses some fixed `px` values, but most are relative or Tailwind-based | ⚠️ Needs testing |
+| **400% zoom without horizontal scroll** | Not tested - layout may break at extreme zoom | ⚠️ Needs testing |
+| **Orientation support** | Flexbox layout should work, but min-width constraints may cause issues | ⚠️ Needs testing |
 
 ---
 
-## Detailed Findings & Fixes
+## Detailed Findings & Recommended Fixes
 
-### 1. Keyboard Navigation
+### 1. Banner/Header Landmark ✅ Mostly Compliant
 
-**Issue:** Chat container and messages area lack proper focus management
-
-**Fixes:**
-- Add `tabindex="-1"` to chat messages container for programmatic focus
-- Implement focus management: move focus to new messages or response options after state changes
-- Add visible focus styles for all interactive elements (`:focus-visible` outlines)
-- Ensure response option buttons receive focus when they appear
-
-```text
-+------------------+     +------------------+     +------------------+
-|  User clicks     | --> |  Contact types   | --> |  Options appear  |
-|  response option |     |  (typing shown)  |     |  focus moves to  |
-|                  |     |                  |     |  first option    |
-+------------------+     +------------------+     +------------------+
+**Current Implementation (TopBar.tsx line 112):**
+```tsx
+<header className="..." role="banner">
 ```
 
-### 2. Screen Reader Support
+**Assessment:**
+- ✅ Uses semantic `<header>` with explicit `role="banner"`
+- ✅ Does not have a name (correct - only one banner)
+- ✅ Controls inside receive focus via Tab, header itself does not
+- ❌ The `role="banner"` is redundant when using `<header>` as a direct child of `<body>` (but harmless)
 
-**Issue:** No ARIA landmarks or live regions
+**Recommended Fix:**
+- Remove redundant `role="banner"` since `<header>` is already a direct child of the document and automatically maps to banner role.
 
-**Fixes:**
-- Wrap chat in `role="region"` with `aria-label="Chat with [contact name]"`
-- Add `role="log"` and `aria-live="polite"` to messages container
-- Add `aria-atomic="false"` so only new messages are announced
-- Add hidden live region for status announcements ("Contact is typing...", "New message received")
-- Add `role="status"` to typing indicator with screen-reader-only text
-- Add `aria-label` to Reset button: `aria-label="Reset conversation"`
+---
 
-**Current HTML structure:**
+### 2. Main Landmark ⚠️ Needs Adjustment
+
+**Current Implementation (BuilderLayout.tsx line 18):**
+```tsx
+<main className="w-2/5 min-w-[320px] overflow-hidden" aria-label="Chat preview">
+```
+
+**Issues:**
+- The `<main>` only wraps the Chat Preview panel (right side), but semantically the "main content" of a builder app should include the builder panel too
+- The `aria-label="Chat preview"` is too specific and doesn't describe the full main content
+
+**Recommended Fix:**
+- Move `<main>` to wrap both the left panel and right panel, OR
+- Keep current structure but remove the `aria-label` (only one main, so no label needed)
+
+**Option A - Remove label (simpler):**
+```tsx
+<main className="w-2/5 min-w-[320px] overflow-hidden">
+```
+
+**Option B - Restructure (better semantics):**
+```tsx
+<main className="flex flex-1 overflow-hidden">
+  <aside className="w-3/5 min-w-[480px] border-r" aria-label="Builder panel">
+    <LeftPanel />
+  </aside>
+  <section className="w-2/5 min-w-[320px]" aria-label="Chat preview">
+    <ChatPreview />
+  </section>
+</main>
+```
+
+---
+
+### 3. Navigation Landmark ✅ Compliant
+
+**Current Implementation (TopBar.tsx line 125):**
+```tsx
+<nav className="flex items-center gap-3" aria-label="Main actions">
+```
+
+**Assessment:**
+- ✅ Uses semantic `<nav>` element
+- ✅ Has descriptive `aria-label` for its purpose
+- ✅ Only one navigation landmark (no conflicts)
+- ✅ Buttons inside are focusable, nav itself is not
+
+---
+
+### 4. Region/Section Landmarks ✅ Mostly Compliant
+
+**Current Implementation (LeftPanel.tsx line 19):**
+```tsx
+<aside className="..." aria-label="Builder panel">
+```
+
+**ThemeTab.tsx Section component (line 82):**
+```tsx
+<section aria-labelledby={id} className="...">
+  <h2 id={id}>{title}</h2>
+```
+
+**Assessment:**
+- ✅ `<aside>` correctly used for complementary content
+- ✅ Sections have `aria-labelledby` pointing to heading IDs
+- ✅ Each section has a unique, descriptive heading
+
+---
+
+### 5. Footer/Contentinfo Landmark - N/A
+
+**Assessment:**
+- The application has no footer, which is acceptable
+- No contentinfo landmark is required if there's no footer content
+
+---
+
+### 6. Page Structure ⚠️ Minor Issues
+
+**Current Implementation (index.html):**
 ```html
-<div class="chat-container" id="app"></div>
+<title>Chat Scenario Builder</title>
 ```
 
-**Proposed accessible structure:**
-```html
-<div class="chat-container" id="app" role="region" aria-label="Chat with Sarah">
-  <header class="chat-header">...</header>
-  <div class="chat-messages" role="log" aria-live="polite" aria-atomic="false">
-    <!-- Messages with role="article" or semantic grouping -->
-  </div>
-  <div aria-live="assertive" class="sr-only" id="status-announcer"></div>
-  <div class="response-options" role="group" aria-label="Response options">
-    <!-- Option buttons -->
-  </div>
-</div>
+**Assessment:**
+- ✅ Unique, descriptive title
+- ✅ `<html lang="en">` present
+- ⚠️ No skip links for keyboard users to jump to main content
+
+**Recommended Fix - Add skip link:**
+```tsx
+// In BuilderLayout.tsx, at the top of the component
+<a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-card focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg">
+  Skip to main content
+</a>
 ```
 
-### 3. Status Change Announcements
+---
 
-**Issue:** Typing indicator is purely visual - no screen reader announcement
+### 7. Text Resize & Zoom Support ⚠️ Needs Verification
 
-**Fixes:**
-- Add hidden live region: `<div aria-live="assertive" class="sr-only" id="status-announcer">`
-- When typing starts: inject text "Contact is typing"
-- When typing ends and message appears: inject "New message from [contact name]"
-- Add `aria-hidden="true"` to decorative typing dots
-- Include screen-reader-only text in the typing indicator bubble
+**Current Implementation:**
+- Uses Tailwind CSS with `px` and `rem` units
+- Fixed minimum widths on panels: `min-w-[480px]` and `min-w-[320px]`
 
-### 4. Message Structure
+**Potential Issues:**
+- Fixed `px` font sizes in some places (`fontSize: ${theme.fontSize}px`)
+- Fixed minimum widths may cause horizontal scrolling at high zoom
+- Panel layout may not adapt well at 400% zoom
 
-**Issue:** Messages lack semantic structure for screen readers
+**Recommended Fixes:**
 
-**Fixes:**
-- Wrap each message in element with clear sender identification
-- Add `aria-label` to message bubbles: e.g., `aria-label="You said: Hello"` or `aria-label="Sarah said: Hi there"`
-- Mark avatar images as decorative (`alt=""`) since sender is identified in message label
-- Use `role="article"` or semantic grouping for message rows
+1. **Use rem for font sizes where possible:**
+```tsx
+// Instead of:
+fontSize: `${theme.fontSize}px`
 
-### 5. Response Options
-
-**Issue:** Options lack group labeling and focus management
-
-**Fixes:**
-- Wrap options in `role="group"` with `aria-label="Choose your response"`
-- Remove visual-only "Choose a response" label or associate it with `aria-labelledby`
-- Move focus to first option button when options appear
-- Add focus trap within options area (optional enhancement)
-
-### 6. Text Resize / Zoom Support
-
-**Issue:** Fixed pixel values may not scale properly
-
-**Fixes:**
-- Change `font-size` in body from `px` to relative units that respect user preferences
-- Use `rem` or `em` for spacing where appropriate
-- Test with browser zoom at 200%
-- Ensure container doesn't overflow and text remains readable
-
-**CSS changes:**
-```css
-body {
-  font-size: 1rem; /* Respects user's browser settings */
-}
-
-/* Or use clamp for flexibility */
-body {
-  font-size: clamp(14px, 1rem, 18px);
-}
+// Consider storing as rem or using a base conversion:
+fontSize: `${theme.fontSize / 16}rem`
 ```
 
-### 7. Visible Focus Indicators
-
-**Issue:** No custom focus styles - relies on browser defaults
-
-**Fixes:**
-- Add explicit `:focus-visible` styles for all buttons
-- Ensure focus ring has sufficient contrast (3:1 minimum)
-
-```css
-.option-btn:focus-visible,
-.start-btn:focus-visible,
-.reset-btn:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
-}
+2. **Make minimum widths responsive:**
+```tsx
+// Consider using clamp or responsive breakpoints
+className="w-3/5 min-w-0 lg:min-w-[480px]"
 ```
 
-### 8. Start Screen Accessibility
+3. **Test at 200% text size and 400% zoom**
 
-**Issue:** Start screen lacks proper heading structure
+---
 
-**Fixes:**
-- Change `.start-title` from `<div>` to `<h1>` or `<h2>`
-- Add `aria-label` to start button
-- Ensure decorative play icon is hidden from screen readers
+### 8. Keyboard Navigation ✅ Compliant
+
+**Assessment:**
+- ✅ All interactive elements (buttons, inputs, tabs) receive focus
+- ✅ Focus-visible styles defined globally in index.css
+- ✅ Tab order follows visual layout
+- ✅ Landmarks themselves don't receive focus
+
+---
+
+### 9. ChatPreview Internal Header ✅ Correct
+
+**Current Implementation (ChatPreview.tsx line 177):**
+```tsx
+<header className="flex items-center gap-4 ...">
+```
+
+**Assessment:**
+- ✅ This is NOT a banner because it's nested inside `<main>`
+- ✅ Correctly uses `<header>` semantically for the chat header section
+- ✅ Does not conflict with the page-level banner
 
 ---
 
 ## Implementation Plan
 
-### Phase 1: Critical Screen Reader Fixes
-1. Add `role="region"` with `aria-label` to chat container
-2. Add `role="log"` and `aria-live="polite"` to messages area
-3. Create hidden status announcer div with `aria-live="assertive"`
-4. Update `render()` function to populate status announcer on typing/new message
-5. Add accessible labels to all buttons
+### Phase 1: Quick Fixes (Low Effort)
 
-### Phase 2: Focus Management
-1. Add `tabindex="-1"` to messages container
-2. Implement `focusElement()` helper function
-3. After typing completes, focus the first response option (if any)
-4. On reset, focus the start button
+1. **Remove redundant `role="banner"`** from TopBar.tsx
+2. **Remove or adjust `aria-label`** from main element in BuilderLayout.tsx
+3. **Add skip link** for keyboard users
 
-### Phase 3: Semantic Structure
-1. Add `role="article"` or proper grouping to message rows
-2. Add descriptive `aria-label` to each message bubble
-3. Mark decorative elements with `aria-hidden="true"`
-4. Change start title to proper heading element
+### Phase 2: Structural Improvements (Medium Effort)
 
-### Phase 4: Text Resize & Focus Styles
-1. Update font-size to use relative units
-2. Add `:focus-visible` styles to all interactive elements
-3. Test at 200% zoom
+1. **Restructure main landmark** to wrap both panels with proper child landmarks
+2. **Review heading hierarchy** in all components to ensure logical structure
+
+### Phase 3: Responsive Accessibility (Testing Required)
+
+1. **Test at 200% text size** - verify no content loss
+2. **Test at 400% browser zoom** - verify no horizontal scrolling required
+3. **Test landscape/portrait** on mobile devices
+4. **Adjust min-width values** if they cause zoom issues
 
 ---
 
@@ -193,67 +239,78 @@ body {
 
 | File | Changes |
 |------|---------|
-| `src/lib/exportZip.ts` | Update `generateStandaloneHTML()` with all accessibility fixes |
+| `src/components/builder/BuilderLayout.tsx` | Restructure landmarks, add skip link |
+| `src/components/builder/TopBar.tsx` | Remove redundant `role="banner"` |
+| `src/components/builder/ChatPreview.tsx` | Minor - adjust nested header if needed |
 
 ---
 
 ## Technical Details
 
-### Status Announcer Implementation
-```javascript
-function announceStatus(message) {
-  const announcer = document.getElementById('status-announcer');
-  if (announcer) {
-    announcer.textContent = '';
-    setTimeout(() => { announcer.textContent = message; }, 50);
-  }
-}
-
-// Usage in addContactMessage:
-function addContactMessage(messageId, content, callback) {
-  isTyping = true;
-  announceStatus(theme.contactName + ' is typing');
-  render();
-  
-  setTimeout(function() {
-    chatHistory.push({ id: messageId, content: content, isUser: false });
-    isTyping = false;
-    announceStatus('New message from ' + theme.contactName);
-    if (callback) callback();
-    render();
-    // Focus first option if available
-    const firstOption = document.querySelector('.option-btn');
-    if (firstOption) firstOption.focus();
-  }, 1000);
+### Skip Link Implementation
+```tsx
+// BuilderLayout.tsx
+export function BuilderLayout() {
+  return (
+    <ScenarioProvider>
+      <div className="flex h-screen flex-col bg-background">
+        {/* Skip Link */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-card focus:px-4 focus:py-2 focus:rounded-xl focus:shadow-lg focus:ring-2 focus:ring-ring"
+        >
+          Skip to main content
+        </a>
+        
+        <TopBar />
+        <main id="main-content" className="flex flex-1 overflow-hidden">
+          {/* ... panels ... */}
+        </main>
+      </div>
+    </ScenarioProvider>
+  );
 }
 ```
 
-### Screen Reader Only CSS Class
-```css
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+### Revised Landmark Structure
+```text
++------------------------------------------+
+| <header> (banner)                        |
+|   <nav aria-label="Main actions">        |
++------------------------------------------+
+| <main id="main-content">                 |
+|   +------------------+------------------+|
+|   | <aside>          | <section>        ||
+|   | Builder panel    | Chat preview     ||
+|   +------------------+------------------+|
++------------------------------------------+
 ```
 
 ---
 
 ## Testing Checklist (Post-Implementation)
 
-- [ ] Tab through all controls - focus order is logical
-- [ ] Screen reader announces chat purpose when entering
-- [ ] Screen reader announces "typing" status
-- [ ] Screen reader announces new messages
-- [ ] Response options are announced as a group
-- [ ] Reset button is announced with clear purpose
-- [ ] Zoom to 200% - no content loss or overflow
-- [ ] Focus indicator visible on all buttons
-- [ ] Start button announces its purpose
+- [ ] Screen reader announces banner landmark on page load
+- [ ] Screen reader can navigate to main landmark via shortcuts
+- [ ] Navigation landmark is discoverable with clear purpose
+- [ ] Regions (aside, sections) are labeled and discoverable
+- [ ] Skip link appears on focus and works correctly
+- [ ] Tab moves focus through controls in logical order
+- [ ] No landmark receives focus itself
+- [ ] Text resizes to 200% without losing information
+- [ ] Page zooms to 400% without horizontal scrolling
+- [ ] Content accessible in both orientations
+
+---
+
+## Priority Recommendation
+
+| Priority | Item | Effort |
+|----------|------|--------|
+| 1 | Add skip link | Low |
+| 2 | Remove redundant `role="banner"` | Low |
+| 3 | Adjust main landmark aria-label | Low |
+| 4 | Test 200% text resize | Low (testing) |
+| 5 | Test 400% zoom behavior | Low (testing) |
+| 6 | Restructure landmarks (optional) | Medium |
 
