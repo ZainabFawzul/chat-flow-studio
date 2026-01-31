@@ -115,7 +115,10 @@ export function VariablesPanel({
       </div>
 
       {/* Variables List */}
-      <div className="max-h-[280px] overflow-y-auto p-2 space-y-1 border">
+      <div className="p-3 pb-2">
+        <div className="text-xs text-muted-foreground mb-2">Variable List</div>
+      </div>
+      <div className="max-h-[280px] overflow-y-auto px-2 pb-2 space-y-1">
         {variables.length === 0 && <div className="text-center py-6 text-sm text-muted-foreground">
             No variables yet
           </div>}
