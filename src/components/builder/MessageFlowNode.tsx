@@ -209,7 +209,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                         tabIndex={internalTabIndex}
                         className={cn(
                           "h-7 w-7 rounded-lg",
-                          message.condition ? "bg-info/20 text-info hover:bg-[#4B96FF] hover:text-[#00178F]" : "text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]"
+                          message.condition ? "bg-info/20 text-info hover:bg-[#A7B5FF] hover:text-[#00178F]" : "text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]"
                         )}
                       >
                         <Eye className="h-3.5 w-3.5" />

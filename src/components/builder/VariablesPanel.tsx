@@ -206,7 +206,7 @@ export function VariablesTrigger({
 }: VariablesTriggerProps) {
   return <Tooltip>
       <TooltipTrigger asChild>
-        <Button variant="ghost" size="sm" onClick={onClick} className="gap-2 rounded-lg h-9 px-3 text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]">
+        <Button variant="ghost" size="sm" onClick={onClick} className="gap-2 rounded-lg h-9 px-3 text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]">
           <ToggleLeft className="h-4 w-4" />
           Variables
           {variableCount > 0 && <span className="ml-1 rounded-full bg-primary/20 text-primary text-xs px-1.5 py-0.5 font-medium">
