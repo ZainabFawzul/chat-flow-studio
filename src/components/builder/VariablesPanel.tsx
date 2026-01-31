@@ -79,7 +79,7 @@ export function VariablesPanel() {
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2 rounded-lg h-9 px-3 text-muted-foreground hover:text-foreground"
+              className="gap-2 rounded-lg h-9 px-3 text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]"
             >
               <ToggleLeft className="h-4 w-4" />
               Variables
@@ -174,7 +174,7 @@ export function VariablesPanel() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
                           >
                             <Trash2 className="h-3 w-3" />
                           </Button>
@@ -201,7 +201,7 @@ export function VariablesPanel() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-6 w-6 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive"
+                        className="h-6 w-6 opacity-0 group-hover:opacity-100 text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
                         onClick={() => deleteVariable(variable.id)}
                       >
                         <Trash2 className="h-3 w-3" />
