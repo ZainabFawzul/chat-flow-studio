@@ -233,13 +233,14 @@ export function ResponseOptionRow({
                 variant="ghost"
                 size="icon"
                 onClick={() => startConnection(messageId, option.id)}
-                className="h-6 w-6 rounded text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100"
+                className="h-6 w-6 rounded text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100 focus:opacity-100"
+                aria-label={`Link "${option.text || 'response'}" to another message`}
               >
-                <Link2 className="h-3 w-3" />
+                <Link2 className="h-3 w-3" aria-hidden="true" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p>Click to link to a message</p>
+              <p>Press Enter to start linking, then Tab to target message</p>
             </TooltipContent>
           </Tooltip>
         )}
