@@ -30,11 +30,12 @@ import { cn } from "@/lib/utils";
 interface MessageFlowNodeData {
   message: ChatMessage;
   isRoot: boolean;
+  nodeNumber: number;
 }
 
 function MessageFlowNodeComponent({ data, selected }: NodeProps) {
   const nodeData = data as unknown as MessageFlowNodeData;
-  const { message, isRoot } = nodeData;
+  const { message, isRoot, nodeNumber } = nodeData;
   
   const {
     updateMessage,
@@ -75,8 +76,8 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
       {/* Header */}
       <div className="flex items-center justify-between gap-2 p-3 border-b border-border/30">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
-            <MessageSquare className="h-3.5 w-3.5 text-primary" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+            {nodeNumber}
           </div>
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
             {isRoot ? "Start" : "Message"}

@@ -38,8 +38,8 @@ function ResponseEdgeComponent({
         id={id}
         path={edgePath}
         style={{
-          stroke: selected ? "hsl(var(--primary))" : "hsl(var(--border))",
-          strokeWidth: selected ? 2 : 1.5,
+          stroke: selected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
+          strokeWidth: selected ? 3 : 2.5,
         }}
       />
       {edgeData?.label && (
