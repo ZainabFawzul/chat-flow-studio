@@ -9,7 +9,10 @@ import { Upload, X, User, Palette, MessageCircle, Type } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
-import { BubbleBorderRadius } from "@/types/scenario";
+import { BubbleBorderRadius, DEFAULT_BORDER_RADIUS } from "@/types/scenario";
+
+const DEFAULT_SENDER_RADIUS: BubbleBorderRadius = { topLeft: 16, topRight: 4, bottomRight: 16, bottomLeft: 16 };
+const DEFAULT_RECEIVER_RADIUS: BubbleBorderRadius = { topLeft: 4, topRight: 16, bottomRight: 16, bottomLeft: 16 };
 
 interface BorderRadiusControlProps {
   label: string;
@@ -81,6 +84,10 @@ export function ThemeTab() {
   const { scenario, updateTheme } = useScenario();
   const { theme } = scenario;
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  
+  // Fallback for legacy scenarios without border radius
+  const senderRadius = theme.senderBorderRadius ?? DEFAULT_SENDER_RADIUS;
+  const receiverRadius = theme.receiverBorderRadius ?? DEFAULT_RECEIVER_RADIUS;
 
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -189,7 +196,7 @@ export function ThemeTab() {
             />
             <BorderRadiusControl
               label="Corner Radius (px)"
-              value={theme.senderBorderRadius}
+              value={senderRadius}
               onChange={(value) => updateTheme({ senderBorderRadius: value })}
             />
             
@@ -200,10 +207,10 @@ export function ThemeTab() {
                 style={{
                   backgroundColor: `hsl(${theme.senderBubbleColor})`,
                   color: `hsl(${theme.senderTextColor})`,
-                  borderTopLeftRadius: `${theme.senderBorderRadius.topLeft}px`,
-                  borderTopRightRadius: `${theme.senderBorderRadius.topRight}px`,
-                  borderBottomRightRadius: `${theme.senderBorderRadius.bottomRight}px`,
-                  borderBottomLeftRadius: `${theme.senderBorderRadius.bottomLeft}px`,
+                  borderTopLeftRadius: `${senderRadius.topLeft}px`,
+                  borderTopRightRadius: `${senderRadius.topRight}px`,
+                  borderBottomRightRadius: `${senderRadius.bottomRight}px`,
+                  borderBottomLeftRadius: `${senderRadius.bottomLeft}px`,
                 }}
               >
                 <span className="text-sm">Preview message</span>
@@ -229,7 +236,7 @@ export function ThemeTab() {
             />
             <BorderRadiusControl
               label="Corner Radius (px)"
-              value={theme.receiverBorderRadius}
+              value={receiverRadius}
               onChange={(value) => updateTheme({ receiverBorderRadius: value })}
             />
             
@@ -240,10 +247,10 @@ export function ThemeTab() {
                 style={{
                   backgroundColor: `hsl(${theme.receiverBubbleColor})`,
                   color: `hsl(${theme.receiverTextColor})`,
-                  borderTopLeftRadius: `${theme.receiverBorderRadius.topLeft}px`,
-                  borderTopRightRadius: `${theme.receiverBorderRadius.topRight}px`,
-                  borderBottomRightRadius: `${theme.receiverBorderRadius.bottomRight}px`,
-                  borderBottomLeftRadius: `${theme.receiverBorderRadius.bottomLeft}px`,
+                  borderTopLeftRadius: `${receiverRadius.topLeft}px`,
+                  borderTopRightRadius: `${receiverRadius.topRight}px`,
+                  borderBottomRightRadius: `${receiverRadius.bottomRight}px`,
+                  borderBottomLeftRadius: `${receiverRadius.bottomLeft}px`,
                 }}
               >
                 <span className="text-sm">Preview message</span>
