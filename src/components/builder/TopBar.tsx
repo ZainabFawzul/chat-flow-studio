@@ -109,7 +109,7 @@ export function TopBar() {
 
   return (
     <>
-      <header className="flex h-16 items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur-xl px-6" role="banner">
+      <header className="flex h-16 items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur-xl px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
             <MessageSquare className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
