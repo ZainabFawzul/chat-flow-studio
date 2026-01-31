@@ -212,18 +212,7 @@ export function ChatPreview() {
                 Reset
               </Button>
             )
-          ) : (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={handleStart}
-              disabled={!rootMessage}
-              className="gap-2 rounded-xl shadow-lg shadow-primary/25"
-            >
-              <Play className="h-4 w-4" aria-hidden="true" />
-              Preview
-            </Button>
-          )}
+          ) : null}
         </div>
       </header>
 
@@ -238,12 +227,23 @@ export function ChatPreview() {
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 {rootMessage ? startTitle : "No Messages Yet"}
               </h3>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground mb-4">
                 {rootMessage 
                   ? startSubtitle
                   : "Add messages in the Messages tab to get started"
                 }
               </p>
+              {rootMessage && (
+                <Button
+                  variant="default"
+                  size="default"
+                  onClick={handleStart}
+                  className="gap-2 rounded-xl shadow-lg shadow-primary/25"
+                >
+                  <Play className="h-4 w-4" aria-hidden="true" />
+                  {startButtonText}
+                </Button>
+              )}
             </div>
           </div>
         ) : (
