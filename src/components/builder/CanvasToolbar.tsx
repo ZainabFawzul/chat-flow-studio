@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, RotateCcw, HelpCircle } from "lucide-react";
 import { useScenario } from "@/context/ScenarioContext";
@@ -18,7 +19,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { VariablesPanel } from "./VariablesPanel";
+import { VariablesPanel, VariablesTrigger } from "./VariablesPanel";
 
 interface CanvasToolbarProps {
   onAddNode: () => void;
@@ -26,6 +27,7 @@ interface CanvasToolbarProps {
 
 export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
   const { scenario, resetScenario, addRootMessage } = useScenario();
+  const [isVariablesPanelOpen, setIsVariablesPanelOpen] = useState(false);
 
   const handleAddNode = () => {
     if (!scenario.rootMessageId) {
@@ -35,6 +37,8 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
       onAddNode();
     }
   };
+
+  const variableCount = Object.keys(scenario.variables || {}).length;
 
   return (
     <TooltipProvider>
@@ -58,7 +62,15 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
 
         <div className="w-px h-6 bg-border" />
 
-        <VariablesPanel />
+        <VariablesTrigger 
+          onClick={() => setIsVariablesPanelOpen(true)}
+          variableCount={variableCount}
+        />
+
+        <VariablesPanel 
+          isOpen={isVariablesPanelOpen}
+          onClose={() => setIsVariablesPanelOpen(false)}
+        />
 
         <div className="w-px h-6 bg-border" />
 

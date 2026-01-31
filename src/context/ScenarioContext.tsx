@@ -74,7 +74,7 @@ type ScenarioAction =
   | { type: "REORDER_OPTIONS"; payload: { messageId: string; fromIndex: number; toIndex: number } }
   | { type: "RESET_SCENARIO" }
   // Variable actions
-  | { type: "ADD_VARIABLE"; payload: { name: string } }
+  | { type: "ADD_VARIABLE"; payload: { name: string; type: import("@/types/scenario").VariableType } }
   | { type: "UPDATE_VARIABLE"; payload: { id: string; name: string } }
   | { type: "DELETE_VARIABLE"; payload: string }
   | { type: "SET_RESPONSE_VARIABLE_ASSIGNMENT"; payload: { messageId: string; optionId: string; assignment: VariableAssignment | null } }
@@ -353,7 +353,7 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
 
     // Variable actions
     case "ADD_VARIABLE": {
-      const newVariable = createVariable(action.payload.name);
+      const newVariable = createVariable(action.payload.name, action.payload.type);
       return {
         ...state,
         variables: { ...state.variables, [newVariable.id]: newVariable },
@@ -485,7 +485,7 @@ interface ScenarioContextType {
   disconnectOption: (messageId: string, optionId: string) => void;
   reorderOptions: (messageId: string, fromIndex: number, toIndex: number) => void;
   // Variables
-  addVariable: (name: string) => void;
+  addVariable: (name: string, type: import("@/types/scenario").VariableType) => void;
   updateVariable: (id: string, name: string) => void;
   deleteVariable: (id: string) => void;
   setResponseVariableAssignment: (messageId: string, optionId: string, assignment: VariableAssignment | null) => void;
@@ -595,8 +595,8 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Variable actions
-  const addVariable = useCallback((name: string) => {
-    dispatch({ type: "ADD_VARIABLE", payload: { name } });
+  const addVariable = useCallback((name: string, type: import("@/types/scenario").VariableType = "boolean") => {
+    dispatch({ type: "ADD_VARIABLE", payload: { name, type } });
   }, []);
 
   const updateVariable = useCallback((id: string, name: string) => {
