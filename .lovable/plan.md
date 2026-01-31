@@ -1,140 +1,339 @@
 
 
-# Chat Scenario Builder - Implementation Plan
+# Miro-Style Flowchart Builder - Implementation Plan
 
 ## Overview
-A web-based tool for instructional designers to create branching conversation scenarios styled as mobile chat interfaces, featuring a structured tree view builder, theme customization, live preview, and export functionality.
+
+Replace the current nested tree view with a visual flowchart canvas (similar to Miro/Figma) that displays conversation nodes and their connections spatially. The design prioritizes accessibility by supporting both drag-and-drop AND click-to-place interactions.
 
 ---
 
-## Phase 1: Core Layout & Design System
+## Architecture Changes
 
-### Builder Interface Layout
-- **Left Panel (40%):** Tabbed interface with "Theme" and "Messages" tabs
-- **Right Panel (60%):** Live chat preview showing the scenario as users build it
-- **Top Bar:** App title, Import button, Export button (ZIP download)
+### New Layout Structure
 
-### Design System Implementation
-- Notion-inspired minimal aesthetic with your specified color palette
-- Clean typography using system fonts
-- Consistent spacing system (4/8/16/24/32/48px)
-- Subtle shadows and borders for panel separation
+```text
++------------------------------------------+
+|              Top Bar                      |
++------------------------------------------+
+|                                          |
+|         FLOWCHART CANVAS                 |
+|    (Full-width visual builder)           |
+|                                          |
+|  +------+        +------+                |
+|  | Node |------->| Node |                |
+|  +------+        +------+                |
+|       \                                  |
+|        \         +------+                |
+|         +------->| Node |                |
+|                  +------+                |
+|                                          |
++------------------+------+----------------+
+|  Theme Panel     | Chat Preview Panel    |
+|  (Collapsible)   | (Collapsible)         |
++------------------+-----------------------+
+```
 
----
-
-## Phase 2: Theme Configuration Tab
-
-### Chat Appearance Settings
-- **Contact Name:** Name displayed at top of chat and in message bubbles
-- **Contact Avatar:** Optional image upload or initials fallback
-- **Sender Bubble Colors:** Background and text color pickers
-- **Receiver Bubble Colors:** Background and text color pickers
-- **Chat Background:** Color or subtle pattern options
-- **Font Settings:** Font size slider and font family selection
-
-### Visual Feedback
-All theme changes instantly reflect in the live preview panel
-
----
-
-## Phase 3: Message Builder (Structured Tree View)
-
-### Tree Structure Design
-- **Root Level:** Starting message from the contact
-- **Expandable Nodes:** Each message can expand to show:
-  - Response options (what the user can choose)
-  - Next message that follows each choice
-- **Visual Hierarchy:** Indentation and connecting lines show conversation flow
-- **Unlimited Depth:** Branches can go as deep as needed
-
-### Message Node Features
-- **Message Content:** Text area for the contact's message
-- **Response Options:** Add 2-4 clickable response choices
-- **End Conversation:** Mark a node as a conversation endpoint
-- **Reorder:** Drag handles to reorder response options
-- **Delete:** Remove nodes with confirmation for branches with children
-
-### Branching Logic
-- Each response option leads to a new message from the contact
-- "Dead ends" can be marked as conversation conclusions
-- Visual indicators show which branches are complete vs. need content
+The flowchart canvas takes center stage, with Theme and Preview panels accessible via collapsible bottom drawers or side panels.
 
 ---
 
-## Phase 4: Live Preview Panel
+## Phase 1: Data Model Updates
 
-### Chat Interface Display
-- Clean chat panel (no phone mockup frame)
-- Realistic message bubbles with proper styling
-- Shows messages appearing in sequence
-- Response options displayed as clickable buttons
-- "Play through" button to test the full conversation flow
+### Add Position Data to Messages
 
-### Interactive Testing
-- Click through response options to preview paths
-- Reset button to start over
-- Shows current path highlighted in the tree view
+Extend `ChatMessage` type to include canvas position:
+
+```typescript
+interface NodePosition {
+  x: number;
+  y: number;
+}
+
+interface ChatMessage {
+  id: string;
+  content: string;
+  isEndpoint: boolean;
+  responseOptions: ResponseOption[];
+  position: NodePosition; // NEW: Canvas coordinates
+}
+```
+
+### Add Canvas State
+
+```typescript
+interface CanvasState {
+  zoom: number;
+  panX: number;
+  panY: number;
+  selectedNodeId: string | null;
+  connectionMode: {
+    active: boolean;
+    sourceNodeId: string | null;
+    sourceOptionId: string | null;
+  };
+}
+```
 
 ---
 
-## Phase 5: Import/Export System
+## Phase 2: React Flow Integration
 
-### Export Functionality
-- **JSON Export:** Save project state for later editing
-- **ZIP Package Export:** 
-  - Standalone HTML file with embedded CSS/JS
-  - Separate JSON data file for reference
-  - Works offline - all assets inline
-  - Compatible with Articulate Rise Code Blocks
+### Library Choice: @xyflow/react
 
-### Import Functionality
-- Upload previously exported JSON to continue editing
-- Validation to ensure file format is correct
-- Error messages for invalid files
+React Flow (xyflow) is the industry standard for flowchart builders with:
+- Built-in accessibility features (ARIA labels, keyboard navigation)
+- Click-to-connect alternative to drag-and-drop
+- Minimap for navigation
+- Zoom controls with keyboard shortcuts
+- Custom node support
+
+### Core Components
+
+1. **FlowCanvas.tsx** - Main canvas wrapper with React Flow
+2. **MessageFlowNode.tsx** - Custom node component for chat messages
+3. **ResponseEdge.tsx** - Custom edge showing response option text
+4. **CanvasControls.tsx** - Zoom, fit view, minimap toggle
+5. **NodeToolbar.tsx** - Actions when a node is selected
 
 ---
 
-## Phase 6: Accessibility (WCAG 2.1 AA)
+## Phase 3: Custom Node Design
+
+### Message Node Visual
+
+```text
++----------------------------------------+
+| [Avatar] Contact Message     [Actions] |
++----------------------------------------+
+|                                        |
+|  "Hello! How can I help you today?"    |
+|                                        |
++----------------------------------------+
+| Response Options:                      |
+| [1] "Tell me more"           ○------->|
+| [2] "I need help"            ○------->|
+| [3] "Goodbye"                ○------->|
+| [+ Add response]                       |
++----------------------------------------+
+```
+
+### Node Features
+- Inline text editing (click to edit message content)
+- Response options listed with connection handles
+- Visual status indicators (endpoint, incomplete)
+- Compact/expanded view toggle
+
+---
+
+## Phase 4: Accessible Connection System
+
+### Two Methods to Connect Nodes
+
+**Method 1: Click-to-Connect (Primary - Accessible)**
+1. Click "Connect" button on a response option
+2. Node enters "connection mode" - visual indicator shows
+3. Click on target canvas area OR existing node
+4. If clicking empty space: creates new node at that position
+5. If clicking existing node: connects to that node
+6. Press Escape to cancel
+
+**Method 2: Drag-and-Drop (Secondary)**
+- Drag from response option handle to target
+- Traditional flowchart interaction for power users
 
 ### Keyboard Navigation
-- Full tab navigation through all controls
-- Arrow keys for tree navigation
-- Enter/Space to activate buttons and expand nodes
-- Escape to close modals/dropdowns
-- Visible focus indicators throughout
 
-### Screen Reader Support
-- Proper ARIA labels on all interactive elements
-- Live regions for dynamic content updates
-- Semantic heading structure
-- Status announcements for actions (saved, exported, etc.)
-
-### Visual Accessibility
-- Color contrast ratios meeting AA standards
-- Focus indicators visible in all color modes
-- Text sizing respects browser zoom
-- No information conveyed by color alone
+| Key | Action |
+|-----|--------|
+| Tab | Move between nodes |
+| Enter | Select/edit node |
+| Arrow keys | Navigate between nodes spatially |
+| C | Start connection from selected response |
+| Escape | Cancel connection / deselect |
+| Delete | Delete selected node (with confirmation) |
+| +/- | Zoom in/out |
+| 0 | Reset zoom to 100% |
+| F | Fit all nodes in view |
 
 ---
 
-## User Experience Flow
+## Phase 5: Canvas Features
 
-1. **Start:** User lands on builder with empty canvas and sample theme
-2. **Configure Theme:** Set colors, contact name, and fonts in Theme tab
-3. **Build Messages:** Switch to Messages tab, add first message
-4. **Add Responses:** Create response options for user to choose
-5. **Branch Out:** Add follow-up messages for each response
-6. **Preview:** Test conversation flow in live preview
-7. **Export:** Download as ZIP for Articulate Rise embedding
-8. **Save Work:** Export JSON to continue later
+### Toolbar Controls
+
+```text
++---------------------------------------------------+
+| [+ Add Node] [Zoom -] 100% [Zoom +] [Fit] [Grid]  |
++---------------------------------------------------+
+```
+
+### Minimap
+- Shows entire flowchart overview
+- Click to navigate
+- Keyboard accessible
+
+### Grid/Snap
+- Optional grid overlay
+- Snap-to-grid for neat alignment
+- Toggle via toolbar
 
 ---
 
-## Technical Approach
+## Phase 6: Panel Reorganization
 
-- React with TypeScript for type safety
-- State management for complex branching data structure
-- Local storage auto-save as backup
-- Client-side ZIP generation for exports
-- No backend needed - fully client-side application
+### New Layout Options
+
+**Option A: Floating Panels**
+- Theme and Preview as floating, draggable panels
+- Can be minimized to icons
+- Position remembered
+
+**Option B: Bottom Drawer (Recommended)**
+- Slide-up drawers for Theme and Preview
+- Keyboard shortcut to toggle (T for Theme, P for Preview)
+- Non-intrusive when building
+
+### Panel Toggle Bar
+
+```text
+Canvas content here...
++--------------------------------------------------+
+| [📋 Theme] [💬 Preview] [📊 Overview]            |
++--------------------------------------------------+
+| (Expanded panel content when toggled)            |
++--------------------------------------------------+
+```
+
+---
+
+## Phase 7: Visual Enhancements
+
+### Connection Lines
+- Smooth bezier curves between nodes
+- Animated flow direction indicator
+- Response text shown on edge label
+- Color-coded by status
+
+### Node States
+- **Default**: Clean white card
+- **Selected**: Primary border, subtle shadow
+- **Hover**: Slight elevation
+- **Connecting**: Pulsing border animation
+- **Incomplete**: Warning badge
+- **Endpoint**: Success indicator
+
+### Canvas Background
+- Subtle dot grid pattern
+- Adjustable via settings
+
+---
+
+## Phase 8: Accessibility Compliance
+
+### WCAG 2.1 AA Requirements
+
+1. **Focus Indicators**
+   - Visible 2px focus ring on all interactive elements
+   - High contrast (3:1 ratio minimum)
+
+2. **Screen Reader Support**
+   - Live region announcements for actions
+   - Descriptive ARIA labels for all nodes and connections
+   - Tree/graph structure communicated properly
+
+3. **Keyboard Operability**
+   - All actions achievable without mouse
+   - No keyboard traps
+   - Focus order follows visual flow
+
+4. **Reduced Motion**
+   - Respect `prefers-reduced-motion`
+   - Skip animations for users who prefer it
+
+---
+
+## Implementation Order
+
+### Step 1: Install React Flow
+- Add `@xyflow/react` dependency
+- Set up basic canvas with existing data
+
+### Step 2: Create Custom Node Component
+- Design MessageFlowNode with inline editing
+- Style to match current design system
+
+### Step 3: Implement Click-to-Connect
+- Connection mode state management
+- Visual feedback during connection
+- Keyboard alternative to drag handles
+
+### Step 4: Update Context for Positions
+- Add position data to message type
+- Auto-layout for imported scenarios
+- Save/restore positions
+
+### Step 5: Add Canvas Controls
+- Zoom, pan, fit view
+- Minimap
+- Grid toggle
+
+### Step 6: Reorganize Panels
+- Create bottom drawer system
+- Move Theme and Preview into drawers
+- Add keyboard shortcuts
+
+### Step 7: Polish Accessibility
+- Full keyboard navigation audit
+- Screen reader testing
+- Focus management
+
+---
+
+## Technical Details
+
+### Dependencies to Add
+```json
+{
+  "@xyflow/react": "^12.x"
+}
+```
+
+### File Structure
+```text
+src/components/builder/
+├── BuilderLayout.tsx      (Updated: new layout)
+├── FlowCanvas.tsx         (NEW: main canvas)
+├── MessageFlowNode.tsx    (NEW: custom node)
+├── ResponseEdge.tsx       (NEW: custom edge)
+├── CanvasControls.tsx     (NEW: toolbar)
+├── CanvasToolbar.tsx      (NEW: add node, etc.)
+├── BottomDrawer.tsx       (NEW: panel container)
+├── ThemeDrawer.tsx        (Refactored from ThemeTab)
+├── PreviewDrawer.tsx      (Refactored from ChatPreview)
+└── ...existing files
+```
+
+### Context Updates
+```typescript
+// New actions for ScenarioContext
+| { type: "UPDATE_NODE_POSITION"; payload: { id: string; position: NodePosition } }
+| { type: "BATCH_UPDATE_POSITIONS"; payload: Record<string, NodePosition> }
+| { type: "CONNECT_NODES"; payload: { sourceId: string; optionId: string; targetId: string } }
+| { type: "ADD_NODE_AT_POSITION"; payload: { content: string; position: NodePosition } }
+```
+
+---
+
+## Migration Strategy
+
+### Handling Existing Data
+- Scenarios without position data get auto-layout
+- Tree structure converted to left-to-right flow
+- Dagre algorithm for automatic positioning
+
+### Backward Compatibility
+- Export format remains compatible
+- Position data optional in JSON
+- Import auto-positions if missing
 
