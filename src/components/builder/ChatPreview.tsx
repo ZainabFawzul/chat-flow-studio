@@ -345,22 +345,35 @@ export function ChatPreview() {
 
       {/* Response Options */}
       {isPlaying && currentMessage && !currentMessage.isEndpoint && !typingMessageId && (
-        <div className="border-t border-border/30 bg-card/90 backdrop-blur-xl p-4" role="group" aria-label="Response options">
-          <p className="mb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
-            Choose a response
+        <div 
+          className="border-t border-border/30 backdrop-blur-xl p-4" 
+          role="group" 
+          aria-label="Response options"
+          style={{
+            backgroundColor: `hsl(${theme.responsePanelBackground ?? '0 0% 100%'})`,
+          }}
+        >
+          <p 
+            className="mb-3 text-xs font-medium uppercase tracking-wide"
+            style={{ color: `hsl(${theme.responsePanelLabelColor ?? '220 9% 46%'})` }}
+          >
+            {theme.responsePanelLabelText ?? "Choose a response"}
           </p>
           <div className="flex flex-wrap gap-2">
             {currentMessage.responseOptions.map((option) => (
-              <Button
+              <button
                 key={option.id}
-                variant="outline"
-                size="sm"
                 onClick={() => handleSelectOption(option.id, option.text)}
-                className="rounded-xl border-border/50 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
                 disabled={!option.text}
+                className="px-3 py-1.5 text-sm font-medium border border-border/50 hover:opacity-80 transition-all disabled:opacity-50"
+                style={{
+                  backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
+                  color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
+                  borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
+                }}
               >
                 {option.text || "Empty option"}
-              </Button>
+              </button>
             ))}
           </div>
         </div>
