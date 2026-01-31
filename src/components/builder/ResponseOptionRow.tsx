@@ -113,8 +113,8 @@ export function ResponseOptionRow({
         {/* Variable indicators */}
         {option.setsVariable && variables[option.setsVariable.variableId] && <Tooltip>
             <TooltipTrigger asChild>
-              <span className="flex items-center gap-0.5 text-[10px] bg-warning/20 text-warning px-2 py-1.5 rounded font-medium">
-                <Zap className="h-4 w-4" />
+              <span className="flex items-center gap-0.5 text-[10px] bg-warning/20 text-warning px-1.5 py-1.5 rounded font-medium">
+                <Zap className="h-2.5 w-2.5" />
               </span>
             </TooltipTrigger>
             <TooltipContent side="top">
