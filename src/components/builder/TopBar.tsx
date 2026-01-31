@@ -1,14 +1,25 @@
-import { Download, Upload, MessageSquare, Sparkles } from "lucide-react";
+import { Download, Upload, MessageSquare, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useScenario } from "@/context/ScenarioContext";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { ScenarioData } from "@/types/scenario";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { generateExportZip } from "@/lib/exportZip";
 
 export function TopBar() {
   const { scenario, importScenario } = useScenario();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const [isFinalizeDialogOpen, setIsFinalizeDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const handleExportJSON = () => {
     const dataStr = JSON.stringify(scenario, null, 2);
@@ -65,50 +76,121 @@ export function TopBar() {
     e.target.value = "";
   };
 
-  return (
-    <header className="flex h-16 items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur-xl px-6" role="banner">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
-          <MessageSquare className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
-        </div>
-        <div>
-          <h1 className="text-lg font-semibold text-foreground tracking-tight">
-            Chat Scenario Builder
-          </h1>
-          <p className="text-xs text-muted-foreground">Design branching conversations</p>
-        </div>
-      </div>
+  const handleFinalize = async () => {
+    setIsExporting(true);
+    try {
+      const zipBlob = await generateExportZip(scenario);
       
-      <nav className="flex items-center gap-3" aria-label="Main actions">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          className="sr-only"
-          onChange={handleFileChange}
-          aria-label="Import scenario file"
-        />
+      // Download the zip file
+      const url = URL.createObjectURL(zipBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${scenario.name.replace(/\s+/g, "-").toLowerCase()}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export complete",
+        description: "Your chat scenario has been downloaded as a ZIP file.",
+      });
+      setIsFinalizeDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Export failed",
+        description: "There was an error creating the ZIP file.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <>
+      <header className="flex h-16 items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur-xl px-6" role="banner">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
+            <MessageSquare className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-foreground tracking-tight">
+              Chat Scenario Builder
+            </h1>
+            <p className="text-xs text-muted-foreground">Design branching conversations</p>
+          </div>
+        </div>
         
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleImportClick}
-          className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80 hover:border-border"
-        >
-          <Upload className="h-4 w-4" aria-hidden="true" />
-          <span>Import</span>
-        </Button>
-        
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleExportJSON}
-          className="gap-2 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
-        >
-          <Download className="h-4 w-4" aria-hidden="true" />
-          <span>Export</span>
-        </Button>
-      </nav>
-    </header>
+        <nav className="flex items-center gap-3" aria-label="Main actions">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            className="sr-only"
+            onChange={handleFileChange}
+            aria-label="Import scenario file"
+          />
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleImportClick}
+            className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80 hover:border-border"
+          >
+            <Upload className="h-4 w-4" aria-hidden="true" />
+            <span>Import</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportJSON}
+            className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80 hover:border-border"
+          >
+            <Download className="h-4 w-4" aria-hidden="true" />
+            <span>Export</span>
+          </Button>
+          
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => setIsFinalizeDialogOpen(true)}
+            className="gap-2 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
+          >
+            <Package className="h-4 w-4" aria-hidden="true" />
+            <span>Finalize</span>
+          </Button>
+        </nav>
+      </header>
+
+      <Dialog open={isFinalizeDialogOpen} onOpenChange={setIsFinalizeDialogOpen}>
+        <DialogContent className="sm:max-w-md rounded-2xl">
+          <DialogHeader>
+            <DialogTitle>Finalize Chat Scenario</DialogTitle>
+            <DialogDescription>
+              Do you want to download your chat scenario as a zipped folder? This package can be uploaded to Articulate Rise and similar authoring tools with an embed code feature.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsFinalizeDialogOpen(false)}
+              className="rounded-xl"
+              disabled={isExporting}
+            >
+              No, cancel
+            </Button>
+            <Button
+              onClick={handleFinalize}
+              className="rounded-xl"
+              disabled={isExporting}
+            >
+              {isExporting ? "Creating..." : "Yes, download ZIP"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
