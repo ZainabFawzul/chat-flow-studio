@@ -128,7 +128,7 @@ export function ThemeTab() {
     return name.split(" ").map(word => word[0]).join("").toUpperCase().slice(0, 2);
   };
   return <ScrollArea className="h-full">
-      <div className="flex flex-col gap-4 p-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
         {/* Contact Info */}
         <Section icon={<User className="h-4 w-4" />} title="Contact Info" id="contact-heading">
           <div className="flex flex-col gap-4">
@@ -338,6 +338,7 @@ export function ThemeTab() {
         </Section>
 
         {/* Response Panel */}
+        <div className="md:col-span-2">
         <Section icon={<MousePointerClick className="h-4 w-4" />} title="Response Panel" id="response-panel-heading">
           <div className="flex flex-col gap-5">
             {/* Label Text */}
@@ -457,8 +458,10 @@ export function ThemeTab() {
             </div>
           </div>
         </Section>
+        </div>
 
         {/* Settings - merged Background, Typography, Controls */}
+        <div className="md:col-span-2">
         <Section icon={<Settings className="h-4 w-4" />} title="Settings" id="settings-heading">
           <div className="flex flex-col gap-5">
             {/* Chat Background */}
@@ -501,6 +504,7 @@ export function ThemeTab() {
             </div>
           </div>
         </Section>
+        </div>
       </div>
     </ScrollArea>;
 }
