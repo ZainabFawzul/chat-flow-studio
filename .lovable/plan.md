@@ -1,357 +1,132 @@
 
 
-# Miro-Style Flowchart Builder - Implementation Plan
+# Flowchart Builder UI Improvements
 
 ## Overview
 
-Replace the current nested tree view with a visual flowchart canvas (similar to Miro/Figma) that displays conversation nodes and their connections spatially. The design prioritizes accessibility by supporting both drag-and-drop AND click-to-place interactions.
+This plan addresses four UI improvements to the flowchart builder: removing the minimap, reordering tabs, making connection lines more visible, and adding node numbers for easier reference.
 
 ---
 
-## Architecture Changes
+## Changes Summary
 
-### New Layout Structure
+### 1. Remove MiniMap from FlowCanvas
+**File:** `src/components/builder/FlowCanvas.tsx`
 
-```text
-+--------------------------------------------------+
-|                    Top Bar                        |
-+--------------------------------------------------+
-|                          |                        |
-|   LEFT PANEL (60%)       |   RIGHT PANEL (40%)   |
-|   +-----------------+    |                        |
-|   | [Theme][Canvas] |    |   Chat Preview        |
-|   +-----------------+    |   (Live simulation)   |
-|   |                 |    |                        |
-|   | Tab: Theme      |    |   Shows conversation  |
-|   | - Colors        |    |   flow as user would  |
-|   | - Contact info  |    |   experience it       |
-|   |                 |    |                        |
-|   | Tab: Canvas     |    |                        |
-|   | +------+        |    |                        |
-|   | | Node |------> |    |                        |
-|   | +------+        |    |                        |
-|   |      \          |    |                        |
-|   |       +------+  |    |                        |
-|   |       | Node |  |    |                        |
-|   |       +------+  |    |                        |
-|   |                 |    |                        |
-|   | [Expand ⛶]      |    |                        |
-|   +-----------------+    |                        |
-+--------------------------------------------------+
-```
-
-The layout keeps the familiar split-panel structure:
-- **Left Panel (60%)**: Contains tabs for Theme settings and the new Flowchart Canvas
-- **Right Panel (40%)**: Chat Preview showing the live conversation simulation
-- **Expand Mode**: Canvas tab can expand to full-screen for complex scenario building
-
----
-
-## Phase 1: Data Model Updates
-
-### Add Position Data to Messages
-
-Extend `ChatMessage` type to include canvas position:
+Remove the MiniMap component entirely from the ReactFlow canvas.
 
 ```typescript
-interface NodePosition {
-  x: number;
-  y: number;
-}
-
-interface ChatMessage {
-  id: string;
-  content: string;
-  isEndpoint: boolean;
-  responseOptions: ResponseOption[];
-  position: NodePosition; // NEW: Canvas coordinates
-}
+// REMOVE this block (lines 145-151):
+<MiniMap
+  className="bg-card border border-border rounded-xl shadow-lg !bottom-4 !right-4"
+  nodeColor="#3b82f6"
+  maskColor="hsl(var(--background) / 0.8)"
+  pannable
+  zoomable
+/>
 ```
 
-### Add Canvas State
+Also remove the unused `MiniMap` import.
+
+---
+
+### 2. Reorder Tabs: Theme First, Canvas Second (No Icons)
+**File:** `src/components/builder/LeftPanel.tsx`
+
+- Change `defaultValue` from "canvas" to "theme"
+- Swap the tab order so Theme comes first
+- Remove the icon imports and icon elements from both tabs
 
 ```typescript
-interface CanvasState {
-  zoom: number;
-  panX: number;
-  panY: number;
-  selectedNodeId: string | null;
-  connectionMode: {
-    active: boolean;
-    sourceNodeId: string | null;
-    sourceOptionId: string | null;
-  };
-}
+// Updated tabs structure:
+<Tabs defaultValue="theme" className="flex h-full flex-col">
+  <TabsList>
+    <TabsTrigger value="theme">Theme</TabsTrigger>
+    <TabsTrigger value="canvas">Canvas</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="theme">...</TabsContent>
+  <TabsContent value="canvas">...</TabsContent>
+</Tabs>
 ```
 
 ---
 
-## Phase 2: React Flow Integration
+### 3. Make Flowchart Lines Thicker and More Visible
+**File:** `src/components/builder/ResponseEdge.tsx`
 
-### Library Choice: @xyflow/react
+Increase stroke width and use a more visible color:
 
-React Flow (xyflow) is the industry standard for flowchart builders with:
-- Built-in accessibility features (ARIA labels, keyboard navigation)
-- Click-to-connect alternative to drag-and-drop
-- Minimap for navigation
-- Zoom controls with keyboard shortcuts
-- Custom node support
-
-### Core Components
-
-1. **FlowCanvas.tsx** - Main canvas wrapper with React Flow
-2. **MessageFlowNode.tsx** - Custom node component for chat messages
-3. **ResponseEdge.tsx** - Custom edge showing response option text
-4. **CanvasControls.tsx** - Zoom, fit view, minimap toggle
-5. **NodeToolbar.tsx** - Actions when a node is selected
-
----
-
-## Phase 3: Custom Node Design
-
-### Message Node Visual
-
-```text
-+----------------------------------------+
-| [Avatar] Contact Message     [Actions] |
-+----------------------------------------+
-|                                        |
-|  "Hello! How can I help you today?"    |
-|                                        |
-+----------------------------------------+
-| Response Options:                      |
-| [1] "Tell me more"           ○------->|
-| [2] "I need help"            ○------->|
-| [3] "Goodbye"                ○------->|
-| [+ Add response]                       |
-+----------------------------------------+
-```
-
-### Node Features
-- Inline text editing (click to edit message content)
-- Response options listed with connection handles
-- Visual status indicators (endpoint, incomplete)
-- Compact/expanded view toggle
-
----
-
-## Phase 4: Accessible Connection System
-
-### Two Methods to Connect Nodes
-
-**Method 1: Click-to-Connect (Primary - Accessible)**
-1. Click "Connect" button on a response option
-2. Node enters "connection mode" - visual indicator shows
-3. Click on target canvas area OR existing node
-4. If clicking empty space: creates new node at that position
-5. If clicking existing node: connects to that node
-6. Press Escape to cancel
-
-**Method 2: Drag-and-Drop (Secondary)**
-- Drag from response option handle to target
-- Traditional flowchart interaction for power users
-
-### Keyboard Navigation
-
-| Key | Action |
-|-----|--------|
-| Tab | Move between nodes |
-| Enter | Select/edit node |
-| Arrow keys | Navigate between nodes spatially |
-| C | Start connection from selected response |
-| Escape | Cancel connection / deselect |
-| Delete | Delete selected node (with confirmation) |
-| +/- | Zoom in/out |
-| 0 | Reset zoom to 100% |
-| F | Fit all nodes in view |
-
----
-
-## Phase 5: Canvas Features
-
-### Toolbar Controls
-
-```text
-+---------------------------------------------------+
-| [+ Add Node] [Zoom -] 100% [Zoom +] [Fit] [Grid]  |
-+---------------------------------------------------+
-```
-
-### Minimap
-- Shows entire flowchart overview
-- Click to navigate
-- Keyboard accessible
-
-### Grid/Snap
-- Optional grid overlay
-- Snap-to-grid for neat alignment
-- Toggle via toolbar
-
----
-
-## Phase 6: Tab-Based Canvas Integration
-
-### Layout Structure
-
-**Left Panel (60% width)**
-- Tab 1: **Theme** - Existing theme configuration
-- Tab 2: **Canvas** - New flowchart builder (replaces Messages tab)
-- Expand button to make canvas full-screen
-
-**Right Panel (40% width)**
-- Chat Preview (unchanged)
-- Shows live conversation simulation
-
-### Canvas Tab Features
-- Full flowchart builder within the tab
-- "Expand" button in toolbar to go full-screen
-- Press Escape or click "Exit" to return to split view
-- Keyboard shortcut: `E` to toggle expand mode
-
-### Expanded Mode
-```text
-+--------------------------------------------------+
-|  [Exit ✕] [+ Add Node] [Zoom] [Fit] [Grid]       |
-+--------------------------------------------------+
-|                                                  |
-|              FULL-SCREEN CANVAS                  |
-|                                                  |
-|   +------+        +------+        +------+       |
-|   | Node |------->| Node |------->| Node |       |
-|   +------+        +------+        +------+       |
-|                                                  |
-+--------------------------------------------------+
-```
-
----
-
-## Phase 7: Visual Enhancements
-
-### Connection Lines
-- Smooth bezier curves between nodes
-- Animated flow direction indicator
-- Response text shown on edge label
-- Color-coded by status
-
-### Node States
-- **Default**: Clean white card
-- **Selected**: Primary border, subtle shadow
-- **Hover**: Slight elevation
-- **Connecting**: Pulsing border animation
-- **Incomplete**: Warning badge
-- **Endpoint**: Success indicator
-
-### Canvas Background
-- Subtle dot grid pattern
-- Adjustable via settings
-
----
-
-## Phase 8: Accessibility Compliance
-
-### WCAG 2.1 AA Requirements
-
-1. **Focus Indicators**
-   - Visible 2px focus ring on all interactive elements
-   - High contrast (3:1 ratio minimum)
-
-2. **Screen Reader Support**
-   - Live region announcements for actions
-   - Descriptive ARIA labels for all nodes and connections
-   - Tree/graph structure communicated properly
-
-3. **Keyboard Operability**
-   - All actions achievable without mouse
-   - No keyboard traps
-   - Focus order follows visual flow
-
-4. **Reduced Motion**
-   - Respect `prefers-reduced-motion`
-   - Skip animations for users who prefer it
-
----
-
-## Implementation Order
-
-### Step 1: Install React Flow
-- Add `@xyflow/react` dependency
-- Set up basic canvas with existing data
-
-### Step 2: Create Custom Node Component
-- Design MessageFlowNode with inline editing
-- Style to match current design system
-
-### Step 3: Implement Click-to-Connect
-- Connection mode state management
-- Visual feedback during connection
-- Keyboard alternative to drag handles
-
-### Step 4: Update Context for Positions
-- Add position data to message type
-- Auto-layout for imported scenarios
-- Save/restore positions
-
-### Step 5: Add Canvas Controls
-- Zoom, pan, fit view
-- Minimap
-- Grid toggle
-
-### Step 6: Reorganize Panels
-- Create bottom drawer system
-- Move Theme and Preview into drawers
-- Add keyboard shortcuts
-
-### Step 7: Polish Accessibility
-- Full keyboard navigation audit
-- Screen reader testing
-- Focus management
-
----
-
-## Technical Details
-
-### Dependencies to Add
-```json
-{
-  "@xyflow/react": "^12.x"
-}
-```
-
-### File Structure
-```text
-src/components/builder/
-├── BuilderLayout.tsx      (Updated: 60/40 split)
-├── LeftPanel.tsx          (Updated: Theme + Canvas tabs)
-├── FlowCanvas.tsx         (NEW: main canvas component)
-├── MessageFlowNode.tsx    (NEW: custom node)
-├── ResponseEdge.tsx       (NEW: custom edge)
-├── CanvasControls.tsx     (NEW: zoom, fit, grid toolbar)
-├── CanvasToolbar.tsx      (NEW: add node, expand button)
-├── ThemeTab.tsx           (Existing: theme settings)
-├── ChatPreview.tsx        (Existing: right panel preview)
-└── ...existing files
-```
-
-### Context Updates
 ```typescript
-// New actions for ScenarioContext
-| { type: "UPDATE_NODE_POSITION"; payload: { id: string; position: NodePosition } }
-| { type: "BATCH_UPDATE_POSITIONS"; payload: Record<string, NodePosition> }
-| { type: "CONNECT_NODES"; payload: { sourceId: string; optionId: string; targetId: string } }
-| { type: "ADD_NODE_AT_POSITION"; payload: { content: string; position: NodePosition } }
+// Current (faint):
+stroke: selected ? "hsl(var(--primary))" : "hsl(var(--border))",
+strokeWidth: selected ? 2 : 1.5,
+
+// Updated (bold and visible):
+stroke: selected ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
+strokeWidth: selected ? 3 : 2.5,
 ```
+
+This changes the default edge color from `--border` (very light gray) to `--muted-foreground` (darker gray that's clearly visible).
 
 ---
 
-## Migration Strategy
+### 4. Add Node Numbers to Each Message Block
+**File:** `src/components/builder/MessageFlowNode.tsx`
 
-### Handling Existing Data
-- Scenarios without position data get auto-layout
-- Tree structure converted to left-to-right flow
-- Dagre algorithm for automatic positioning
+Add a node number passed from FlowCanvas to help users reference specific message blocks.
 
-### Backward Compatibility
-- Export format remains compatible
-- Position data optional in JSON
-- Import auto-positions if missing
+**A) Update FlowCanvas to pass node index:**
+```typescript
+// In the nodes useMemo, add nodeNumber to data:
+data: {
+  message,
+  isRoot: message.id === scenario.rootMessageId,
+  nodeNumber: index + 1,  // 1-based numbering
+},
+```
+
+**B) Update MessageFlowNode to display node number:**
+```typescript
+// In the header, show node number prominently:
+<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+  {nodeNumber}
+</div>
+<span className="text-xs font-medium text-muted-foreground">
+  {isRoot ? "Start" : "Message"}
+</span>
+```
+
+The node number badge will be:
+- Solid primary color background (blue)
+- White text for contrast
+- Bold font weight
+- Shown before the "Start" or "Message" label
+
+---
+
+## Files to Modify
+
+| File | Changes |
+|------|---------|
+| `src/components/builder/FlowCanvas.tsx` | Remove MiniMap, add nodeNumber to data |
+| `src/components/builder/LeftPanel.tsx` | Reorder tabs, remove icons |
+| `src/components/builder/ResponseEdge.tsx` | Increase stroke width and visibility |
+| `src/components/builder/MessageFlowNode.tsx` | Display node number in header |
+
+---
+
+## Visual Result
+
+### Before:
+- MiniMap in bottom-right corner
+- Canvas tab first with GitBranch icon
+- Faint gray connection lines (1.5px)
+- No node numbers
+
+### After:
+- No MiniMap
+- Theme tab first (no icons on either tab)
+- Bold visible connection lines (2.5px in darker gray)
+- Each node shows a numbered badge (1, 2, 3...) in the header
 
