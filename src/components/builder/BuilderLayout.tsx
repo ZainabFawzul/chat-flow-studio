@@ -7,18 +7,26 @@ export function BuilderLayout() {
   return (
     <ScenarioProvider>
       <div className="flex h-screen flex-col bg-background">
+        {/* Skip Link for keyboard users */}
+        <a 
+          href="#main-content" 
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-card focus:px-4 focus:py-2 focus:rounded-xl focus:shadow-lg focus:ring-2 focus:ring-ring focus:text-foreground"
+        >
+          Skip to main content
+        </a>
+        
         <TopBar />
-        <div className="flex flex-1 overflow-hidden">
+        <main id="main-content" className="flex flex-1 overflow-hidden">
           {/* Left Panel - 60% for Canvas/Theme */}
-          <div className="w-3/5 min-w-[480px] border-r border-border/50">
+          <aside className="w-3/5 min-w-0 lg:min-w-[480px] border-r border-border/50" aria-label="Builder panel">
             <LeftPanel />
-          </div>
+          </aside>
           
           {/* Right Panel - 40% for Chat Preview */}
-          <main className="w-2/5 min-w-[320px] overflow-hidden" aria-label="Chat preview">
+          <section className="w-2/5 min-w-0 lg:min-w-[320px] overflow-hidden" aria-label="Chat preview">
             <ChatPreview />
-          </main>
-        </div>
+          </section>
+        </main>
       </div>
     </ScenarioProvider>
   );
