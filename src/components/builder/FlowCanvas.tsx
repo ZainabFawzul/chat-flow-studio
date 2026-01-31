@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -16,7 +16,7 @@ import { MessageFlowNode } from "./MessageFlowNode";
 import { ResponseEdge } from "./ResponseEdge";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { Maximize2, Minimize2, Link2, X } from "lucide-react";
 
 const nodeTypes = {
   messageNode: MessageFlowNode,
@@ -36,9 +36,31 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
     scenario,
     updateNodePosition,
     addMessageAtPosition,
-    addFollowUpMessage,
     connectNodes,
+    pendingConnection,
+    cancelConnection,
   } = useScenario();
+
+  // Handle Escape key to cancel connection mode
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && pendingConnection) {
+        cancelConnection();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [pendingConnection, cancelConnection]);
+
+  // Get the pending option text for the banner
+  const pendingOptionText = useMemo(() => {
+    if (!pendingConnection) return null;
+    const message = scenario.messages[pendingConnection.sourceMessageId];
+    if (!message) return null;
+    const option = message.responseOptions.find(o => o.id === pendingConnection.optionId);
+    return option?.text || "response";
+  }, [pendingConnection, scenario.messages]);
 
   // Convert scenario messages to React Flow nodes
   const nodes: Node[] = useMemo(() => {
@@ -52,9 +74,11 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         message,
         isRoot: message.id === scenario.rootMessageId,
         nodeNumber: index + 1,
+        pendingConnection,
+        variables: scenario.variables || {},
       },
     }));
-  }, [scenario.messages, scenario.rootMessageId]);
+  }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables]);
 
   // Convert response options to React Flow edges
   const edges: Edge[] = useMemo(() => {
@@ -101,13 +125,6 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
       addMessageAtPosition("New message...", position);
     },
     [addMessageAtPosition]
-  );
-
-  const handlePaneClick = useCallback(
-    (event: React.MouseEvent) => {
-      // Only add node on double-click
-    },
-    []
   );
 
   return (
@@ -158,6 +175,27 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
             )}
           </Button>
         </Panel>
+
+        {/* Connection mode banner */}
+        {pendingConnection && (
+          <Panel position="top-center" className="mt-4">
+            <div className="flex items-center gap-3 px-4 py-2 bg-primary text-primary-foreground rounded-xl shadow-lg animate-in slide-in-from-top-2">
+              <Link2 className="h-4 w-4" />
+              <span className="text-sm font-medium">
+                Connecting "{pendingOptionText}" — Click a message node
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={cancelConnection}
+                className="h-6 w-6 rounded-lg hover:bg-primary-foreground/20"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+              <span className="text-xs opacity-70">or press Esc</span>
+            </div>
+          </Panel>
+        )}
       </ReactFlow>
     </div>
   );

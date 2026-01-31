@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { VariablesPanel } from "./VariablesPanel";
 
 interface CanvasToolbarProps {
   onAddNode: () => void;
@@ -54,6 +55,10 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
             <p>Add a new message node</p>
           </TooltipContent>
         </Tooltip>
+
+        <div className="w-px h-6 bg-border" />
+
+        <VariablesPanel />
 
         <div className="w-px h-6 bg-border" />
 
@@ -109,6 +114,7 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
               <p><strong>Connect</strong> response options by dragging from circles</p>
               <p><strong>Click</strong> to select nodes</p>
               <p><strong>Scroll</strong> to zoom in/out</p>
+              <p><strong>Variables</strong> enable conditional response visibility</p>
             </div>
           </TooltipContent>
         </Tooltip>

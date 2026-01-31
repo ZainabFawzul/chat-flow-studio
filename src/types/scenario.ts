@@ -5,10 +5,29 @@ export interface NodePosition {
   y: number;
 }
 
+// Variable types for conditional logic
+export interface ScenarioVariable {
+  id: string;
+  name: string;
+  defaultValue: boolean;
+}
+
+export interface VariableCondition {
+  variableId: string;
+  requiredValue: boolean;
+}
+
+export interface VariableAssignment {
+  variableId: string;
+  value: boolean;
+}
+
 export interface ResponseOption {
   id: string;
   text: string;
   nextMessageId: string | null; // null if this is an endpoint
+  setsVariable?: VariableAssignment; // When chosen, set this variable
+  condition?: VariableCondition; // Only show if condition is met
 }
 
 export interface ChatMessage {
@@ -17,6 +36,7 @@ export interface ChatMessage {
   isEndpoint: boolean;
   responseOptions: ResponseOption[];
   position: NodePosition;
+  condition?: VariableCondition; // Message only shown if condition is met
 }
 
 export interface ChatTheme {
@@ -36,6 +56,7 @@ export interface ScenarioData {
   name: string;
   theme: ChatTheme;
   messages: Record<string, ChatMessage>;
+  variables: Record<string, ScenarioVariable>; // Scenario-level variables
   rootMessageId: string | null;
   createdAt: string;
   updatedAt: string;
@@ -59,6 +80,7 @@ export const createEmptyScenario = (): ScenarioData => ({
   name: "Untitled Scenario",
   theme: { ...DEFAULT_THEME },
   messages: {},
+  variables: {},
   rootMessageId: null,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
@@ -76,4 +98,10 @@ export const createResponseOption = (text: string = ""): ResponseOption => ({
   id: crypto.randomUUID(),
   text,
   nextMessageId: null,
+});
+
+export const createVariable = (name: string): ScenarioVariable => ({
+  id: crypto.randomUUID(),
+  name,
+  defaultValue: false,
 });

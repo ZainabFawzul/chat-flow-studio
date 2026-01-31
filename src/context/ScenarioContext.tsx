@@ -1,14 +1,24 @@
-import React, { createContext, useContext, useReducer, useCallback, useEffect } from "react";
+import React, { createContext, useContext, useReducer, useCallback, useEffect, useState } from "react";
 import {
   ScenarioData,
   ChatTheme,
   ChatMessage,
   ResponseOption,
   NodePosition,
+  ScenarioVariable,
+  VariableCondition,
+  VariableAssignment,
   createEmptyScenario,
   createMessage,
   createResponseOption,
+  createVariable,
 } from "@/types/scenario";
+
+// Pending connection state for click-to-connect
+export interface PendingConnection {
+  sourceMessageId: string;
+  optionId: string;
+}
 
 // Action types
 type ScenarioAction =
@@ -28,7 +38,14 @@ type ScenarioAction =
   | { type: "CONNECT_NODES"; payload: { sourceMessageId: string; optionId: string; targetMessageId: string } }
   | { type: "DISCONNECT_OPTION"; payload: { messageId: string; optionId: string } }
   | { type: "REORDER_OPTIONS"; payload: { messageId: string; fromIndex: number; toIndex: number } }
-  | { type: "RESET_SCENARIO" };
+  | { type: "RESET_SCENARIO" }
+  // Variable actions
+  | { type: "ADD_VARIABLE"; payload: { name: string } }
+  | { type: "UPDATE_VARIABLE"; payload: { id: string; name: string } }
+  | { type: "DELETE_VARIABLE"; payload: string }
+  | { type: "SET_RESPONSE_VARIABLE_ASSIGNMENT"; payload: { messageId: string; optionId: string; assignment: VariableAssignment | null } }
+  | { type: "SET_RESPONSE_CONDITION"; payload: { messageId: string; optionId: string; condition: VariableCondition | null } }
+  | { type: "SET_MESSAGE_CONDITION"; payload: { messageId: string; condition: VariableCondition | null } };
 
 // Reducer
 function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioData {
@@ -300,6 +317,113 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
     case "RESET_SCENARIO":
       return createEmptyScenario();
 
+    // Variable actions
+    case "ADD_VARIABLE": {
+      const newVariable = createVariable(action.payload.name);
+      return {
+        ...state,
+        variables: { ...state.variables, [newVariable.id]: newVariable },
+        updatedAt: now,
+      };
+    }
+
+    case "UPDATE_VARIABLE": {
+      const { id, name } = action.payload;
+      if (!state.variables[id]) return state;
+      return {
+        ...state,
+        variables: {
+          ...state.variables,
+          [id]: { ...state.variables[id], name },
+        },
+        updatedAt: now,
+      };
+    }
+
+    case "DELETE_VARIABLE": {
+      const variableId = action.payload;
+      const newVariables = { ...state.variables };
+      delete newVariables[variableId];
+      
+      // Clear all references to this variable in messages and options
+      const newMessages = { ...state.messages };
+      Object.keys(newMessages).forEach((msgId) => {
+        const msg = newMessages[msgId];
+        // Clear message condition if it references this variable
+        if (msg.condition?.variableId === variableId) {
+          newMessages[msgId] = { ...msg, condition: undefined };
+        }
+        // Clear option conditions and assignments
+        newMessages[msgId] = {
+          ...newMessages[msgId],
+          responseOptions: msg.responseOptions.map((opt) => ({
+            ...opt,
+            condition: opt.condition?.variableId === variableId ? undefined : opt.condition,
+            setsVariable: opt.setsVariable?.variableId === variableId ? undefined : opt.setsVariable,
+          })),
+        };
+      });
+      
+      return {
+        ...state,
+        variables: newVariables,
+        messages: newMessages,
+        updatedAt: now,
+      };
+    }
+
+    case "SET_RESPONSE_VARIABLE_ASSIGNMENT": {
+      const { messageId, optionId, assignment } = action.payload;
+      if (!state.messages[messageId]) return state;
+      
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [messageId]: {
+            ...state.messages[messageId],
+            responseOptions: state.messages[messageId].responseOptions.map((opt) =>
+              opt.id === optionId ? { ...opt, setsVariable: assignment || undefined } : opt
+            ),
+          },
+        },
+        updatedAt: now,
+      };
+    }
+
+    case "SET_RESPONSE_CONDITION": {
+      const { messageId, optionId, condition } = action.payload;
+      if (!state.messages[messageId]) return state;
+      
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [messageId]: {
+            ...state.messages[messageId],
+            responseOptions: state.messages[messageId].responseOptions.map((opt) =>
+              opt.id === optionId ? { ...opt, condition: condition || undefined } : opt
+            ),
+          },
+        },
+        updatedAt: now,
+      };
+    }
+
+    case "SET_MESSAGE_CONDITION": {
+      const { messageId, condition } = action.payload;
+      if (!state.messages[messageId]) return state;
+      
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [messageId]: { ...state.messages[messageId], condition: condition || undefined },
+        },
+        updatedAt: now,
+      };
+    }
+
     default:
       return state;
   }
@@ -308,14 +432,17 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
 // Context types
 interface ScenarioContextType {
   scenario: ScenarioData;
+  // Theme and name
   updateTheme: (theme: Partial<ChatTheme>) => void;
   setName: (name: string) => void;
+  // Messages
   addRootMessage: (content: string, position?: NodePosition) => void;
   addMessageAtPosition: (content: string, position: NodePosition) => void;
   updateMessage: (id: string, content: string) => void;
   updateNodePosition: (id: string, position: NodePosition) => void;
   deleteMessage: (id: string) => void;
   toggleEndpoint: (id: string) => void;
+  // Response options
   addResponseOption: (messageId: string, text: string) => void;
   updateResponseOption: (messageId: string, optionId: string, text: string) => void;
   deleteResponseOption: (messageId: string, optionId: string) => void;
@@ -323,6 +450,19 @@ interface ScenarioContextType {
   connectNodes: (sourceMessageId: string, optionId: string, targetMessageId: string) => void;
   disconnectOption: (messageId: string, optionId: string) => void;
   reorderOptions: (messageId: string, fromIndex: number, toIndex: number) => void;
+  // Variables
+  addVariable: (name: string) => void;
+  updateVariable: (id: string, name: string) => void;
+  deleteVariable: (id: string) => void;
+  setResponseVariableAssignment: (messageId: string, optionId: string, assignment: VariableAssignment | null) => void;
+  setResponseCondition: (messageId: string, optionId: string, condition: VariableCondition | null) => void;
+  setMessageCondition: (messageId: string, condition: VariableCondition | null) => void;
+  // Click-to-connect
+  pendingConnection: PendingConnection | null;
+  startConnection: (sourceMessageId: string, optionId: string) => void;
+  cancelConnection: () => void;
+  completeConnection: (targetMessageId: string) => void;
+  // Import/Export
   importScenario: (data: ScenarioData) => void;
   resetScenario: () => void;
 }
@@ -339,13 +479,21 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        // Ensure variables field exists (migration for old data)
+        if (!parsed.variables) {
+          parsed.variables = {};
+        }
+        return parsed;
       }
     } catch (e) {
       console.error("Failed to load saved scenario:", e);
     }
     return createEmptyScenario();
   });
+
+  // Pending connection state for click-to-connect
+  const [pendingConnection, setPendingConnection] = useState<PendingConnection | null>(null);
 
   // Auto-save to localStorage
   useEffect(() => {
@@ -416,6 +564,54 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "REORDER_OPTIONS", payload: { messageId, fromIndex, toIndex } });
   }, []);
 
+  // Variable actions
+  const addVariable = useCallback((name: string) => {
+    dispatch({ type: "ADD_VARIABLE", payload: { name } });
+  }, []);
+
+  const updateVariable = useCallback((id: string, name: string) => {
+    dispatch({ type: "UPDATE_VARIABLE", payload: { id, name } });
+  }, []);
+
+  const deleteVariable = useCallback((id: string) => {
+    dispatch({ type: "DELETE_VARIABLE", payload: id });
+  }, []);
+
+  const setResponseVariableAssignment = useCallback((messageId: string, optionId: string, assignment: VariableAssignment | null) => {
+    dispatch({ type: "SET_RESPONSE_VARIABLE_ASSIGNMENT", payload: { messageId, optionId, assignment } });
+  }, []);
+
+  const setResponseCondition = useCallback((messageId: string, optionId: string, condition: VariableCondition | null) => {
+    dispatch({ type: "SET_RESPONSE_CONDITION", payload: { messageId, optionId, condition } });
+  }, []);
+
+  const setMessageCondition = useCallback((messageId: string, condition: VariableCondition | null) => {
+    dispatch({ type: "SET_MESSAGE_CONDITION", payload: { messageId, condition } });
+  }, []);
+
+  // Click-to-connect actions
+  const startConnection = useCallback((sourceMessageId: string, optionId: string) => {
+    setPendingConnection({ sourceMessageId, optionId });
+  }, []);
+
+  const cancelConnection = useCallback(() => {
+    setPendingConnection(null);
+  }, []);
+
+  const completeConnection = useCallback((targetMessageId: string) => {
+    if (pendingConnection) {
+      dispatch({
+        type: "CONNECT_NODES",
+        payload: {
+          sourceMessageId: pendingConnection.sourceMessageId,
+          optionId: pendingConnection.optionId,
+          targetMessageId,
+        },
+      });
+      setPendingConnection(null);
+    }
+  }, [pendingConnection]);
+
   const importScenario = useCallback((data: ScenarioData) => {
     dispatch({ type: "SET_SCENARIO", payload: data });
   }, []);
@@ -443,6 +639,19 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
         connectNodes,
         disconnectOption,
         reorderOptions,
+        // Variables
+        addVariable,
+        updateVariable,
+        deleteVariable,
+        setResponseVariableAssignment,
+        setResponseCondition,
+        setMessageCondition,
+        // Click-to-connect
+        pendingConnection,
+        startConnection,
+        cancelConnection,
+        completeConnection,
+        // Import/Export
         importScenario,
         resetScenario,
       }}
