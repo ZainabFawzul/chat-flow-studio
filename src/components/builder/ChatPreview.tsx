@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Play, Phone, MoreVertical } from "lucide-react";
+import { RotateCcw, Play } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { BubbleBorderRadius } from "@/types/scenario";
@@ -16,6 +16,37 @@ interface ChatBubble {
   isUser: boolean;
 }
 
+function TypingIndicator({ color }: { color: string }) {
+  return (
+    <div className="flex items-center gap-1 px-4 py-3">
+      <span 
+        className="w-2 h-2 rounded-full animate-bounce"
+        style={{ 
+          backgroundColor: color,
+          animationDelay: "0ms",
+          animationDuration: "600ms"
+        }}
+      />
+      <span 
+        className="w-2 h-2 rounded-full animate-bounce"
+        style={{ 
+          backgroundColor: color,
+          animationDelay: "150ms",
+          animationDuration: "600ms"
+        }}
+      />
+      <span 
+        className="w-2 h-2 rounded-full animate-bounce"
+        style={{ 
+          backgroundColor: color,
+          animationDelay: "300ms",
+          animationDuration: "600ms"
+        }}
+      />
+    </div>
+  );
+}
+
 export function ChatPreview() {
   const { scenario } = useScenario();
   const { theme, messages, rootMessageId } = scenario;
@@ -27,9 +58,20 @@ export function ChatPreview() {
   const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
   const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const currentMessage = currentMessageId ? messages[currentMessageId] : null;
   const rootMessage = rootMessageId ? messages[rootMessageId] : null;
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const getInitials = (name: string) => {
     return name
@@ -40,24 +82,37 @@ export function ChatPreview() {
       .slice(0, 2);
   };
 
+  const addContactMessage = (messageId: string, content: string, callback?: () => void) => {
+    // Show typing indicator
+    setTypingMessageId(messageId);
+    
+    // After delay, show actual message
+    typingTimeoutRef.current = setTimeout(() => {
+      setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
+      setTypingMessageId(null);
+      callback?.();
+    }, 1000);
+  };
+
   const handleStart = () => {
     if (!rootMessageId || !rootMessage) return;
     
     setIsPlaying(true);
-    setChatHistory([
-      {
-        id: rootMessageId,
-        content: rootMessage.content,
-        isUser: false,
-      },
-    ]);
+    setChatHistory([]);
     setCurrentMessageId(rootMessageId);
+    
+    // Show typing indicator, then the first message
+    addContactMessage(rootMessageId, rootMessage.content);
   };
 
   const handleReset = () => {
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
     setIsPlaying(false);
     setChatHistory([]);
     setCurrentMessageId(null);
+    setTypingMessageId(null);
   };
 
   const handleSelectOption = (optionId: string, optionText: string) => {
@@ -66,44 +121,48 @@ export function ChatPreview() {
     const option = currentMessage.responseOptions.find((o) => o.id === optionId);
     if (!option) return;
 
-    // Add user's response to history
-    const newHistory: ChatBubble[] = [
-      ...chatHistory,
+    // Add user's response to history immediately
+    setChatHistory(prev => [
+      ...prev,
       {
         id: `user-${optionId}`,
         content: optionText,
         isUser: true,
       },
-    ];
+    ]);
 
-    // If there's a follow-up message, add it
+    // If there's a follow-up message, show typing then message
     if (option.nextMessageId) {
       const nextMessage = messages[option.nextMessageId];
       if (nextMessage) {
-        newHistory.push({
-          id: option.nextMessageId,
-          content: nextMessage.content,
-          isUser: false,
-        });
         setCurrentMessageId(option.nextMessageId);
+        addContactMessage(option.nextMessageId, nextMessage.content);
+      } else {
+        setCurrentMessageId(null);
       }
     } else {
       // End of conversation path
       setCurrentMessageId(null);
     }
-
-    setChatHistory(newHistory);
   };
 
   const isConversationEnded =
     isPlaying &&
     currentMessage &&
-    (currentMessage.isEndpoint || currentMessage.responseOptions.length === 0);
+    (currentMessage.isEndpoint || currentMessage.responseOptions.length === 0) &&
+    !typingMessageId;
 
   const isDeadEnd =
     isPlaying &&
     !currentMessageId &&
-    chatHistory.length > 0;
+    chatHistory.length > 0 &&
+    !typingMessageId;
+
+  // Start screen text with fallbacks
+  const startTitle = theme.startScreenTitle ?? "Ready to Start";
+  const startSubtitle = theme.startScreenSubtitle ?? "Begin the conversation";
+  const startButtonText = theme.startButtonText ?? "Start";
+  const showResetButton = theme.showResetButton ?? true;
 
   return (
     <div
@@ -142,15 +201,17 @@ export function ChatPreview() {
         </div>
         <div className="flex items-center gap-2">
           {isPlaying ? (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleReset} 
-              className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80"
-            >
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              Reset
-            </Button>
+            showResetButton && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleReset} 
+                className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80"
+              >
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                Reset
+              </Button>
+            )
           ) : (
             <Button
               variant="default"
@@ -175,11 +236,11 @@ export function ChatPreview() {
                 <Play className="h-10 w-10 text-muted-foreground/50" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
-                {rootMessage ? "Ready to Preview" : "No Messages Yet"}
+                {rootMessage ? startTitle : "No Messages Yet"}
               </h3>
               <p className="text-sm text-muted-foreground">
                 {rootMessage 
-                  ? "Click Preview to test your conversation flow"
+                  ? startSubtitle
                   : "Add messages in the Messages tab to get started"
                 }
               </p>
@@ -187,7 +248,7 @@ export function ChatPreview() {
           </div>
         ) : (
           <div className="space-y-4" role="log" aria-label="Chat messages">
-            {chatHistory.map((bubble, index) => (
+            {chatHistory.map((bubble) => (
               <div
                 key={bubble.id}
                 className={cn(
@@ -233,6 +294,38 @@ export function ChatPreview() {
               </div>
             ))}
 
+            {/* Typing indicator */}
+            {typingMessageId && (
+              <div className="flex justify-start animate-fade-in">
+                <Avatar className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
+                  {theme.contactAvatar && (
+                    <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
+                  )}
+                  <AvatarFallback
+                    className="text-xs font-semibold"
+                    style={{
+                      background: `linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7))`,
+                      color: `hsl(${theme.senderTextColor})`,
+                    }}
+                  >
+                    {getInitials(theme.contactName)}
+                  </AvatarFallback>
+                </Avatar>
+                <div
+                  className="shadow-sm"
+                  style={{
+                    backgroundColor: `hsl(${theme.receiverBubbleColor})`,
+                    borderTopLeftRadius: `${receiverRadius.topLeft}px`,
+                    borderTopRightRadius: `${receiverRadius.topRight}px`,
+                    borderBottomRightRadius: `${receiverRadius.bottomRight}px`,
+                    borderBottomLeftRadius: `${receiverRadius.bottomLeft}px`,
+                  }}
+                >
+                  <TypingIndicator color={`hsl(${theme.receiverTextColor} / 0.5)`} />
+                </div>
+              </div>
+            )}
+
             {/* End state messages */}
             {(isConversationEnded || isDeadEnd) && (
               <div className="flex justify-center pt-4">
@@ -247,7 +340,7 @@ export function ChatPreview() {
       </ScrollArea>
 
       {/* Response Options */}
-      {isPlaying && currentMessage && !currentMessage.isEndpoint && (
+      {isPlaying && currentMessage && !currentMessage.isEndpoint && !typingMessageId && (
         <div className="border-t border-border/30 bg-card/90 backdrop-blur-xl p-4" role="group" aria-label="Response options">
           <p className="mb-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
             Choose a response

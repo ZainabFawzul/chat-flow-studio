@@ -17,15 +17,19 @@ import {
 
 function migrateScenario(input: any): ScenarioData {
   const scenario = input as Partial<ScenarioData>;
+  const existingTheme = scenario.theme as Partial<ChatTheme> | undefined;
 
   // Note: We intentionally preserve ids/timestamps/content; only fill missing fields.
   const theme: ChatTheme = {
     ...DEFAULT_THEME,
-    ...(scenario.theme as Partial<ChatTheme> | undefined),
-    senderBorderRadius:
-      (scenario.theme as Partial<ChatTheme> | undefined)?.senderBorderRadius ?? DEFAULT_THEME.senderBorderRadius,
-    receiverBorderRadius:
-      (scenario.theme as Partial<ChatTheme> | undefined)?.receiverBorderRadius ?? DEFAULT_THEME.receiverBorderRadius,
+    ...existingTheme,
+    senderBorderRadius: existingTheme?.senderBorderRadius ?? DEFAULT_THEME.senderBorderRadius,
+    receiverBorderRadius: existingTheme?.receiverBorderRadius ?? DEFAULT_THEME.receiverBorderRadius,
+    // Start screen customization (new fields)
+    startScreenTitle: existingTheme?.startScreenTitle ?? DEFAULT_THEME.startScreenTitle,
+    startScreenSubtitle: existingTheme?.startScreenSubtitle ?? DEFAULT_THEME.startScreenSubtitle,
+    startButtonText: existingTheme?.startButtonText ?? DEFAULT_THEME.startButtonText,
+    showResetButton: existingTheme?.showResetButton ?? DEFAULT_THEME.showResetButton,
   };
 
   return {
