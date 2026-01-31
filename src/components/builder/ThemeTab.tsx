@@ -156,7 +156,7 @@ export function ThemeTab() {
                 <input ref={avatarInputRef} type="file" accept="image/*" className="sr-only" onChange={handleAvatarUpload} aria-label="Upload avatar image" />
                 
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={() => avatarInputRef.current?.click()} className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80">
+                  <Button variant="secondary" size="sm" onClick={() => avatarInputRef.current?.click()} className="gap-2 rounded-xl">
                     <Upload className="h-4 w-4" aria-hidden="true" />
                     Upload
                   </Button>
