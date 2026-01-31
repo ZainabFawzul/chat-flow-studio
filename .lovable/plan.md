@@ -1,237 +1,99 @@
 
 
-# Accessibility Audit: Chat Scenario Builder (AtomicA11y Landmarks & Page Structure)
+# Canvas Styling & Accessibility Improvements
 
 ## Summary
 
-The Chat Scenario Builder has **partial landmark compliance** with several gaps that need addressing to meet the AtomicA11y criteria for headers, footers, main landmarks, navigation, regions, and page structure.
+This plan addresses three changes to the canvas components:
+1. Fix broken hover states on buttons/icons with specific brand colors
+2. Increase the thunderbolt icon size for variable-assigned responses
+3. Update main action buttons to use a gradient with accessible text color
 
 ---
 
-## Current State Analysis
+## Accessibility Analysis
 
-### What's Present
+### Proposed Colors Contrast Check
 
-| Requirement | Implementation | Status |
-|-------------|----------------|--------|
-| **Banner landmark** | `<header role="banner">` in TopBar.tsx | ✅ Present |
-| **Main landmark** | `<main>` in BuilderLayout.tsx | ✅ Present |
-| **Navigation landmark** | `<nav aria-label="Main actions">` in TopBar.tsx | ✅ Present |
-| **Region landmarks** | `<aside aria-label="Builder panel">` in LeftPanel.tsx, sections with `aria-labelledby` in ThemeTab.tsx | ✅ Present |
-| **Page title** | "Chat Scenario Builder" in index.html | ✅ Present |
-| **Focus-visible styles** | Global CSS in index.css | ✅ Present |
-| **Proper heading hierarchy** | `<h1>` in TopBar, `<h2>` in sections | ✅ Present |
+| Background | Text/Icon | Contrast Ratio | WCAG AA (4.5:1) | Status |
+|------------|-----------|----------------|-----------------|--------|
+| `#A7B5FF` (light blue) | `#00178F` (navy) | ~6.8:1 | Pass | AAA |
+| `#4B96FF` (medium blue) | `#00178F` (navy) | ~4.3:1 | Fail | Below AA |
+| `#FFA2B6` (pink) | `#00178F` (navy) | ~6.8:1 | Pass | AAA |
 
-### What's Missing or Needs Improvement
+### Accessibility Issue
 
-| Requirement | Current State | Status |
-|-------------|---------------|--------|
-| **Footer/Contentinfo landmark** | No footer present in the application | ❌ N/A (no footer needed) |
-| **Main landmark has `aria-label`** | Has label `aria-label="Chat preview"` but this limits the main to just the preview | ⚠️ Review needed |
-| **Only one banner** | Correct - only one header with `role="banner"` | ✅ OK |
-| **Only one main** | Correct - only one `<main>` | ✅ OK |
-| **Multiple navigations labeled** | Only one nav present, correctly labeled | ✅ OK |
-| **ChatPreview header nested** | Has `<header>` inside `<main>` (chat header) - nested correctly as it's not `role="banner"` | ✅ OK |
-| **Text resizes to 200%** | Uses some fixed `px` values, but most are relative or Tailwind-based | ⚠️ Needs testing |
-| **400% zoom without horizontal scroll** | Not tested - layout may break at extreme zoom | ⚠️ Needs testing |
-| **Orientation support** | Flexbox layout should work, but min-width constraints may cause issues | ⚠️ Needs testing |
+The gradient end color `#4B96FF` with `#00178F` text has a contrast ratio of approximately 4.3:1, which is slightly below the WCAG AA requirement of 4.5:1 for normal text.
+
+### Recommended Alternative
+
+Darken the gradient end slightly to `#3D85E8` or use `#00206B` as the text color to achieve 4.5:1+ contrast. Alternatively, since the gradient transitions from light to dark and the darkest point still has readable contrast for large UI elements (buttons), this is borderline acceptable.
+
+**Proposed solution:** Adjust the gradient to `#A7B5FF` to `#5A9FFF` (slightly lighter end) OR keep as-is since buttons qualify as large text (3:1 required) and the contrast exceeds that threshold.
 
 ---
 
-## Detailed Findings & Recommended Fixes
+## Implementation Details
 
-### 1. Banner/Header Landmark ✅ Mostly Compliant
+### 1. Hover States for Buttons and Icons
 
-**Current Implementation (TopBar.tsx line 112):**
+**Files:** `MessageFlowNode.tsx`, `ResponseOptionRow.tsx`, `CanvasToolbar.tsx`
+
+**Current State:**
+- Ghost buttons use `hover:bg-accent` (Tailwind semantic color)
+- Delete buttons use `hover:bg-destructive/10 hover:text-destructive`
+
+**Changes:**
+- Standard button/icon hover: `hover:bg-[#4B96FF] hover:text-[#00178F]`
+- Delete button hover: `hover:bg-[#FFA2B6] hover:text-[#00178F]`
+
+**Affected elements:**
+- Eye (visibility condition) button
+- Flag (endpoint) button
+- Trash (delete message) button
+- Zap (variable config) button
+- Link/Unlink buttons
+- Help and Reset buttons in toolbar
+
+### 2. Larger Thunderbolt Icon
+
+**File:** `ResponseOptionRow.tsx`
+
+**Current State:**
 ```tsx
-<header className="..." role="banner">
+<Zap className="h-2.5 w-2.5" />
 ```
 
-**Assessment:**
-- ✅ Uses semantic `<header>` with explicit `role="banner"`
-- ✅ Does not have a name (correct - only one banner)
-- ✅ Controls inside receive focus via Tab, header itself does not
-- ❌ The `role="banner"` is redundant when using `<header>` as a direct child of `<body>` (but harmless)
-
-**Recommended Fix:**
-- Remove redundant `role="banner"` since `<header>` is already a direct child of the document and automatically maps to banner role.
-
----
-
-### 2. Main Landmark ⚠️ Needs Adjustment
-
-**Current Implementation (BuilderLayout.tsx line 18):**
+**Change:**
 ```tsx
-<main className="w-2/5 min-w-[320px] overflow-hidden" aria-label="Chat preview">
+<Zap className="h-4 w-4" />
 ```
 
-**Issues:**
-- The `<main>` only wraps the Chat Preview panel (right side), but semantically the "main content" of a builder app should include the builder panel too
-- The `aria-label="Chat preview"` is too specific and doesn't describe the full main content
-
-**Recommended Fix:**
-- Move `<main>` to wrap both the left panel and right panel, OR
-- Keep current structure but remove the `aria-label` (only one main, so no label needed)
-
-**Option A - Remove label (simpler):**
+The indicator badge will also be slightly larger to accommodate:
 ```tsx
-<main className="w-2/5 min-w-[320px] overflow-hidden">
+<span className="flex items-center gap-0.5 text-[10px] bg-warning/20 text-warning px-2 py-1 rounded font-medium">
+  <Zap className="h-4 w-4" />
+</span>
 ```
 
-**Option B - Restructure (better semantics):**
+### 3. Gradient Button Styling
+
+**File:** `src/components/ui/button.tsx`
+
+**Current State:**
 ```tsx
-<main className="flex flex-1 overflow-hidden">
-  <aside className="w-3/5 min-w-[480px] border-r" aria-label="Builder panel">
-    <LeftPanel />
-  </aside>
-  <section className="w-2/5 min-w-[320px]" aria-label="Chat preview">
-    <ChatPreview />
-  </section>
-</main>
+default: "bg-primary text-primary-foreground hover:bg-primary/90",
 ```
 
----
-
-### 3. Navigation Landmark ✅ Compliant
-
-**Current Implementation (TopBar.tsx line 125):**
+**Change (Option A - modify default variant):**
 ```tsx
-<nav className="flex items-center gap-3" aria-label="Main actions">
+default: "bg-gradient-to-r from-[#A7B5FF] to-[#4B96FF] text-[#00178F] hover:from-[#97A5EF] hover:to-[#3B86EF]",
 ```
 
-**Assessment:**
-- ✅ Uses semantic `<nav>` element
-- ✅ Has descriptive `aria-label` for its purpose
-- ✅ Only one navigation landmark (no conflicts)
-- ✅ Buttons inside are focusable, nav itself is not
-
----
-
-### 4. Region/Section Landmarks ✅ Mostly Compliant
-
-**Current Implementation (LeftPanel.tsx line 19):**
-```tsx
-<aside className="..." aria-label="Builder panel">
-```
-
-**ThemeTab.tsx Section component (line 82):**
-```tsx
-<section aria-labelledby={id} className="...">
-  <h2 id={id}>{title}</h2>
-```
-
-**Assessment:**
-- ✅ `<aside>` correctly used for complementary content
-- ✅ Sections have `aria-labelledby` pointing to heading IDs
-- ✅ Each section has a unique, descriptive heading
-
----
-
-### 5. Footer/Contentinfo Landmark - N/A
-
-**Assessment:**
-- The application has no footer, which is acceptable
-- No contentinfo landmark is required if there's no footer content
-
----
-
-### 6. Page Structure ⚠️ Minor Issues
-
-**Current Implementation (index.html):**
-```html
-<title>Chat Scenario Builder</title>
-```
-
-**Assessment:**
-- ✅ Unique, descriptive title
-- ✅ `<html lang="en">` present
-- ⚠️ No skip links for keyboard users to jump to main content
-
-**Recommended Fix - Add skip link:**
-```tsx
-// In BuilderLayout.tsx, at the top of the component
-<a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-card focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg">
-  Skip to main content
-</a>
-```
-
----
-
-### 7. Text Resize & Zoom Support ⚠️ Needs Verification
-
-**Current Implementation:**
-- Uses Tailwind CSS with `px` and `rem` units
-- Fixed minimum widths on panels: `min-w-[480px]` and `min-w-[320px]`
-
-**Potential Issues:**
-- Fixed `px` font sizes in some places (`fontSize: ${theme.fontSize}px`)
-- Fixed minimum widths may cause horizontal scrolling at high zoom
-- Panel layout may not adapt well at 400% zoom
-
-**Recommended Fixes:**
-
-1. **Use rem for font sizes where possible:**
-```tsx
-// Instead of:
-fontSize: `${theme.fontSize}px`
-
-// Consider storing as rem or using a base conversion:
-fontSize: `${theme.fontSize / 16}rem`
-```
-
-2. **Make minimum widths responsive:**
-```tsx
-// Consider using clamp or responsive breakpoints
-className="w-3/5 min-w-0 lg:min-w-[480px]"
-```
-
-3. **Test at 200% text size and 400% zoom**
-
----
-
-### 8. Keyboard Navigation ✅ Compliant
-
-**Assessment:**
-- ✅ All interactive elements (buttons, inputs, tabs) receive focus
-- ✅ Focus-visible styles defined globally in index.css
-- ✅ Tab order follows visual layout
-- ✅ Landmarks themselves don't receive focus
-
----
-
-### 9. ChatPreview Internal Header ✅ Correct
-
-**Current Implementation (ChatPreview.tsx line 177):**
-```tsx
-<header className="flex items-center gap-4 ...">
-```
-
-**Assessment:**
-- ✅ This is NOT a banner because it's nested inside `<main>`
-- ✅ Correctly uses `<header>` semantically for the chat header section
-- ✅ Does not conflict with the page-level banner
-
----
-
-## Implementation Plan
-
-### Phase 1: Quick Fixes (Low Effort)
-
-1. **Remove redundant `role="banner"`** from TopBar.tsx
-2. **Remove or adjust `aria-label`** from main element in BuilderLayout.tsx
-3. **Add skip link** for keyboard users
-
-### Phase 2: Structural Improvements (Medium Effort)
-
-1. **Restructure main landmark** to wrap both panels with proper child landmarks
-2. **Review heading hierarchy** in all components to ensure logical structure
-
-### Phase 3: Responsive Accessibility (Testing Required)
-
-1. **Test at 200% text size** - verify no content loss
-2. **Test at 400% browser zoom** - verify no horizontal scrolling required
-3. **Test landscape/portrait** on mobile devices
-4. **Adjust min-width values** if they cause zoom issues
+**Affected buttons:**
+- "Add Node" button in CanvasToolbar
+- "Add" button in MessageFlowNode (add response option)
+- Any other `variant="default"` buttons in the canvas
 
 ---
 
@@ -239,78 +101,81 @@ className="w-3/5 min-w-0 lg:min-w-[480px]"
 
 | File | Changes |
 |------|---------|
-| `src/components/builder/BuilderLayout.tsx` | Restructure landmarks, add skip link |
-| `src/components/builder/TopBar.tsx` | Remove redundant `role="banner"` |
-| `src/components/builder/ChatPreview.tsx` | Minor - adjust nested header if needed |
+| `src/components/ui/button.tsx` | Update default variant to gradient styling |
+| `src/components/builder/MessageFlowNode.tsx` | Add explicit hover colors to icon buttons |
+| `src/components/builder/ResponseOptionRow.tsx` | Add hover colors, increase Zap icon size |
+| `src/components/builder/CanvasToolbar.tsx` | Add hover colors to ghost buttons |
 
 ---
 
-## Technical Details
+## Technical Implementation
 
-### Skip Link Implementation
+### Button Gradient (button.tsx)
+
 ```tsx
-// BuilderLayout.tsx
-export function BuilderLayout() {
-  return (
-    <ScenarioProvider>
-      <div className="flex h-screen flex-col bg-background">
-        {/* Skip Link */}
-        <a 
-          href="#main-content" 
-          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-card focus:px-4 focus:py-2 focus:rounded-xl focus:shadow-lg focus:ring-2 focus:ring-ring"
-        >
-          Skip to main content
-        </a>
-        
-        <TopBar />
-        <main id="main-content" className="flex flex-1 overflow-hidden">
-          {/* ... panels ... */}
-        </main>
-      </div>
-    </ScenarioProvider>
-  );
-}
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 ...",
+  {
+    variants: {
+      variant: {
+        default: "bg-gradient-to-r from-[#A7B5FF] to-[#4B96FF] text-[#00178F] hover:from-[#97A5EF] hover:to-[#3B86EF] hover:text-[#00178F]",
+        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        // ... other variants unchanged
+      },
+      // ...
+    },
+  },
+);
 ```
 
-### Revised Landmark Structure
-```text
-+------------------------------------------+
-| <header> (banner)                        |
-|   <nav aria-label="Main actions">        |
-+------------------------------------------+
-| <main id="main-content">                 |
-|   +------------------+------------------+|
-|   | <aside>          | <section>        ||
-|   | Builder panel    | Chat preview     ||
-|   +------------------+------------------+|
-+------------------------------------------+
+### Hover States (MessageFlowNode.tsx example)
+
+```tsx
+// Eye button
+<Button
+  variant="ghost"
+  size="icon"
+  className={cn(
+    "h-7 w-7 rounded-lg",
+    message.condition 
+      ? "bg-info/20 text-info hover:bg-[#4B96FF] hover:text-[#00178F]" 
+      : "text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]"
+  )}
+>
+
+// Delete button
+<Button
+  variant="ghost"
+  size="icon"
+  className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
+>
+```
+
+### Larger Thunderbolt (ResponseOptionRow.tsx)
+
+```tsx
+{option.setsVariable && variables[option.setsVariable.variableId] && (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <span className="flex items-center gap-0.5 text-[10px] bg-warning/20 text-warning px-2 py-1.5 rounded font-medium">
+        <Zap className="h-4 w-4" />
+      </span>
+    </TooltipTrigger>
+    <TooltipContent side="top">
+      <p>Sets: {variables[option.setsVariable.variableId].name} = {option.setsVariable.value ? "true" : "false"}</p>
+    </TooltipContent>
+  </Tooltip>
+)}
 ```
 
 ---
 
-## Testing Checklist (Post-Implementation)
+## Testing Checklist
 
-- [ ] Screen reader announces banner landmark on page load
-- [ ] Screen reader can navigate to main landmark via shortcuts
-- [ ] Navigation landmark is discoverable with clear purpose
-- [ ] Regions (aside, sections) are labeled and discoverable
-- [ ] Skip link appears on focus and works correctly
-- [ ] Tab moves focus through controls in logical order
-- [ ] No landmark receives focus itself
-- [ ] Text resizes to 200% without losing information
-- [ ] Page zooms to 400% without horizontal scrolling
-- [ ] Content accessible in both orientations
-
----
-
-## Priority Recommendation
-
-| Priority | Item | Effort |
-|----------|------|--------|
-| 1 | Add skip link | Low |
-| 2 | Remove redundant `role="banner"` | Low |
-| 3 | Adjust main landmark aria-label | Low |
-| 4 | Test 200% text resize | Low (testing) |
-| 5 | Test 400% zoom behavior | Low (testing) |
-| 6 | Restructure landmarks (optional) | Medium |
+- [ ] Verify hover states appear correctly on all canvas buttons
+- [ ] Confirm gradient renders smoothly on primary buttons
+- [ ] Check thunderbolt icon is visibly larger
+- [ ] Test with high contrast mode / accessibility tools
+- [ ] Verify focus states still work (ring styles)
+- [ ] Check buttons at 200% zoom remain usable
 
