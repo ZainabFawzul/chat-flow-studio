@@ -32,10 +32,10 @@ function BorderRadiusControl({ label, value, onChange }: BorderRadiusControlProp
   return (
     <div>
       <Label className="mb-2 block text-sm font-medium">{label}</Label>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="flex gap-2">
         {corners.map(({ key, label: cornerLabel }) => (
-          <div key={key} className="flex flex-col gap-1">
-            <span className="text-[10px] text-muted-foreground font-medium">{cornerLabel}</span>
+          <div key={key} className="flex-1 flex flex-col gap-1">
+            <span className="text-[9px] text-muted-foreground font-medium text-center truncate">{cornerLabel}</span>
             <Input
               type="number"
               min={0}
