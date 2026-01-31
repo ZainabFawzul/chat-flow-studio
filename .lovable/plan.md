@@ -1,206 +1,190 @@
 
-# Variable Type Placeholders - Locked Functionality
+# Plan: Add Documentation Comments to All Project Files
 
-## Summary
+## Overview
+This plan adds a documentation header comment at the beginning of every file in the project. Each comment will describe what the file does, what it configures, and what dependencies it requires.
 
-Add a type selector interface to the Variables panel that shows three variable types: Boolean (current functionality), Text Matching, and Number. The Text and Number types will be visible but locked with a "Coming Soon" indicator.
-
----
-
-## Design Approach
-
-### Type Selection UI
-
-When adding a new variable, users will see a segmented control or radio group to select the type before entering the name. The interface will clearly indicate which types are available now vs coming soon.
-
-```text
-+------------------------------------------+
-| Conditional Variables                    |
-| Boolean flags that control...            |
-+------------------------------------------+
-| Type:                                    |
-| [True/False]  [Text*]  [Number*]         |
-|               * Coming Soon              |
-+------------------------------------------+
-| [Existing variables list...]             |
-+------------------------------------------+
-| [Name input]  [Add]                      |
-+------------------------------------------+
-```
-
-### Variable Type Icons
-
-- **True/False (Boolean)**: `ToggleLeft` icon (current)
-- **Text Matching**: `Type` or `ALargeSmall` icon
-- **Number**: `Hash` icon
-
-### Locked State Visual Treatment
-
-Locked variable types will have:
-- A small lock icon overlay or badge
-- Reduced opacity (50%)
-- "Coming soon" tooltip on hover
-- Non-interactive (cursor-not-allowed)
-- A subtle "Coming Soon" badge next to the type name
-
----
-
-## Implementation Details
-
-### 1. Add Variable Type Enum
-
-**File:** `src/types/scenario.ts`
-
-Add a type discriminator to the variable system (prepared for future use):
+## Comment Format
+Each file will receive a multi-line comment at the very top following this structure:
 
 ```typescript
-export type VariableType = "boolean" | "text" | "number";
-
-export interface ScenarioVariable {
-  id: string;
-  name: string;
-  type: VariableType; // New field
-  defaultValue: boolean; // Will become union type later
-}
-
-// Update createVariable to default to "boolean"
-export const createVariable = (name: string, type: VariableType = "boolean"): ScenarioVariable => ({
-  id: crypto.randomUUID(),
-  name,
-  type,
-  defaultValue: false,
-});
+/**
+ * @file [filename]
+ * @description [Brief description of what the file does]
+ * 
+ * @dependencies [List of key external/internal dependencies]
+ * @usage [How/where this file is used]
+ */
 ```
 
-### 2. Update VariablesPanel UI
+---
 
-**File:** `src/components/builder/VariablesPanel.tsx`
+## Files to Update
 
-**Changes:**
-- Add imports for new icons: `Lock`, `Type`, `Hash` from lucide-react
-- Add a type selector section with three options
-- Disable Text and Number options with locked styling
-- Show a "Coming Soon" badge on locked types
-- Display variable type icon based on the variable's type field
+### Root Configuration Files (7 files)
 
-**New Type Selector Component (inline):**
+| File | Description |
+|------|-------------|
+| `vite.config.ts` | Vite build configuration with React SWC plugin, dev server settings, and path aliases |
+| `vitest.config.ts` | Vitest test runner configuration with jsdom environment and test file patterns |
+| `tailwind.config.ts` | Tailwind CSS configuration with custom colors, animations, and theme extensions |
+| `tsconfig.json` | Root TypeScript configuration that references app and node configs |
+| `tsconfig.app.json` | TypeScript config for app source files with path aliases |
+| `tsconfig.node.json` | TypeScript config for Node.js tooling files |
+| `eslint.config.js` | ESLint configuration for code linting rules |
+| `postcss.config.js` | PostCSS configuration for Tailwind CSS processing |
+| `components.json` | shadcn/ui configuration for component generation |
 
-```tsx
-const VARIABLE_TYPES = [
-  { id: "boolean", label: "True/False", icon: ToggleLeft, locked: false },
-  { id: "text", label: "Text", icon: Type, locked: true },
-  { id: "number", label: "Number", icon: Hash, locked: true },
-] as const;
+### Source Entry Files (3 files)
 
-// State for selected type
-const [selectedType, setSelectedType] = useState<"boolean" | "text" | "number">("boolean");
-```
+| File | Description |
+|------|-------------|
+| `src/main.tsx` | Application entry point; mounts React app to DOM |
+| `src/App.tsx` | Root component; sets up providers (Query, Tooltip, Scenario), routing, and toasters |
+| `src/vite-env.d.ts` | Vite environment type declarations |
 
-**Type Selector UI:**
+### Pages (2 files)
 
-```tsx
-<div className="p-3 border-b border-border">
-  <div className="text-xs text-muted-foreground mb-2">Variable Type</div>
-  <div className="flex gap-1">
-    {VARIABLE_TYPES.map((vt) => (
-      <button
-        key={vt.id}
-        onClick={() => !vt.locked && setSelectedType(vt.id)}
-        disabled={vt.locked}
-        className={cn(
-          "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors",
-          selectedType === vt.id && !vt.locked
-            ? "bg-primary/20 text-primary"
-            : vt.locked
-            ? "opacity-50 cursor-not-allowed text-muted-foreground"
-            : "hover:bg-secondary text-muted-foreground"
-        )}
-      >
-        <vt.icon className="h-3 w-3" />
-        {vt.label}
-        {vt.locked && <Lock className="h-2.5 w-2.5 ml-0.5" />}
-      </button>
-    ))}
-  </div>
-  <div className="text-[10px] text-muted-foreground mt-1.5 text-center">
-    Text and Number types coming soon
-  </div>
-</div>
-```
+| File | Description |
+|------|-------------|
+| `src/pages/Index.tsx` | Main page component; renders the BuilderLayout |
+| `src/pages/NotFound.tsx` | 404 error page for unmatched routes |
 
-### 3. Update Variable List Display
+### Context (1 file)
 
-Each variable in the list will show its type icon:
+| File | Description |
+|------|-------------|
+| `src/context/ScenarioContext.tsx` | Global state management for scenarios using React Context and useReducer; handles messages, themes, variables, and connections |
 
-```tsx
-// Get icon based on variable type
-const getVariableIcon = (type: VariableType = "boolean") => {
-  switch (type) {
-    case "text": return Type;
-    case "number": return Hash;
-    default: return ToggleLeft;
-  }
-};
+### Types (1 file)
 
-// In the variable row
-const VariableIcon = getVariableIcon(variable.type);
-<VariableIcon className="h-3 w-3" />
-```
+| File | Description |
+|------|-------------|
+| `src/types/scenario.ts` | TypeScript type definitions for scenario data structures including ChatMessage, ChatTheme, ResponseOption, and variables |
 
-### 4. Migration for Existing Variables
+### Library/Utils (3 files)
 
-**File:** `src/context/ScenarioContext.tsx`
+| File | Description |
+|------|-------------|
+| `src/lib/utils.ts` | Utility functions including cn() for className merging |
+| `src/lib/contrast.ts` | WCAG 2.1 contrast ratio utilities for accessibility validation |
+| `src/lib/exportZip.ts` | ZIP export functionality to generate standalone HTML chat scenarios |
 
-Update the `migrateScenario` function to add `type: "boolean"` to any existing variables that lack the field:
+### Hooks (2 files)
+
+| File | Description |
+|------|-------------|
+| `src/hooks/use-toast.ts` | Toast notification state management hook with add/dismiss/update actions |
+| `src/hooks/use-mobile.tsx` | Responsive hook to detect mobile viewport breakpoint |
+
+### Builder Components (14 files)
+
+| File | Description |
+|------|-------------|
+| `src/components/builder/BuilderLayout.tsx` | Main builder layout; composes TopBar, LeftPanel, and ChatPreview |
+| `src/components/builder/TopBar.tsx` | Header bar with app branding, import/export buttons, and finalize dialog |
+| `src/components/builder/LeftPanel.tsx` | Left sidebar with Theme/Canvas tabs navigation |
+| `src/components/builder/ThemeTab.tsx` | Theme customization panel for colors, typography, and styling |
+| `src/components/builder/FlowCanvas.tsx` | React Flow canvas for visual node-based message editing |
+| `src/components/builder/MessageFlowNode.tsx` | Individual message node component for the flow canvas |
+| `src/components/builder/ResponseOptionRow.tsx` | Response option UI with variable assignments and conditions |
+| `src/components/builder/ResponseEdge.tsx` | Custom edge component for connecting nodes in React Flow |
+| `src/components/builder/ChatPreview.tsx` | Live chat preview panel showing conversation simulation |
+| `src/components/builder/MessagesTab.tsx` | Tree-based message editing view (alternative to canvas) |
+| `src/components/builder/MessageNode.tsx` | Recursive message component for tree view |
+| `src/components/builder/CanvasToolbar.tsx` | Canvas toolbar with add node, variables, reset, and help buttons |
+| `src/components/builder/VariablesPanel.tsx` | Floating panel for creating and managing variables |
+| `src/components/builder/FloatingPanel.tsx` | Reusable draggable floating panel component |
+
+### Other Components (1 file)
+
+| File | Description |
+|------|-------------|
+| `src/components/NavLink.tsx` | Wrapper for React Router NavLink with conditional className support |
+
+### UI Components (50 files)
+All shadcn/ui component files in `src/components/ui/` will receive a brief comment identifying them as shadcn/ui primitives:
 
 ```typescript
-// Inside migrateScenario
-const migratedVariables: Record<string, ScenarioVariable> = {};
-Object.entries(scenario.variables ?? {}).forEach(([id, variable]) => {
-  migratedVariables[id] = {
-    ...variable,
-    type: (variable as any).type ?? "boolean",
-  };
-});
+/**
+ * @file button.tsx
+ * @description shadcn/ui Button component - A styled button with multiple variants
+ * 
+ * @see https://ui.shadcn.com/docs/components/button
+ */
 ```
 
----
+### Test Files (2 files)
 
-## Files to Modify
+| File | Description |
+|------|-------------|
+| `src/test/setup.ts` | Test environment setup with DOM mocks |
+| `src/test/example.test.ts` | Example test file demonstrating Vitest usage |
 
-| File | Changes |
-|------|---------|
-| `src/types/scenario.ts` | Add `VariableType` type, add `type` field to `ScenarioVariable`, update `createVariable` |
-| `src/components/builder/VariablesPanel.tsx` | Add type selector UI with locked states, add new icons, display type icons on variables |
-| `src/context/ScenarioContext.tsx` | Add migration logic for existing variables without type field |
+### CSS Files (2 files)
 
----
-
-## Accessibility Considerations
-
-- Locked buttons use `disabled` attribute for screen readers
-- Tooltip on locked types explains "Coming soon"
-- Clear visual distinction between active and locked states
-- Lock icon provides visual indicator even without color
+| File | Description |
+|------|-------------|
+| `src/index.css` | Global CSS with Tailwind directives and CSS variables for theming |
+| `src/App.css` | Application-specific CSS styles |
 
 ---
 
-## Visual Summary
+## Technical Details
 
-**Type Selector States:**
-- **Active (Boolean)**: Highlighted background, primary color
-- **Locked (Text/Number)**: 50% opacity, lock icon, non-clickable
+### Comment Style by File Type
 
-**Variable List:**
-- Each variable shows its type icon (Toggle, Type, or Hash)
-- Future Text/Number variables will show their respective icons
+**TypeScript/JavaScript files (`.ts`, `.tsx`, `.js`):**
+```typescript
+/**
+ * @file filename.tsx
+ * @description Brief description
+ * 
+ * @dependencies List of key imports
+ * @usage Where/how this file is used
+ */
+```
+
+**CSS files (`.css`):**
+```css
+/**
+ * @file filename.css
+ * @description Brief description
+ */
+```
+
+**JSON files (`tsconfig.json`, `components.json`):**
+JSON doesn't support comments, so these will be skipped or documented in a separate README if needed.
 
 ---
 
-## Testing Checklist
+## Implementation Order
 
-- [ ] Boolean variables can still be created normally
-- [ ] Text and Number type buttons are visually distinct and non-clickable
-- [ ] Existing scenarios load correctly with migrated boolean type
-- [ ] Tooltips display correctly on locked types
-- [ ] Hover states follow the established color palette
+1. **Core files first** - Entry points and configuration
+2. **Context and types** - Foundation layer
+3. **Utility libraries** - Shared helpers
+4. **Builder components** - Main application features
+5. **UI components** - shadcn/ui primitives (batch update)
+6. **Remaining files** - Hooks, pages, tests
+
+---
+
+## File Count Summary
+
+| Category | Count |
+|----------|-------|
+| Configuration files | 7 |
+| Source entry files | 3 |
+| Pages | 2 |
+| Context | 1 |
+| Types | 1 |
+| Library/Utils | 3 |
+| Hooks | 2 |
+| Builder components | 14 |
+| Other components | 1 |
+| UI components | 50 |
+| Test files | 2 |
+| CSS files | 2 |
+| **Total** | **88 files** |
+
+*Note: JSON config files will be documented via inline comments where supported, or skipped where not possible.*
