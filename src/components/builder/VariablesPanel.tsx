@@ -115,7 +115,7 @@ export function VariablesPanel({
       </div>
 
       {/* Variables List */}
-      <div className="p-3 pb-2 border-t border-border">
+      <div className="p-3 pb-2 border-t border-border border-0">
         <div className="text-xs text-muted-foreground mb-2">Variable List</div>
       </div>
       <div className="max-h-[280px] overflow-y-auto px-2 pb-2 space-y-1">
