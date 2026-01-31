@@ -4,6 +4,7 @@ import {
   ChatTheme,
   ChatMessage,
   ResponseOption,
+  NodePosition,
   createEmptyScenario,
   createMessage,
   createResponseOption,
@@ -14,14 +15,18 @@ type ScenarioAction =
   | { type: "SET_SCENARIO"; payload: ScenarioData }
   | { type: "UPDATE_THEME"; payload: Partial<ChatTheme> }
   | { type: "SET_NAME"; payload: string }
-  | { type: "ADD_ROOT_MESSAGE"; payload: string }
+  | { type: "ADD_ROOT_MESSAGE"; payload: { content: string; position: NodePosition } }
+  | { type: "ADD_MESSAGE_AT_POSITION"; payload: { content: string; position: NodePosition } }
   | { type: "UPDATE_MESSAGE"; payload: { id: string; content: string } }
+  | { type: "UPDATE_NODE_POSITION"; payload: { id: string; position: NodePosition } }
   | { type: "DELETE_MESSAGE"; payload: string }
   | { type: "TOGGLE_ENDPOINT"; payload: string }
   | { type: "ADD_RESPONSE_OPTION"; payload: { messageId: string; text: string } }
   | { type: "UPDATE_RESPONSE_OPTION"; payload: { messageId: string; optionId: string; text: string } }
   | { type: "DELETE_RESPONSE_OPTION"; payload: { messageId: string; optionId: string } }
-  | { type: "ADD_FOLLOW_UP_MESSAGE"; payload: { parentMessageId: string; optionId: string; content: string } }
+  | { type: "ADD_FOLLOW_UP_MESSAGE"; payload: { parentMessageId: string; optionId: string; content: string; position: NodePosition } }
+  | { type: "CONNECT_NODES"; payload: { sourceMessageId: string; optionId: string; targetMessageId: string } }
+  | { type: "DISCONNECT_OPTION"; payload: { messageId: string; optionId: string } }
   | { type: "REORDER_OPTIONS"; payload: { messageId: string; fromIndex: number; toIndex: number } }
   | { type: "RESET_SCENARIO" };
 
@@ -48,11 +53,38 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
       };
 
     case "ADD_ROOT_MESSAGE": {
-      const newMessage = createMessage(action.payload);
+      const { content, position } = action.payload;
+      const newMessage = createMessage(content, position);
       return {
         ...state,
         messages: { ...state.messages, [newMessage.id]: newMessage },
         rootMessageId: newMessage.id,
+        updatedAt: now,
+      };
+    }
+
+    case "ADD_MESSAGE_AT_POSITION": {
+      const { content, position } = action.payload;
+      const newMessage = createMessage(content, position);
+      // If no root exists, make this the root
+      const isRoot = !state.rootMessageId;
+      return {
+        ...state,
+        messages: { ...state.messages, [newMessage.id]: newMessage },
+        rootMessageId: isRoot ? newMessage.id : state.rootMessageId,
+        updatedAt: now,
+      };
+    }
+
+    case "UPDATE_NODE_POSITION": {
+      const { id, position } = action.payload;
+      if (!state.messages[id]) return state;
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [id]: { ...state.messages[id], position },
+        },
         updatedAt: now,
       };
     }
@@ -188,10 +220,10 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
     }
 
     case "ADD_FOLLOW_UP_MESSAGE": {
-      const { parentMessageId, optionId, content } = action.payload;
+      const { parentMessageId, optionId, content, position } = action.payload;
       if (!state.messages[parentMessageId]) return state;
       
-      const newMessage = createMessage(content);
+      const newMessage = createMessage(content, position);
       
       return {
         ...state,
@@ -202,6 +234,44 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
             ...state.messages[parentMessageId],
             responseOptions: state.messages[parentMessageId].responseOptions.map((opt) =>
               opt.id === optionId ? { ...opt, nextMessageId: newMessage.id } : opt
+            ),
+          },
+        },
+        updatedAt: now,
+      };
+    }
+
+    case "CONNECT_NODES": {
+      const { sourceMessageId, optionId, targetMessageId } = action.payload;
+      if (!state.messages[sourceMessageId] || !state.messages[targetMessageId]) return state;
+      
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [sourceMessageId]: {
+            ...state.messages[sourceMessageId],
+            responseOptions: state.messages[sourceMessageId].responseOptions.map((opt) =>
+              opt.id === optionId ? { ...opt, nextMessageId: targetMessageId } : opt
+            ),
+          },
+        },
+        updatedAt: now,
+      };
+    }
+
+    case "DISCONNECT_OPTION": {
+      const { messageId, optionId } = action.payload;
+      if (!state.messages[messageId]) return state;
+      
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [messageId]: {
+            ...state.messages[messageId],
+            responseOptions: state.messages[messageId].responseOptions.map((opt) =>
+              opt.id === optionId ? { ...opt, nextMessageId: null } : opt
             ),
           },
         },
@@ -240,14 +310,18 @@ interface ScenarioContextType {
   scenario: ScenarioData;
   updateTheme: (theme: Partial<ChatTheme>) => void;
   setName: (name: string) => void;
-  addRootMessage: (content: string) => void;
+  addRootMessage: (content: string, position?: NodePosition) => void;
+  addMessageAtPosition: (content: string, position: NodePosition) => void;
   updateMessage: (id: string, content: string) => void;
+  updateNodePosition: (id: string, position: NodePosition) => void;
   deleteMessage: (id: string) => void;
   toggleEndpoint: (id: string) => void;
   addResponseOption: (messageId: string, text: string) => void;
   updateResponseOption: (messageId: string, optionId: string, text: string) => void;
   deleteResponseOption: (messageId: string, optionId: string) => void;
-  addFollowUpMessage: (parentMessageId: string, optionId: string, content: string) => void;
+  addFollowUpMessage: (parentMessageId: string, optionId: string, content: string, position: NodePosition) => void;
+  connectNodes: (sourceMessageId: string, optionId: string, targetMessageId: string) => void;
+  disconnectOption: (messageId: string, optionId: string) => void;
   reorderOptions: (messageId: string, fromIndex: number, toIndex: number) => void;
   importScenario: (data: ScenarioData) => void;
   resetScenario: () => void;
@@ -290,12 +364,20 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "SET_NAME", payload: name });
   }, []);
 
-  const addRootMessage = useCallback((content: string) => {
-    dispatch({ type: "ADD_ROOT_MESSAGE", payload: content });
+  const addRootMessage = useCallback((content: string, position?: NodePosition) => {
+    dispatch({ type: "ADD_ROOT_MESSAGE", payload: { content, position: position || { x: 100, y: 200 } } });
+  }, []);
+
+  const addMessageAtPosition = useCallback((content: string, position: NodePosition) => {
+    dispatch({ type: "ADD_MESSAGE_AT_POSITION", payload: { content, position } });
   }, []);
 
   const updateMessage = useCallback((id: string, content: string) => {
     dispatch({ type: "UPDATE_MESSAGE", payload: { id, content } });
+  }, []);
+
+  const updateNodePosition = useCallback((id: string, position: NodePosition) => {
+    dispatch({ type: "UPDATE_NODE_POSITION", payload: { id, position } });
   }, []);
 
   const deleteMessage = useCallback((id: string) => {
@@ -318,8 +400,16 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "DELETE_RESPONSE_OPTION", payload: { messageId, optionId } });
   }, []);
 
-  const addFollowUpMessage = useCallback((parentMessageId: string, optionId: string, content: string) => {
-    dispatch({ type: "ADD_FOLLOW_UP_MESSAGE", payload: { parentMessageId, optionId, content } });
+  const addFollowUpMessage = useCallback((parentMessageId: string, optionId: string, content: string, position: NodePosition) => {
+    dispatch({ type: "ADD_FOLLOW_UP_MESSAGE", payload: { parentMessageId, optionId, content, position } });
+  }, []);
+
+  const connectNodes = useCallback((sourceMessageId: string, optionId: string, targetMessageId: string) => {
+    dispatch({ type: "CONNECT_NODES", payload: { sourceMessageId, optionId, targetMessageId } });
+  }, []);
+
+  const disconnectOption = useCallback((messageId: string, optionId: string) => {
+    dispatch({ type: "DISCONNECT_OPTION", payload: { messageId, optionId } });
   }, []);
 
   const reorderOptions = useCallback((messageId: string, fromIndex: number, toIndex: number) => {
@@ -341,13 +431,17 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
         updateTheme,
         setName,
         addRootMessage,
+        addMessageAtPosition,
         updateMessage,
+        updateNodePosition,
         deleteMessage,
         toggleEndpoint,
         addResponseOption,
         updateResponseOption,
         deleteResponseOption,
         addFollowUpMessage,
+        connectNodes,
+        disconnectOption,
         reorderOptions,
         importScenario,
         resetScenario,

@@ -191,6 +191,41 @@ input[type="color"]::-moz-color-swatch {
   border-radius: 12px;
 }
 
+/* React Flow customizations */
+.react-flow__node {
+  cursor: grab;
+}
+
+.react-flow__node:active {
+  cursor: grabbing;
+}
+
+.react-flow__controls {
+  box-shadow: 0 4px 12px -2px hsl(var(--foreground) / 0.08);
+}
+
+.react-flow__controls-button {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.react-flow__controls-button:hover {
+  background: hsl(var(--secondary));
+}
+
+.react-flow__minimap {
+  box-shadow: 0 4px 12px -2px hsl(var(--foreground) / 0.08);
+}
+
+.react-flow__handle {
+  transition: transform 0.15s ease;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.3);
+}
+
 /* Smooth transitions */
 @layer utilities {
   .transition-smooth {

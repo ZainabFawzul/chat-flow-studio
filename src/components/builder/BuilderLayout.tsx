@@ -9,13 +9,13 @@ export function BuilderLayout() {
       <div className="flex h-screen flex-col bg-background">
         <TopBar />
         <div className="flex flex-1 overflow-hidden">
-          {/* Left Panel - 40% */}
-          <div className="w-2/5 min-w-[360px] max-w-[560px] border-r border-border/50">
+          {/* Left Panel - 60% for Canvas/Theme */}
+          <div className="w-3/5 min-w-[480px] border-r border-border/50">
             <LeftPanel />
           </div>
           
-          {/* Right Panel - 60% */}
-          <main className="flex-1 overflow-hidden" aria-label="Chat preview">
+          {/* Right Panel - 40% for Chat Preview */}
+          <main className="w-2/5 min-w-[320px] overflow-hidden" aria-label="Chat preview">
             <ChatPreview />
           </main>
         </div>
