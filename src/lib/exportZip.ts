@@ -65,6 +65,9 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
   const startTitle = theme.startScreenTitle ?? "Ready to Start";
   const startSubtitle = theme.startScreenSubtitle ?? "Begin the conversation";
   const startButtonText = theme.startButtonText ?? "Start";
+  const startButtonColor = theme.startButtonColor ?? "214 100% 65%";
+  const startButtonTextColor = theme.startButtonTextColor ?? "0 0% 100%";
+  const startButtonBorderRadius = theme.startButtonBorderRadius ?? 12;
   const showResetButton = theme.showResetButton ?? true;
 
   // Escape for safe JSON embedding in script
@@ -389,20 +392,20 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       align-items: center;
       gap: 8px;
       padding: 10px 20px;
-      border-radius: 12px;
+      border-radius: ${startButtonBorderRadius}px;
       border: none;
-      background: hsl(${theme.senderBubbleColor});
-      color: hsl(${theme.senderTextColor});
+      background: hsl(${startButtonColor});
+      color: hsl(${startButtonTextColor});
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      box-shadow: 0 4px 12px hsl(${theme.senderBubbleColor} / 0.25);
+      box-shadow: 0 4px 12px hsl(${startButtonColor} / 0.25);
       transition: all 0.2s;
     }
 
     .start-btn:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px hsl(${theme.senderBubbleColor} / 0.3);
+      box-shadow: 0 6px 16px hsl(${startButtonColor} / 0.3);
     }
 
     .start-btn:disabled {

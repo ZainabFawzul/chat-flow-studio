@@ -62,6 +62,9 @@ export interface ChatTheme {
   startScreenTitle: string;
   startScreenSubtitle: string;
   startButtonText: string;
+  startButtonColor: string;
+  startButtonTextColor: string;
+  startButtonBorderRadius: number; // 0-24px
   // Controls
   showResetButton: boolean;
 }
@@ -101,6 +104,9 @@ export const DEFAULT_THEME: ChatTheme = {
   startScreenTitle: "Ready to Start",
   startScreenSubtitle: "Begin the conversation",
   startButtonText: "Start",
+  startButtonColor: "214 100% 65%", // Primary blue
+  startButtonTextColor: "0 0% 100%", // White
+  startButtonBorderRadius: 12,
   // Controls
   showResetButton: true,
 };

@@ -3,7 +3,7 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Play } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { cn } from "@/lib/utils";
 import { BubbleBorderRadius } from "@/types/scenario";
 
@@ -217,7 +217,7 @@ export function ChatPreview() {
       </header>
 
       {/* Chat Messages */}
-      <ScrollArea className="flex-1 px-5 py-4">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
         {!isPlaying ? (
           <div className="flex h-full items-center justify-center">
             <div className="text-center max-w-sm">
@@ -234,15 +234,19 @@ export function ChatPreview() {
                 }
               </p>
               {rootMessage && (
-                <Button
-                  variant="default"
-                  size="default"
+                <button
                   onClick={handleStart}
-                  className="gap-2 rounded-xl shadow-lg shadow-primary/25"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 font-medium transition-all"
+                  style={{
+                    backgroundColor: `hsl(${theme.startButtonColor ?? '214 100% 65%'})`,
+                    color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
+                    borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
+                    boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '214 100% 65%'} / 0.25)`,
+                  }}
                 >
                   <Play className="h-4 w-4" aria-hidden="true" />
                   {startButtonText}
-                </Button>
+                </button>
               )}
             </div>
           </div>
@@ -337,7 +341,7 @@ export function ChatPreview() {
             )}
           </div>
         )}
-      </ScrollArea>
+      </div>
 
       {/* Response Options */}
       {isPlaying && currentMessage && !currentMessage.isEndpoint && !typingMessageId && (
