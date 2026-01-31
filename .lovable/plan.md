@@ -13,28 +13,37 @@ Replace the current nested tree view with a visual flowchart canvas (similar to 
 ### New Layout Structure
 
 ```text
-+------------------------------------------+
-|              Top Bar                      |
-+------------------------------------------+
-|                                          |
-|         FLOWCHART CANVAS                 |
-|    (Full-width visual builder)           |
-|                                          |
-|  +------+        +------+                |
-|  | Node |------->| Node |                |
-|  +------+        +------+                |
-|       \                                  |
-|        \         +------+                |
-|         +------->| Node |                |
-|                  +------+                |
-|                                          |
-+------------------+------+----------------+
-|  Theme Panel     | Chat Preview Panel    |
-|  (Collapsible)   | (Collapsible)         |
-+------------------+-----------------------+
++--------------------------------------------------+
+|                    Top Bar                        |
++--------------------------------------------------+
+|                          |                        |
+|   LEFT PANEL (60%)       |   RIGHT PANEL (40%)   |
+|   +-----------------+    |                        |
+|   | [Theme][Canvas] |    |   Chat Preview        |
+|   +-----------------+    |   (Live simulation)   |
+|   |                 |    |                        |
+|   | Tab: Theme      |    |   Shows conversation  |
+|   | - Colors        |    |   flow as user would  |
+|   | - Contact info  |    |   experience it       |
+|   |                 |    |                        |
+|   | Tab: Canvas     |    |                        |
+|   | +------+        |    |                        |
+|   | | Node |------> |    |                        |
+|   | +------+        |    |                        |
+|   |      \          |    |                        |
+|   |       +------+  |    |                        |
+|   |       | Node |  |    |                        |
+|   |       +------+  |    |                        |
+|   |                 |    |                        |
+|   | [Expand ⛶]      |    |                        |
+|   +-----------------+    |                        |
++--------------------------------------------------+
 ```
 
-The flowchart canvas takes center stage, with Theme and Preview panels accessible via collapsible bottom drawers or side panels.
+The layout keeps the familiar split-panel structure:
+- **Left Panel (60%)**: Contains tabs for Theme settings and the new Flowchart Canvas
+- **Right Panel (40%)**: Chat Preview showing the live conversation simulation
+- **Expand Mode**: Canvas tab can expand to full-screen for complex scenario building
 
 ---
 
@@ -180,28 +189,37 @@ React Flow (xyflow) is the industry standard for flowchart builders with:
 
 ---
 
-## Phase 6: Panel Reorganization
+## Phase 6: Tab-Based Canvas Integration
 
-### New Layout Options
+### Layout Structure
 
-**Option A: Floating Panels**
-- Theme and Preview as floating, draggable panels
-- Can be minimized to icons
-- Position remembered
+**Left Panel (60% width)**
+- Tab 1: **Theme** - Existing theme configuration
+- Tab 2: **Canvas** - New flowchart builder (replaces Messages tab)
+- Expand button to make canvas full-screen
 
-**Option B: Bottom Drawer (Recommended)**
-- Slide-up drawers for Theme and Preview
-- Keyboard shortcut to toggle (T for Theme, P for Preview)
-- Non-intrusive when building
+**Right Panel (40% width)**
+- Chat Preview (unchanged)
+- Shows live conversation simulation
 
-### Panel Toggle Bar
+### Canvas Tab Features
+- Full flowchart builder within the tab
+- "Expand" button in toolbar to go full-screen
+- Press Escape or click "Exit" to return to split view
+- Keyboard shortcut: `E` to toggle expand mode
 
+### Expanded Mode
 ```text
-Canvas content here...
 +--------------------------------------------------+
-| [📋 Theme] [💬 Preview] [📊 Overview]            |
+|  [Exit ✕] [+ Add Node] [Zoom] [Fit] [Grid]       |
 +--------------------------------------------------+
-| (Expanded panel content when toggled)            |
+|                                                  |
+|              FULL-SCREEN CANVAS                  |
+|                                                  |
+|   +------+        +------+        +------+       |
+|   | Node |------->| Node |------->| Node |       |
+|   +------+        +------+        +------+       |
+|                                                  |
 +--------------------------------------------------+
 ```
 
@@ -302,15 +320,15 @@ Canvas content here...
 ### File Structure
 ```text
 src/components/builder/
-├── BuilderLayout.tsx      (Updated: new layout)
-├── FlowCanvas.tsx         (NEW: main canvas)
+├── BuilderLayout.tsx      (Updated: 60/40 split)
+├── LeftPanel.tsx          (Updated: Theme + Canvas tabs)
+├── FlowCanvas.tsx         (NEW: main canvas component)
 ├── MessageFlowNode.tsx    (NEW: custom node)
 ├── ResponseEdge.tsx       (NEW: custom edge)
-├── CanvasControls.tsx     (NEW: toolbar)
-├── CanvasToolbar.tsx      (NEW: add node, etc.)
-├── BottomDrawer.tsx       (NEW: panel container)
-├── ThemeDrawer.tsx        (Refactored from ThemeTab)
-├── PreviewDrawer.tsx      (Refactored from ChatPreview)
+├── CanvasControls.tsx     (NEW: zoom, fit, grid toolbar)
+├── CanvasToolbar.tsx      (NEW: add node, expand button)
+├── ThemeTab.tsx           (Existing: theme settings)
+├── ChatPreview.tsx        (Existing: right panel preview)
 └── ...existing files
 ```
 
