@@ -88,7 +88,7 @@ export function VariablesPanel({
       </div>
 
       {/* Type Selector */}
-      <div className="p-3 border-b border-border border-0">
+      <div className="p-3">
         <div className="text-xs text-muted-foreground mb-2">Variable Type</div>
         <div className="flex gap-1">
           {VARIABLE_TYPES.map(vt => <button key={vt.id} onClick={() => setSelectedType(vt.id)} className={cn("flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors", selectedType === vt.id ? "bg-primary/20 text-primary" : "hover:bg-secondary text-muted-foreground")}>
@@ -115,7 +115,7 @@ export function VariablesPanel({
       </div>
 
       {/* Variables List */}
-      <div className="p-3 pb-2">
+      <div className="p-3 pb-2 border-t border-border">
         <div className="text-xs text-muted-foreground mb-2">Variable List</div>
       </div>
       <div className="max-h-[280px] overflow-y-auto px-2 pb-2 space-y-1">
