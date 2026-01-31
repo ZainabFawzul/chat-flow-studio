@@ -69,7 +69,7 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground"
+                  className="h-9 w-9 rounded-lg text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]"
                 >
                   <RotateCcw className="h-4 w-4" />
                 </Button>
@@ -103,7 +103,7 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground"
+              className="h-9 w-9 rounded-lg text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]"
             >
               <HelpCircle className="h-4 w-4" />
             </Button>
