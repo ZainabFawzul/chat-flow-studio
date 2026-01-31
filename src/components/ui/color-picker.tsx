@@ -116,29 +116,29 @@ export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
           align="end"
           sideOffset={8}
         >
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-3 w-[200px]">
             {/* react-colorful picker */}
             <HexColorPicker 
               color={hexValue} 
               onChange={handleColorChange}
-              className="!w-[200px] !h-[150px] [&_.react-colorful__saturation]:rounded-t-xl [&_.react-colorful__hue]:rounded-b-xl [&_.react-colorful__hue]:h-4"
+              className="!w-full !h-[150px] [&_.react-colorful__saturation]:rounded-t-xl [&_.react-colorful__hue]:rounded-b-xl [&_.react-colorful__hue]:h-4"
             />
             
             {/* Hex input with preview swatch */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <div
-                className="h-10 w-10 rounded-full shadow-lg ring-2 ring-white/20 shrink-0"
+                className="h-8 w-8 rounded-full shadow-lg ring-2 ring-white/20 shrink-0"
                 style={{ backgroundColor: hexValue }}
               />
               <div className="flex-1 relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">#</span>
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">#</span>
                 <Input
                   value={hexValue.replace('#', '')}
                   onChange={handleHexInput}
                   maxLength={6}
                   className={cn(
-                    "h-10 pl-7 pr-3 rounded-xl border-border/50 bg-secondary/50",
-                    "text-sm font-mono uppercase tracking-wider",
+                    "h-8 pl-6 pr-2 rounded-lg border-border/50 bg-secondary/50",
+                    "text-xs font-mono uppercase tracking-wider",
                     "focus:bg-background transition-colors"
                   )}
                   placeholder="000000"
