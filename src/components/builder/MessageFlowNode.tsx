@@ -170,7 +170,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                         tabIndex={internalTabIndex}
                         className={cn(
                           "h-7 w-7 rounded-lg",
-                          message.condition ? "bg-info/20 text-info hover:bg-info/30" : "text-muted-foreground hover:text-foreground"
+                          message.condition ? "bg-info/20 text-info hover:bg-[#4B96FF] hover:text-[#00178F]" : "text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]"
                         )}
                       >
                         <Eye className="h-3.5 w-3.5" />
@@ -244,7 +244,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                     variant="ghost"
                     size="icon"
                     tabIndex={internalTabIndex}
-                    className="h-7 w-7 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                    className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
