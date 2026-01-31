@@ -1,3 +1,12 @@
+/**
+ * @file VariablesPanel.tsx
+ * @description Floating panel for creating and managing scenario variables (boolean, text, number)
+ *              with type selection, editing, and delete confirmation for in-use variables
+ * 
+ * @dependencies ScenarioContext, FloatingPanel, scenario types, UI components
+ * @usage Opened from CanvasToolbar Variables button
+ */
+
 import { useState } from "react";
 import { useScenario } from "@/context/ScenarioContext";
 import { Button } from "@/components/ui/button";

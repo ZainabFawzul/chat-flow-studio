@@ -1,3 +1,12 @@
+/**
+ * @file BuilderLayout.tsx
+ * @description Main builder layout component that composes TopBar, LeftPanel, and ChatPreview
+ *              into a responsive two-panel interface
+ * 
+ * @dependencies ScenarioContext, TopBar, LeftPanel, ChatPreview
+ * @usage Rendered by Index page component
+ */
+
 import { ScenarioProvider } from "@/context/ScenarioContext";
 import { TopBar } from "./TopBar";
 import { LeftPanel } from "./LeftPanel";

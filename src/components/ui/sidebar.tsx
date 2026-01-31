@@ -1,3 +1,10 @@
+/**
+ * @file sidebar.tsx
+ * @description shadcn/ui Sidebar component with collapsible panels, tooltips, and responsive behavior
+ * 
+ * @see https://ui.shadcn.com/docs/components/sidebar
+ */
+
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { VariantProps, cva } from "class-variance-authority";

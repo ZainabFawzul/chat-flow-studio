@@ -1,3 +1,11 @@
+/**
+ * @file App.tsx
+ * @description Root component that sets up providers (QueryClient, Tooltip, Scenario), routing, and toasters
+ * 
+ * @dependencies react-router-dom, @tanstack/react-query, ScenarioContext, UI components
+ * @usage Imported and rendered by main.tsx
+ */
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";

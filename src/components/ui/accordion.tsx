@@ -1,3 +1,10 @@
+/**
+ * @file accordion.tsx
+ * @description shadcn/ui Accordion component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/accordion
+ */
+
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";

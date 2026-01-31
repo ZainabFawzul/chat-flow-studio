@@ -1,3 +1,12 @@
+/**
+ * @file use-toast.ts
+ * @description Toast notification state management hook with add/dismiss/update actions.
+ *              Implements a reducer pattern for managing toast queue.
+ * 
+ * @dependencies React, toast UI component
+ * @usage Import useToast hook and toast function for notifications throughout the app
+ */
+
 import * as React from "react";
 
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast";

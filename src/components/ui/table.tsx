@@ -1,3 +1,10 @@
+/**
+ * @file table.tsx
+ * @description shadcn/ui Table component with Header, Body, Row, Head, and Cell parts
+ * 
+ * @see https://ui.shadcn.com/docs/components/table
+ */
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

@@ -1,3 +1,10 @@
+/**
+ * @file popover.tsx
+ * @description shadcn/ui Popover component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/popover
+ */
+
 import * as React from "react";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 

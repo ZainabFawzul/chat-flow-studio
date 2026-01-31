@@ -1,3 +1,11 @@
+/**
+ * @file App.css
+ * @description Application-specific CSS styles (legacy, mostly unused in current implementation)
+ * 
+ * @dependencies None
+ * @usage Legacy styles for root element and logo animations
+ */
+
 #root {
   max-width: 1280px;
   margin: 0 auto;

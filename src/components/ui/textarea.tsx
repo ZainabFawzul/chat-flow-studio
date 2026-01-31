@@ -1,3 +1,10 @@
+/**
+ * @file textarea.tsx
+ * @description shadcn/ui Textarea component for multi-line text input
+ * 
+ * @see https://ui.shadcn.com/docs/components/textarea
+ */
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

@@ -1,3 +1,10 @@
+/**
+ * @file badge.tsx
+ * @description shadcn/ui Badge component with variant support
+ * 
+ * @see https://ui.shadcn.com/docs/components/badge
+ */
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 

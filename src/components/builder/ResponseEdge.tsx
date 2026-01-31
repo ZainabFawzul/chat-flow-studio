@@ -1,3 +1,12 @@
+/**
+ * @file ResponseEdge.tsx
+ * @description Custom edge component for React Flow that displays bezier curves
+ *              with response option labels between connected message nodes
+ * 
+ * @dependencies @xyflow/react
+ * @usage Registered as custom edge type in FlowCanvas
+ */
+
 import { memo } from "react";
 import {
   EdgeProps,

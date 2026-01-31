@@ -1,3 +1,11 @@
+/**
+ * @file use-mobile.tsx
+ * @description Responsive hook to detect mobile viewport breakpoint (< 768px)
+ * 
+ * @dependencies React
+ * @usage Import useIsMobile hook for responsive component logic
+ */
+
 import * as React from "react";
 
 const MOBILE_BREAKPOINT = 768;

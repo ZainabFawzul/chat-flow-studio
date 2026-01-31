@@ -1,3 +1,10 @@
+/**
+ * @file command.tsx
+ * @description shadcn/ui Command component (cmdk) for command palettes and searchable menus
+ * 
+ * @see https://ui.shadcn.com/docs/components/command
+ */
+
 import * as React from "react";
 import { type DialogProps } from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";

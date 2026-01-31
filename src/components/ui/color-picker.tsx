@@ -1,3 +1,12 @@
+/**
+ * @file color-picker.tsx
+ * @description Custom color picker component using react-colorful with HSL support,
+ *              hex input, and popover interface for theme customization
+ * 
+ * @dependencies react-colorful, Popover, Input
+ * @usage Used in ThemeTab for color selection
+ */
+
 import * as React from "react";
 import { HexColorPicker } from "react-colorful";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";

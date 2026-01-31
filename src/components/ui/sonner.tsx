@@ -1,3 +1,10 @@
+/**
+ * @file sonner.tsx
+ * @description Sonner toast wrapper with theme-aware styling
+ * 
+ * @see https://sonner.emilkowal.ski/
+ */
+
 import { useTheme } from "next-themes";
 import { Toaster as Sonner, toast } from "sonner";
 

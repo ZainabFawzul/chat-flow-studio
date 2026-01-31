@@ -1,3 +1,10 @@
+/**
+ * @file resizable.tsx
+ * @description shadcn/ui Resizable panels component using react-resizable-panels
+ * 
+ * @see https://ui.shadcn.com/docs/components/resizable
+ */
+
 import { GripVertical } from "lucide-react";
 import * as ResizablePrimitive from "react-resizable-panels";
 

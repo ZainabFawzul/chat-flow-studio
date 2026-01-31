@@ -1,3 +1,12 @@
+/**
+ * @file FloatingPanel.tsx
+ * @description Reusable draggable floating panel component with customizable position,
+ *              width, and viewport-bounded drag behavior
+ * 
+ * @dependencies React, UI components
+ * @usage Wraps content that needs to float over the canvas (e.g., VariablesPanel)
+ */
+
 import { useState, useRef, useCallback, useEffect, ReactNode } from "react";
 import { X, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";

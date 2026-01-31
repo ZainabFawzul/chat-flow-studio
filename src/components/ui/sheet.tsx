@@ -1,3 +1,10 @@
+/**
+ * @file sheet.tsx
+ * @description shadcn/ui Sheet component for side panel overlays
+ * 
+ * @see https://ui.shadcn.com/docs/components/sheet
+ */
+
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";

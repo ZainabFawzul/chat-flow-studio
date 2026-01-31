@@ -1,3 +1,10 @@
+/**
+ * @file tabs.tsx
+ * @description shadcn/ui Tabs component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/tabs
+ */
+
 import * as React from "react";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 

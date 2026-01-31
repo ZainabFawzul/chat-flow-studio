@@ -1,3 +1,10 @@
+/**
+ * @file calendar.tsx
+ * @description shadcn/ui Calendar component built on react-day-picker
+ * 
+ * @see https://ui.shadcn.com/docs/components/calendar
+ */
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker } from "react-day-picker";

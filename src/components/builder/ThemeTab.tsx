@@ -1,3 +1,12 @@
+/**
+ * @file ThemeTab.tsx
+ * @description Theme customization panel for colors, typography, bubble styling, and start screen settings.
+ *              Includes WCAG contrast warnings and live previews.
+ * 
+ * @dependencies ScenarioContext, contrast utilities, ColorPicker, UI components
+ * @usage Rendered in LeftPanel Theme tab
+ */
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";

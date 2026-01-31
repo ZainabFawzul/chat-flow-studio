@@ -1,3 +1,11 @@
+/**
+ * @file NotFound.tsx
+ * @description 404 error page displayed for unmatched routes with a link back to home
+ * 
+ * @dependencies react-router-dom
+ * @usage Rendered at the catch-all "*" route in App.tsx
+ */
+
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 

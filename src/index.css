@@ -1,3 +1,12 @@
+/**
+ * @file index.css
+ * @description Global CSS with Tailwind directives and CSS variables for theming.
+ *              Defines light/dark mode color tokens, scrollbar styling, and React Flow customizations.
+ * 
+ * @dependencies tailwindcss
+ * @usage Imported in main.tsx; provides design system tokens
+ */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

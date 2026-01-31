@@ -1,3 +1,10 @@
+/**
+ * @file toggle-group.tsx
+ * @description shadcn/ui Toggle Group component for grouped toggle buttons
+ * 
+ * @see https://ui.shadcn.com/docs/components/toggle-group
+ */
+
 import * as React from "react";
 import * as ToggleGroupPrimitive from "@radix-ui/react-toggle-group";
 import { type VariantProps } from "class-variance-authority";

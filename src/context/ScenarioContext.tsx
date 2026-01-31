@@ -1,3 +1,12 @@
+/**
+ * @file ScenarioContext.tsx
+ * @description Global state management for chat scenarios using React Context and useReducer.
+ *              Handles messages, themes, variables, connections, and localStorage persistence.
+ * 
+ * @dependencies React, scenario types
+ * @usage Wrap app in ScenarioProvider; consume with useScenario hook
+ */
+
 import React, { createContext, useContext, useReducer, useCallback, useEffect, useState } from "react";
 import {
   ScenarioData,

@@ -1,3 +1,11 @@
+/**
+ * @file eslint.config.js
+ * @description ESLint configuration for TypeScript/React linting with react-hooks and react-refresh plugins
+ * 
+ * @dependencies @eslint/js, typescript-eslint, eslint-plugin-react-hooks, eslint-plugin-react-refresh
+ * @usage Used by ESLint CLI to lint TypeScript and TSX files
+ */
+
 import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";

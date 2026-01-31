@@ -1,3 +1,10 @@
+/**
+ * @file carousel.tsx
+ * @description shadcn/ui Carousel component built on Embla Carousel
+ * 
+ * @see https://ui.shadcn.com/docs/components/carousel
+ */
+
 import * as React from "react";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import { ArrowLeft, ArrowRight } from "lucide-react";

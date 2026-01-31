@@ -1,3 +1,10 @@
+/**
+ * @file progress.tsx
+ * @description shadcn/ui Progress component for progress bars
+ * 
+ * @see https://ui.shadcn.com/docs/components/progress
+ */
+
 import * as React from "react";
 import * as ProgressPrimitive from "@radix-ui/react-progress";
 

@@ -1,3 +1,12 @@
+/**
+ * @file NavLink.tsx
+ * @description Wrapper for React Router NavLink with conditional className support
+ *              for active and pending states
+ * 
+ * @dependencies react-router-dom, utils
+ * @usage Use instead of NavLink when you need activeClassName/pendingClassName props
+ */
+
 import { NavLink as RouterNavLink, NavLinkProps } from "react-router-dom";
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";

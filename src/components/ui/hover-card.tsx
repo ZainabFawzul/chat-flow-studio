@@ -1,3 +1,10 @@
+/**
+ * @file hover-card.tsx
+ * @description shadcn/ui Hover Card component for hover-triggered popovers
+ * 
+ * @see https://ui.shadcn.com/docs/components/hover-card
+ */
+
 import * as React from "react";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 

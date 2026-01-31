@@ -1,3 +1,10 @@
+/**
+ * @file drawer.tsx
+ * @description shadcn/ui Drawer component (mobile-friendly sliding panels) using Vaul
+ * 
+ * @see https://ui.shadcn.com/docs/components/drawer
+ */
+
 import * as React from "react";
 import { Drawer as DrawerPrimitive } from "vaul";
 
