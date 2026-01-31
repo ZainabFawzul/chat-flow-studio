@@ -5,12 +5,13 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, Palette, MessageCircle, Type, Play, Settings } from "lucide-react";
+import { Upload, X, User, MessageCircle, Play, Settings, AlertTriangle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
 import { BubbleBorderRadius, DEFAULT_BORDER_RADIUS } from "@/types/scenario";
 import { Switch } from "@/components/ui/switch";
+import { getContrastLevel } from "@/lib/contrast";
 const DEFAULT_SENDER_RADIUS: BubbleBorderRadius = {
   topLeft: 16,
   topRight: 4,
@@ -222,6 +223,10 @@ export function ThemeTab() {
               senderTextColor: value
             })} />
             </div>
+            
+            {/* Contrast Warning */}
+            <ContrastWarning bgColor={theme.senderBubbleColor} textColor={theme.senderTextColor} />
+            
             <BorderRadiusControl label="Corner Radius (px)" value={senderRadius} onChange={value => updateTheme({
             senderBorderRadius: value
           })} />
@@ -253,6 +258,10 @@ export function ThemeTab() {
               receiverTextColor: value
             })} />
             </div>
+            
+            {/* Contrast Warning */}
+            <ContrastWarning bgColor={theme.receiverBubbleColor} textColor={theme.receiverTextColor} />
+            
             <BorderRadiusControl label="Corner Radius (px)" value={receiverRadius} onChange={value => updateTheme({
             receiverBorderRadius: value
           })} />
@@ -273,33 +282,72 @@ export function ThemeTab() {
           </div>
         </Section>
 
-        {/* Chat Background */}
-        <Section icon={<Palette className="h-4 w-4" />} title="Background" id="chat-heading">
-          <ColorPicker id="chat-bg" label="Chat Background" value={theme.chatBackground} onChange={value => updateTheme({
-          chatBackground: value
-        })} />
-        </Section>
-
-        {/* Typography */}
-        <Section icon={<Type className="h-4 w-4" />} title="Typography" id="font-heading">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <Label htmlFor="font-size" className="text-sm font-medium">
-                Message Size
-              </Label>
-              <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                {theme.fontSize}px
-              </span>
+        {/* Settings - merged Background, Typography, Controls */}
+        <Section icon={<Settings className="h-4 w-4" />} title="Settings" id="settings-heading">
+          <div className="flex flex-col gap-5">
+            {/* Chat Background */}
+            <ColorPicker id="chat-bg" label="Chat Background" value={theme.chatBackground} onChange={value => updateTheme({
+              chatBackground: value
+            })} />
+            
+            {/* Font Size */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label htmlFor="font-size" className="text-sm font-medium">
+                  Message Size
+                </Label>
+                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
+                  {theme.fontSize}px
+                </span>
+              </div>
+              <Slider id="font-size" min={12} max={20} step={1} value={[theme.fontSize]} onValueChange={([value]) => updateTheme({
+                fontSize: value
+              })} aria-label="Font size" className="py-2" />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>Small</span>
+                <span>Large</span>
+              </div>
             </div>
-            <Slider id="font-size" min={12} max={20} step={1} value={[theme.fontSize]} onValueChange={([value]) => updateTheme({
-            fontSize: value
-          })} aria-label="Font size" className="py-2" />
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span>Small</span>
-              <span>Large</span>
+            
+            {/* Show Reset Button */}
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-0.5">
+                <Label htmlFor="show-reset" className="text-sm font-medium">
+                  Show Reset Button
+                </Label>
+                <span className="text-xs text-muted-foreground">
+                  Allow users to restart the conversation
+                </span>
+              </div>
+              <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
+                showResetButton: checked
+              })} />
             </div>
           </div>
         </Section>
       </div>
     </ScrollArea>;
+}
+
+// Contrast warning component
+function ContrastWarning({ bgColor, textColor }: { bgColor: string; textColor: string }) {
+  const { ratio, level } = getContrastLevel(bgColor, textColor);
+  
+  if (level === "aa" || level === "aaa") return null;
+  
+  return (
+    <div className="flex items-start gap-2 p-2.5 rounded-lg bg-destructive/10 border border-destructive/20">
+      <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-medium text-destructive">
+          Low contrast ({ratio.toFixed(1)}:1)
+        </p>
+        <p className="text-xs text-muted-foreground">
+          {level === "aa-large" 
+            ? "Only meets WCAG AA for large text. Increase contrast for better accessibility."
+            : "Does not meet WCAG 2.1 AA standards. Adjust colors for accessibility."}
+        </p>
+      </div>
+    </div>
+  );
 }
