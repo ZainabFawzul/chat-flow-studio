@@ -1,3 +1,10 @@
+/**
+ * @file dialog.tsx
+ * @description shadcn/ui Dialog component for modal overlays
+ * 
+ * @see https://ui.shadcn.com/docs/components/dialog
+ */
+
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";

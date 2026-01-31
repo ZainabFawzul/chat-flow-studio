@@ -1,3 +1,10 @@
+/**
+ * @file navigation-menu.tsx
+ * @description shadcn/ui Navigation Menu component for site navigation
+ * 
+ * @see https://ui.shadcn.com/docs/components/navigation-menu
+ */
+
 import * as React from "react";
 import * as NavigationMenuPrimitive from "@radix-ui/react-navigation-menu";
 import { cva } from "class-variance-authority";

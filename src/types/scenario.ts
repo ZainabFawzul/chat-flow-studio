@@ -1,5 +1,13 @@
-// Core types for the Chat Scenario Builder
+/**
+ * @file scenario.ts
+ * @description TypeScript type definitions for scenario data structures including ChatMessage,
+ *              ChatTheme, ResponseOption, ScenarioVariable, and factory functions
+ * 
+ * @dependencies None (pure types)
+ * @usage Imported throughout the app for type safety
+ */
 
+// Core types for the Chat Scenario Builder
 export interface NodePosition {
   x: number;
   y: number;

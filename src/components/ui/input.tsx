@@ -1,3 +1,10 @@
+/**
+ * @file input.tsx
+ * @description shadcn/ui Input component with standard form styling
+ * 
+ * @see https://ui.shadcn.com/docs/components/input
+ */
+
 import * as React from "react";
 
 import { cn } from "@/lib/utils";

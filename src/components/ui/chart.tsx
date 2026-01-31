@@ -1,3 +1,10 @@
+/**
+ * @file chart.tsx
+ * @description shadcn/ui Chart components built on Recharts with theming support
+ * 
+ * @see https://ui.shadcn.com/docs/components/chart
+ */
+
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
 

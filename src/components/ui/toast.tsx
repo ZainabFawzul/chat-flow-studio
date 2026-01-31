@@ -1,3 +1,10 @@
+/**
+ * @file toast.tsx
+ * @description shadcn/ui Toast component primitives with variants
+ * 
+ * @see https://ui.shadcn.com/docs/components/toast
+ */
+
 import * as React from "react";
 import * as ToastPrimitives from "@radix-ui/react-toast";
 import { cva, type VariantProps } from "class-variance-authority";

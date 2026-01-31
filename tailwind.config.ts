@@ -1,3 +1,11 @@
+/**
+ * @file tailwind.config.ts
+ * @description Tailwind CSS configuration with custom colors, animations, spacing, and theme extensions
+ * 
+ * @dependencies tailwindcss, tailwindcss-animate
+ * @usage Used by Tailwind CSS to generate utility classes based on the design system
+ */
+
 import type { Config } from "tailwindcss";
 
 export default {

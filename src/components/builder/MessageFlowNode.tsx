@@ -1,3 +1,12 @@
+/**
+ * @file MessageFlowNode.tsx
+ * @description Individual message node component for the flow canvas with content editing,
+ *              response options, variable conditions, and connection handling
+ * 
+ * @dependencies @xyflow/react, ScenarioContext, ResponseOptionRow, UI components
+ * @usage Registered as custom node type in FlowCanvas
+ */
+
 import { memo, useState } from "react";
 import { Handle, Position, NodeProps } from "@xyflow/react";
 import { useScenario, PendingConnection } from "@/context/ScenarioContext";

@@ -1,3 +1,10 @@
+/**
+ * @file toaster.tsx
+ * @description Toast container component that renders active toast notifications
+ * 
+ * @see https://ui.shadcn.com/docs/components/toast
+ */
+
 import { useToast } from "@/hooks/use-toast";
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from "@/components/ui/toast";
 

@@ -1,3 +1,12 @@
+/**
+ * @file FlowCanvas.tsx
+ * @description React Flow canvas for visual node-based message editing with drag-and-drop
+ *              and click-to-connect functionality for building conversation flows
+ * 
+ * @dependencies @xyflow/react, ScenarioContext, MessageFlowNode, ResponseEdge, CanvasToolbar
+ * @usage Rendered in LeftPanel Canvas tab
+ */
+
 import { useCallback, useMemo, useEffect, useRef } from "react";
 import {
   ReactFlow,

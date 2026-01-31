@@ -1,3 +1,11 @@
+/**
+ * @file CanvasToolbar.tsx
+ * @description Canvas toolbar with add node, variables panel, reset canvas, and help buttons
+ * 
+ * @dependencies ScenarioContext, VariablesPanel, UI components
+ * @usage Rendered as a Panel in FlowCanvas
+ */
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, RotateCcw, HelpCircle } from "lucide-react";

@@ -1,3 +1,12 @@
+/**
+ * @file exportZip.ts
+ * @description ZIP export functionality to generate standalone HTML chat scenarios for Articulate Rise
+ *              and other authoring tools. Creates a self-contained package with embedded CSS/JS.
+ * 
+ * @dependencies jszip, scenario types
+ * @usage Called from TopBar when user clicks "Finalize" button
+ */
+
 import JSZip from "jszip";
 import { ScenarioData } from "@/types/scenario";
 

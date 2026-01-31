@@ -1,3 +1,10 @@
+/**
+ * @file checkbox.tsx
+ * @description shadcn/ui Checkbox component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/checkbox
+ */
+
 import * as React from "react";
 import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
 import { Check } from "lucide-react";

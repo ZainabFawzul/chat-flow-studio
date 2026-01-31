@@ -1,3 +1,10 @@
+/**
+ * @file breadcrumb.tsx
+ * @description shadcn/ui Breadcrumb component for navigation hierarchy
+ * 
+ * @see https://ui.shadcn.com/docs/components/breadcrumb
+ */
+
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { ChevronRight, MoreHorizontal } from "lucide-react";

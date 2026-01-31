@@ -1,3 +1,10 @@
+/**
+ * @file select.tsx
+ * @description shadcn/ui Select component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/select
+ */
+
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";

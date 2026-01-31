@@ -1,3 +1,10 @@
+/**
+ * @file alert.tsx
+ * @description shadcn/ui Alert component with variant support for info/warning/error states
+ * 
+ * @see https://ui.shadcn.com/docs/components/alert
+ */
+
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 

@@ -1,3 +1,10 @@
+/**
+ * @file skeleton.tsx
+ * @description shadcn/ui Skeleton component for loading placeholders
+ * 
+ * @see https://ui.shadcn.com/docs/components/skeleton
+ */
+
 import { cn } from "@/lib/utils";
 
 function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {

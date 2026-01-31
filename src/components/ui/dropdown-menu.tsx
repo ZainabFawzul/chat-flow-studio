@@ -1,3 +1,10 @@
+/**
+ * @file dropdown-menu.tsx
+ * @description shadcn/ui Dropdown Menu component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/dropdown-menu
+ */
+
 import * as React from "react";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";

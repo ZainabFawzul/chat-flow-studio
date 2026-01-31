@@ -1,3 +1,12 @@
+/**
+ * @file MessageNode.tsx
+ * @description Recursive message component for tree view with collapsible content,
+ *              response options editing, and nested follow-up messages
+ * 
+ * @dependencies ScenarioContext, UI components
+ * @usage Rendered recursively by MessagesTab for tree-based editing
+ */
+
 import { useState } from "react";
 import { useScenario } from "@/context/ScenarioContext";
 import { Textarea } from "@/components/ui/textarea";

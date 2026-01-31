@@ -1,3 +1,10 @@
+/**
+ * @file alert-dialog.tsx
+ * @description shadcn/ui Alert Dialog component for confirmations and destructive actions
+ * 
+ * @see https://ui.shadcn.com/docs/components/alert-dialog
+ */
+
 import * as React from "react";
 import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 

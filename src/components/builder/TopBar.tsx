@@ -1,3 +1,11 @@
+/**
+ * @file TopBar.tsx
+ * @description Header bar with app branding, import/export JSON buttons, and finalize ZIP dialog
+ * 
+ * @dependencies ScenarioContext, exportZip, UI components
+ * @usage Rendered in BuilderLayout header
+ */
+
 import { Download, Upload, MessageSquare, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useScenario } from "@/context/ScenarioContext";

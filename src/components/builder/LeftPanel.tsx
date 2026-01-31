@@ -1,3 +1,11 @@
+/**
+ * @file LeftPanel.tsx
+ * @description Left sidebar with Theme/Canvas tabs navigation and fullscreen canvas support
+ * 
+ * @dependencies ThemeTab, FlowCanvas, UI tabs
+ * @usage Rendered in BuilderLayout left panel
+ */
+
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeTab } from "./ThemeTab";

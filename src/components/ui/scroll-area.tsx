@@ -1,3 +1,10 @@
+/**
+ * @file scroll-area.tsx
+ * @description shadcn/ui Scroll Area component with custom scrollbars
+ * 
+ * @see https://ui.shadcn.com/docs/components/scroll-area
+ */
+
 import * as React from "react";
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
 

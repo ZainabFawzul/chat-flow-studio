@@ -1,3 +1,10 @@
+/**
+ * @file input-otp.tsx
+ * @description shadcn/ui OTP Input component for one-time password entry
+ * 
+ * @see https://ui.shadcn.com/docs/components/input-otp
+ */
+
 import * as React from "react";
 import { OTPInput, OTPInputContext } from "input-otp";
 import { Dot } from "lucide-react";

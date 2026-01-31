@@ -1,3 +1,12 @@
+/**
+ * @file MessagesTab.tsx
+ * @description Tree-based message editing view as an alternative to the canvas.
+ *              Displays recursive message tree with nested response options.
+ * 
+ * @dependencies ScenarioContext, MessageNode, UI components
+ * @usage Alternative view for editing conversation structure (currently unused in LeftPanel)
+ */
+
 import { useScenario } from "@/context/ScenarioContext";
 import { Button } from "@/components/ui/button";
 import { Plus, MessageSquarePlus, Sparkles } from "lucide-react";

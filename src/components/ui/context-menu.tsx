@@ -1,3 +1,10 @@
+/**
+ * @file context-menu.tsx
+ * @description shadcn/ui Context Menu component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/context-menu
+ */
+
 import * as React from "react";
 import * as ContextMenuPrimitive from "@radix-ui/react-context-menu";
 import { Check, ChevronRight, Circle } from "lucide-react";

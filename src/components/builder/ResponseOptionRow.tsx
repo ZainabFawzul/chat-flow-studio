@@ -1,3 +1,12 @@
+/**
+ * @file ResponseOptionRow.tsx
+ * @description Response option UI component with text editing, variable assignments,
+ *              visibility conditions, and connection controls (link/unlink)
+ * 
+ * @dependencies @xyflow/react, ScenarioContext, scenario types, UI components
+ * @usage Rendered by MessageFlowNode for each response option
+ */
+
 import { Handle, Position } from "@xyflow/react";
 import { useScenario, PendingConnection } from "@/context/ScenarioContext";
 import { ResponseOption, ScenarioVariable, VariableAssignment, VariableCondition, VariableValue } from "@/types/scenario";

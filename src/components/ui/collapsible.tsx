@@ -1,3 +1,10 @@
+/**
+ * @file collapsible.tsx
+ * @description shadcn/ui Collapsible component for expandable sections
+ * 
+ * @see https://ui.shadcn.com/docs/components/collapsible
+ */
+
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible";
 
 const Collapsible = CollapsiblePrimitive.Root;

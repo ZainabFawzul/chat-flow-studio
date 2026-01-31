@@ -1,3 +1,10 @@
+/**
+ * @file menubar.tsx
+ * @description shadcn/ui Menubar component for horizontal menu navigation
+ * 
+ * @see https://ui.shadcn.com/docs/components/menubar
+ */
+
 import * as React from "react";
 import * as MenubarPrimitive from "@radix-ui/react-menubar";
 import { Check, ChevronRight, Circle } from "lucide-react";

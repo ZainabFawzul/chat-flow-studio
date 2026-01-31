@@ -1,3 +1,12 @@
+/**
+ * @file ChatPreview.tsx
+ * @description Live chat preview panel showing conversation simulation with typing indicators,
+ *              themed message bubbles, and interactive response selection
+ * 
+ * @dependencies ScenarioContext, scenario types, UI components
+ * @usage Rendered in BuilderLayout right panel
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

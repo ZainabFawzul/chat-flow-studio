@@ -1,3 +1,10 @@
+/**
+ * @file slider.tsx
+ * @description shadcn/ui Slider component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/slider
+ */
+
 import * as React from "react";
 import * as SliderPrimitive from "@radix-ui/react-slider";
 

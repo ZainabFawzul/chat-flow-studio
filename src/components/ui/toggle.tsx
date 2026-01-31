@@ -1,3 +1,10 @@
+/**
+ * @file toggle.tsx
+ * @description shadcn/ui Toggle component for binary on/off states
+ * 
+ * @see https://ui.shadcn.com/docs/components/toggle
+ */
+
 import * as React from "react";
 import * as TogglePrimitive from "@radix-ui/react-toggle";
 import { cva, type VariantProps } from "class-variance-authority";

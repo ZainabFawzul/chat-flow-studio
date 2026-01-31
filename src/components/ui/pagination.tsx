@@ -1,3 +1,10 @@
+/**
+ * @file pagination.tsx
+ * @description shadcn/ui Pagination component for navigating paged content
+ * 
+ * @see https://ui.shadcn.com/docs/components/pagination
+ */
+
 import * as React from "react";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 

@@ -1,3 +1,10 @@
+/**
+ * @file radio-group.tsx
+ * @description shadcn/ui Radio Group component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/radio-group
+ */
+
 import * as React from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Circle } from "lucide-react";

@@ -1,3 +1,10 @@
+/**
+ * @file separator.tsx
+ * @description shadcn/ui Separator component for horizontal/vertical dividers
+ * 
+ * @see https://ui.shadcn.com/docs/components/separator
+ */
+
 import * as React from "react";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 

@@ -1,3 +1,10 @@
+/**
+ * @file tooltip.tsx
+ * @description shadcn/ui Tooltip component with Radix UI primitives
+ * 
+ * @see https://ui.shadcn.com/docs/components/tooltip
+ */
+
 import * as React from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 

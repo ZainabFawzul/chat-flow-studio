@@ -1,3 +1,10 @@
+/**
+ * @file avatar.tsx
+ * @description shadcn/ui Avatar component with image and fallback support
+ * 
+ * @see https://ui.shadcn.com/docs/components/avatar
+ */
+
 import * as React from "react";
 import * as AvatarPrimitive from "@radix-ui/react-avatar";
 

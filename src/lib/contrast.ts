@@ -1,5 +1,10 @@
 /**
- * WCAG 2.1 contrast ratio utilities
+ * @file contrast.ts
+ * @description WCAG 2.1 contrast ratio utilities for accessibility validation.
+ *              Converts HSL to RGB and calculates luminance-based contrast ratios.
+ * 
+ * @dependencies None (pure functions)
+ * @usage Import getContrastLevel, meetsWCAG_AA for color accessibility checks in ThemeTab
  */
 
 // Convert HSL string (e.g., "214 100% 65%") to RGB

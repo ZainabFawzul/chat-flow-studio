@@ -1,3 +1,10 @@
+/**
+ * @file form.tsx
+ * @description shadcn/ui Form components with React Hook Form integration
+ * 
+ * @see https://ui.shadcn.com/docs/components/form
+ */
+
 import * as React from "react";
 import * as LabelPrimitive from "@radix-ui/react-label";
 import { Slot } from "@radix-ui/react-slot";
