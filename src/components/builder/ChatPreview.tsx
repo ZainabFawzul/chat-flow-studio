@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Play, Phone, MoreVertical } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { BubbleBorderRadius } from "@/types/scenario";
+
+const DEFAULT_SENDER_RADIUS: BubbleBorderRadius = { topLeft: 16, topRight: 4, bottomRight: 16, bottomLeft: 16 };
+const DEFAULT_RECEIVER_RADIUS: BubbleBorderRadius = { topLeft: 4, topRight: 16, bottomRight: 16, bottomLeft: 16 };
 
 interface ChatBubble {
   id: string;
@@ -15,6 +19,10 @@ interface ChatBubble {
 export function ChatPreview() {
   const { scenario } = useScenario();
   const { theme, messages, rootMessageId } = scenario;
+  
+  // Fallback for legacy scenarios without border radius
+  const senderRadius = theme.senderBorderRadius ?? DEFAULT_SENDER_RADIUS;
+  const receiverRadius = theme.receiverBorderRadius ?? DEFAULT_RECEIVER_RADIUS;
 
   const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
   const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
@@ -212,10 +220,10 @@ export function ChatPreview() {
                     color: bubble.isUser
                       ? `hsl(${theme.senderTextColor})`
                       : `hsl(${theme.receiverTextColor})`,
-                    borderTopLeftRadius: `${bubble.isUser ? theme.senderBorderRadius.topLeft : theme.receiverBorderRadius.topLeft}px`,
-                    borderTopRightRadius: `${bubble.isUser ? theme.senderBorderRadius.topRight : theme.receiverBorderRadius.topRight}px`,
-                    borderBottomRightRadius: `${bubble.isUser ? theme.senderBorderRadius.bottomRight : theme.receiverBorderRadius.bottomRight}px`,
-                    borderBottomLeftRadius: `${bubble.isUser ? theme.senderBorderRadius.bottomLeft : theme.receiverBorderRadius.bottomLeft}px`,
+                    borderTopLeftRadius: `${bubble.isUser ? senderRadius.topLeft : receiverRadius.topLeft}px`,
+                    borderTopRightRadius: `${bubble.isUser ? senderRadius.topRight : receiverRadius.topRight}px`,
+                    borderBottomRightRadius: `${bubble.isUser ? senderRadius.bottomRight : receiverRadius.bottomRight}px`,
+                    borderBottomLeftRadius: `${bubble.isUser ? senderRadius.bottomLeft : receiverRadius.bottomLeft}px`,
                   }}
                 >
                   {bubble.content || (
