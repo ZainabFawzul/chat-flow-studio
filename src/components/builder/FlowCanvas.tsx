@@ -47,10 +47,12 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
 
   // Convert scenario messages to React Flow nodes
   const nodes: Node[] = useMemo(() => {
-    return Object.values(scenario.messages).map((message) => ({
+    const messageList = Object.values(scenario.messages);
+    return messageList.map((message, index) => ({
       id: message.id,
       type: "messageNode",
-      position: message.position,
+      // Fallback position for messages without coordinates (legacy data)
+      position: message.position || { x: 100 + (index % 3) * 400, y: 100 + Math.floor(index / 3) * 300 },
       data: {
         message,
         isRoot: message.id === scenario.rootMessageId,
