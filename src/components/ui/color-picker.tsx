@@ -1,4 +1,5 @@
 import * as React from "react";
+import { HexColorPicker } from "react-colorful";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -72,8 +73,8 @@ export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const hexValue = hslToHex(value);
 
-  const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(hexToHsl(e.target.value));
+  const handleColorChange = (newHex: string) => {
+    onChange(hexToHsl(newHex));
   };
 
   const handleHexInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,19 +117,12 @@ export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
           sideOffset={8}
         >
           <div className="flex flex-col gap-4">
-            {/* Modern color picker using native input */}
-            <div className="relative">
-              <input
-                type="color"
-                value={hexValue}
-                onChange={handleColorChange}
-                className="w-[200px] h-[150px] cursor-pointer border-0 rounded-xl overflow-hidden bg-transparent"
-                style={{
-                  WebkitAppearance: 'none',
-                  padding: 0,
-                }}
-              />
-            </div>
+            {/* react-colorful picker */}
+            <HexColorPicker 
+              color={hexValue} 
+              onChange={handleColorChange}
+              className="!w-[200px] !h-[150px] [&_.react-colorful__saturation]:rounded-t-xl [&_.react-colorful__hue]:rounded-b-xl [&_.react-colorful__hue]:h-4"
+            />
             
             {/* Hex input with preview swatch */}
             <div className="flex items-center gap-3">
