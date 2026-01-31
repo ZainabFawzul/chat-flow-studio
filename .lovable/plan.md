@@ -1,99 +1,168 @@
 
-
-# Canvas Styling & Accessibility Improvements
+# Variable Type Placeholders - Locked Functionality
 
 ## Summary
 
-This plan addresses three changes to the canvas components:
-1. Fix broken hover states on buttons/icons with specific brand colors
-2. Increase the thunderbolt icon size for variable-assigned responses
-3. Update main action buttons to use a gradient with accessible text color
+Add a type selector interface to the Variables panel that shows three variable types: Boolean (current functionality), Text Matching, and Number. The Text and Number types will be visible but locked with a "Coming Soon" indicator.
 
 ---
 
-## Accessibility Analysis
+## Design Approach
 
-### Proposed Colors Contrast Check
+### Type Selection UI
 
-| Background | Text/Icon | Contrast Ratio | WCAG AA (4.5:1) | Status |
-|------------|-----------|----------------|-----------------|--------|
-| `#A7B5FF` (light blue) | `#00178F` (navy) | ~6.8:1 | Pass | AAA |
-| `#4B96FF` (medium blue) | `#00178F` (navy) | ~4.3:1 | Fail | Below AA |
-| `#FFA2B6` (pink) | `#00178F` (navy) | ~6.8:1 | Pass | AAA |
+When adding a new variable, users will see a segmented control or radio group to select the type before entering the name. The interface will clearly indicate which types are available now vs coming soon.
 
-### Accessibility Issue
+```text
++------------------------------------------+
+| Conditional Variables                    |
+| Boolean flags that control...            |
++------------------------------------------+
+| Type:                                    |
+| [True/False]  [Text*]  [Number*]         |
+|               * Coming Soon              |
++------------------------------------------+
+| [Existing variables list...]             |
++------------------------------------------+
+| [Name input]  [Add]                      |
++------------------------------------------+
+```
 
-The gradient end color `#4B96FF` with `#00178F` text has a contrast ratio of approximately 4.3:1, which is slightly below the WCAG AA requirement of 4.5:1 for normal text.
+### Variable Type Icons
 
-### Recommended Alternative
+- **True/False (Boolean)**: `ToggleLeft` icon (current)
+- **Text Matching**: `Type` or `ALargeSmall` icon
+- **Number**: `Hash` icon
 
-Darken the gradient end slightly to `#3D85E8` or use `#00206B` as the text color to achieve 4.5:1+ contrast. Alternatively, since the gradient transitions from light to dark and the darkest point still has readable contrast for large UI elements (buttons), this is borderline acceptable.
+### Locked State Visual Treatment
 
-**Proposed solution:** Adjust the gradient to `#A7B5FF` to `#5A9FFF` (slightly lighter end) OR keep as-is since buttons qualify as large text (3:1 required) and the contrast exceeds that threshold.
+Locked variable types will have:
+- A small lock icon overlay or badge
+- Reduced opacity (50%)
+- "Coming soon" tooltip on hover
+- Non-interactive (cursor-not-allowed)
+- A subtle "Coming Soon" badge next to the type name
 
 ---
 
 ## Implementation Details
 
-### 1. Hover States for Buttons and Icons
+### 1. Add Variable Type Enum
 
-**Files:** `MessageFlowNode.tsx`, `ResponseOptionRow.tsx`, `CanvasToolbar.tsx`
+**File:** `src/types/scenario.ts`
 
-**Current State:**
-- Ghost buttons use `hover:bg-accent` (Tailwind semantic color)
-- Delete buttons use `hover:bg-destructive/10 hover:text-destructive`
+Add a type discriminator to the variable system (prepared for future use):
+
+```typescript
+export type VariableType = "boolean" | "text" | "number";
+
+export interface ScenarioVariable {
+  id: string;
+  name: string;
+  type: VariableType; // New field
+  defaultValue: boolean; // Will become union type later
+}
+
+// Update createVariable to default to "boolean"
+export const createVariable = (name: string, type: VariableType = "boolean"): ScenarioVariable => ({
+  id: crypto.randomUUID(),
+  name,
+  type,
+  defaultValue: false,
+});
+```
+
+### 2. Update VariablesPanel UI
+
+**File:** `src/components/builder/VariablesPanel.tsx`
 
 **Changes:**
-- Standard button/icon hover: `hover:bg-[#4B96FF] hover:text-[#00178F]`
-- Delete button hover: `hover:bg-[#FFA2B6] hover:text-[#00178F]`
+- Add imports for new icons: `Lock`, `Type`, `Hash` from lucide-react
+- Add a type selector section with three options
+- Disable Text and Number options with locked styling
+- Show a "Coming Soon" badge on locked types
+- Display variable type icon based on the variable's type field
 
-**Affected elements:**
-- Eye (visibility condition) button
-- Flag (endpoint) button
-- Trash (delete message) button
-- Zap (variable config) button
-- Link/Unlink buttons
-- Help and Reset buttons in toolbar
+**New Type Selector Component (inline):**
 
-### 2. Larger Thunderbolt Icon
-
-**File:** `ResponseOptionRow.tsx`
-
-**Current State:**
 ```tsx
-<Zap className="h-2.5 w-2.5" />
+const VARIABLE_TYPES = [
+  { id: "boolean", label: "True/False", icon: ToggleLeft, locked: false },
+  { id: "text", label: "Text", icon: Type, locked: true },
+  { id: "number", label: "Number", icon: Hash, locked: true },
+] as const;
+
+// State for selected type
+const [selectedType, setSelectedType] = useState<"boolean" | "text" | "number">("boolean");
 ```
 
-**Change:**
+**Type Selector UI:**
+
 ```tsx
-<Zap className="h-4 w-4" />
+<div className="p-3 border-b border-border">
+  <div className="text-xs text-muted-foreground mb-2">Variable Type</div>
+  <div className="flex gap-1">
+    {VARIABLE_TYPES.map((vt) => (
+      <button
+        key={vt.id}
+        onClick={() => !vt.locked && setSelectedType(vt.id)}
+        disabled={vt.locked}
+        className={cn(
+          "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-xs font-medium transition-colors",
+          selectedType === vt.id && !vt.locked
+            ? "bg-primary/20 text-primary"
+            : vt.locked
+            ? "opacity-50 cursor-not-allowed text-muted-foreground"
+            : "hover:bg-secondary text-muted-foreground"
+        )}
+      >
+        <vt.icon className="h-3 w-3" />
+        {vt.label}
+        {vt.locked && <Lock className="h-2.5 w-2.5 ml-0.5" />}
+      </button>
+    ))}
+  </div>
+  <div className="text-[10px] text-muted-foreground mt-1.5 text-center">
+    Text and Number types coming soon
+  </div>
+</div>
 ```
 
-The indicator badge will also be slightly larger to accommodate:
+### 3. Update Variable List Display
+
+Each variable in the list will show its type icon:
+
 ```tsx
-<span className="flex items-center gap-0.5 text-[10px] bg-warning/20 text-warning px-2 py-1 rounded font-medium">
-  <Zap className="h-4 w-4" />
-</span>
+// Get icon based on variable type
+const getVariableIcon = (type: VariableType = "boolean") => {
+  switch (type) {
+    case "text": return Type;
+    case "number": return Hash;
+    default: return ToggleLeft;
+  }
+};
+
+// In the variable row
+const VariableIcon = getVariableIcon(variable.type);
+<VariableIcon className="h-3 w-3" />
 ```
 
-### 3. Gradient Button Styling
+### 4. Migration for Existing Variables
 
-**File:** `src/components/ui/button.tsx`
+**File:** `src/context/ScenarioContext.tsx`
 
-**Current State:**
-```tsx
-default: "bg-primary text-primary-foreground hover:bg-primary/90",
+Update the `migrateScenario` function to add `type: "boolean"` to any existing variables that lack the field:
+
+```typescript
+// Inside migrateScenario
+const migratedVariables: Record<string, ScenarioVariable> = {};
+Object.entries(scenario.variables ?? {}).forEach(([id, variable]) => {
+  migratedVariables[id] = {
+    ...variable,
+    type: (variable as any).type ?? "boolean",
+  };
+});
 ```
-
-**Change (Option A - modify default variant):**
-```tsx
-default: "bg-gradient-to-r from-[#A7B5FF] to-[#4B96FF] text-[#00178F] hover:from-[#97A5EF] hover:to-[#3B86EF]",
-```
-
-**Affected buttons:**
-- "Add Node" button in CanvasToolbar
-- "Add" button in MessageFlowNode (add response option)
-- Any other `variant="default"` buttons in the canvas
 
 ---
 
@@ -101,81 +170,37 @@ default: "bg-gradient-to-r from-[#A7B5FF] to-[#4B96FF] text-[#00178F] hover:from
 
 | File | Changes |
 |------|---------|
-| `src/components/ui/button.tsx` | Update default variant to gradient styling |
-| `src/components/builder/MessageFlowNode.tsx` | Add explicit hover colors to icon buttons |
-| `src/components/builder/ResponseOptionRow.tsx` | Add hover colors, increase Zap icon size |
-| `src/components/builder/CanvasToolbar.tsx` | Add hover colors to ghost buttons |
+| `src/types/scenario.ts` | Add `VariableType` type, add `type` field to `ScenarioVariable`, update `createVariable` |
+| `src/components/builder/VariablesPanel.tsx` | Add type selector UI with locked states, add new icons, display type icons on variables |
+| `src/context/ScenarioContext.tsx` | Add migration logic for existing variables without type field |
 
 ---
 
-## Technical Implementation
+## Accessibility Considerations
 
-### Button Gradient (button.tsx)
+- Locked buttons use `disabled` attribute for screen readers
+- Tooltip on locked types explains "Coming soon"
+- Clear visual distinction between active and locked states
+- Lock icon provides visual indicator even without color
 
-```tsx
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 ...",
-  {
-    variants: {
-      variant: {
-        default: "bg-gradient-to-r from-[#A7B5FF] to-[#4B96FF] text-[#00178F] hover:from-[#97A5EF] hover:to-[#3B86EF] hover:text-[#00178F]",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        // ... other variants unchanged
-      },
-      // ...
-    },
-  },
-);
-```
+---
 
-### Hover States (MessageFlowNode.tsx example)
+## Visual Summary
 
-```tsx
-// Eye button
-<Button
-  variant="ghost"
-  size="icon"
-  className={cn(
-    "h-7 w-7 rounded-lg",
-    message.condition 
-      ? "bg-info/20 text-info hover:bg-[#4B96FF] hover:text-[#00178F]" 
-      : "text-muted-foreground hover:bg-[#4B96FF] hover:text-[#00178F]"
-  )}
->
+**Type Selector States:**
+- **Active (Boolean)**: Highlighted background, primary color
+- **Locked (Text/Number)**: 50% opacity, lock icon, non-clickable
 
-// Delete button
-<Button
-  variant="ghost"
-  size="icon"
-  className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
->
-```
-
-### Larger Thunderbolt (ResponseOptionRow.tsx)
-
-```tsx
-{option.setsVariable && variables[option.setsVariable.variableId] && (
-  <Tooltip>
-    <TooltipTrigger asChild>
-      <span className="flex items-center gap-0.5 text-[10px] bg-warning/20 text-warning px-2 py-1.5 rounded font-medium">
-        <Zap className="h-4 w-4" />
-      </span>
-    </TooltipTrigger>
-    <TooltipContent side="top">
-      <p>Sets: {variables[option.setsVariable.variableId].name} = {option.setsVariable.value ? "true" : "false"}</p>
-    </TooltipContent>
-  </Tooltip>
-)}
-```
+**Variable List:**
+- Each variable shows its type icon (Toggle, Type, or Hash)
+- Future Text/Number variables will show their respective icons
 
 ---
 
 ## Testing Checklist
 
-- [ ] Verify hover states appear correctly on all canvas buttons
-- [ ] Confirm gradient renders smoothly on primary buttons
-- [ ] Check thunderbolt icon is visibly larger
-- [ ] Test with high contrast mode / accessibility tools
-- [ ] Verify focus states still work (ring styles)
-- [ ] Check buttons at 200% zoom remain usable
-
+- [ ] Boolean variables can still be created normally
+- [ ] Text and Number type buttons are visually distinct and non-clickable
+- [ ] Existing scenarios load correctly with migrated boolean type
+- [ ] Tooltips display correctly on locked types
+- [ ] Hover states follow the established color palette
