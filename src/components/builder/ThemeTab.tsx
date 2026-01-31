@@ -165,7 +165,7 @@ export function ThemeTab() {
 
         {/* Start Screen */}
         <Section icon={<Play className="h-4 w-4" />} title="Start Screen" id="start-screen-heading">
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-5">
             <div>
               <Label htmlFor="start-title" className="mb-2 block text-sm font-medium">
                 Title
@@ -192,26 +192,72 @@ export function ThemeTab() {
               startButtonText: e.target.value
             })} placeholder="Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
-          </div>
-        </Section>
 
-        {/* Controls */}
-        <Section icon={<Settings className="h-4 w-4" />} title="Controls" id="controls-heading">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col gap-0.5">
-              <Label htmlFor="show-reset" className="text-sm font-medium">
-                Show Reset Button
-              </Label>
-              <span className="text-xs text-muted-foreground">
-                Allow users to restart the conversation
-              </span>
+            {/* Button Colors */}
+            <div className="flex gap-md">
+              <ColorPicker 
+                id="start-btn-bg" 
+                label="Button Color" 
+                value={theme.startButtonColor ?? "214 100% 65%"} 
+                onChange={value => updateTheme({ startButtonColor: value })} 
+              />
+              <ColorPicker 
+                id="start-btn-text" 
+                label="Button Text" 
+                value={theme.startButtonTextColor ?? "0 0% 100%"} 
+                onChange={value => updateTheme({ startButtonTextColor: value })} 
+              />
             </div>
-            <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
-            showResetButton: checked
-          })} />
+
+            {/* Contrast Warning */}
+            <ContrastWarning 
+              bgColor={theme.startButtonColor ?? "214 100% 65%"} 
+              textColor={theme.startButtonTextColor ?? "0 0% 100%"} 
+            />
+
+            {/* Button Shape */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label htmlFor="start-btn-radius" className="text-sm font-medium">
+                  Button Corner Radius
+                </Label>
+                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
+                  {theme.startButtonBorderRadius ?? 12}px
+                </span>
+              </div>
+              <Slider 
+                id="start-btn-radius" 
+                min={0} 
+                max={24} 
+                step={1} 
+                value={[theme.startButtonBorderRadius ?? 12]} 
+                onValueChange={([value]) => updateTheme({ startButtonBorderRadius: value })} 
+                aria-label="Button border radius" 
+                className="py-2" 
+              />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>Square</span>
+                <span>Round</span>
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="mt-2 flex justify-center">
+              <button
+                className="inline-flex items-center gap-2 px-5 py-2.5 font-medium"
+                style={{
+                  backgroundColor: `hsl(${theme.startButtonColor ?? '214 100% 65%'})`,
+                  color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
+                  borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
+                  boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '214 100% 65%'} / 0.25)`,
+                }}
+              >
+                <Play className="h-4 w-4" />
+                {theme.startButtonText ?? "Start"}
+              </button>
+            </div>
           </div>
         </Section>
-
         {/* Sender Bubbles */}
         <Section icon={<MessageCircle className="h-4 w-4" />} title="Your Messages" id="sender-heading">
           <div className="flex flex-col gap-[20px]">
