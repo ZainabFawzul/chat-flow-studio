@@ -3,17 +3,12 @@ import {
   ReactFlow,
   Background,
   Controls,
-  MiniMap,
-  useNodesState,
-  useEdgesState,
-  addEdge,
   Connection,
   Edge,
   Node,
   BackgroundVariant,
   Panel,
   NodeChange,
-  applyNodeChanges,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useScenario } from "@/context/ScenarioContext";
@@ -56,6 +51,7 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
       data: {
         message,
         isRoot: message.id === scenario.rootMessageId,
+        nodeNumber: index + 1,
       },
     }));
   }, [scenario.messages, scenario.rootMessageId]);
@@ -141,13 +137,6 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
           showZoom
           showFitView
           showInteractive={false}
-        />
-        <MiniMap
-          className="bg-card border border-border rounded-xl shadow-lg !bottom-4 !right-4"
-          nodeColor="#3b82f6"
-          maskColor="hsl(var(--background) / 0.8)"
-          pannable
-          zoomable
         />
         
         <Panel position="top-left" className="m-4">
