@@ -24,7 +24,7 @@ export interface VariableCondition {
 
 export interface VariableAssignment {
   variableId: string;
-  value: boolean;
+  value: VariableValue;
 }
 
 export interface ResponseOption {

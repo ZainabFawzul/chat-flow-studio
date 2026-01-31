@@ -1,6 +1,6 @@
 import { Handle, Position } from "@xyflow/react";
 import { useScenario, PendingConnection } from "@/context/ScenarioContext";
-import { ResponseOption, ScenarioVariable, VariableAssignment, VariableCondition } from "@/types/scenario";
+import { ResponseOption, ScenarioVariable, VariableAssignment, VariableCondition, VariableValue } from "@/types/scenario";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, Link2, Unlink, Zap, Eye } from "lucide-react";
@@ -36,7 +36,7 @@ export function ResponseOptionRow({
   } = useScenario();
   const variableList = Object.values(variables);
   const isPendingSource = pendingConnection?.sourceMessageId === messageId && pendingConnection?.optionId === option.id;
-  const handleSetVariable = (variableId: string | null, value: boolean) => {
+  const handleSetVariable = (variableId: string | null, value: VariableValue) => {
     if (variableId) {
       setResponseVariableAssignment(messageId, option.id, {
         variableId,
@@ -45,6 +45,36 @@ export function ResponseOptionRow({
     } else {
       setResponseVariableAssignment(messageId, option.id, null);
     }
+  };
+
+  const handleVariableValueChange = (value: VariableValue) => {
+    if (option.setsVariable) {
+      setResponseVariableAssignment(messageId, option.id, {
+        variableId: option.setsVariable.variableId,
+        value
+      });
+    }
+  };
+
+  const getSelectedVariable = () => {
+    if (!option.setsVariable) return null;
+    return variables[option.setsVariable.variableId] || null;
+  };
+
+  const selectedVariable = getSelectedVariable();
+
+  const getDefaultValueForType = (type: string): VariableValue => {
+    switch (type) {
+      case "text": return "";
+      case "number": return 0;
+      default: return true;
+    }
+  };
+
+  const formatDisplayValue = (value: VariableValue): string => {
+    if (typeof value === "boolean") return value ? "true" : "false";
+    if (typeof value === "string") return value || '""';
+    return String(value);
   };
   const handleSetCondition = (variableId: string | null, requiredValue: boolean) => {
     if (variableId) {
@@ -72,7 +102,7 @@ export function ResponseOptionRow({
               </span>
             </TooltipTrigger>
             <TooltipContent side="top">
-              <p>Sets: {variables[option.setsVariable.variableId].name} = {option.setsVariable.value ? "true" : "false"}</p>
+              <p>Sets: {variables[option.setsVariable.variableId].name} = {formatDisplayValue(option.setsVariable.value)}</p>
             </TooltipContent>
           </Tooltip>}
 
@@ -108,26 +138,61 @@ export function ResponseOptionRow({
                     When chosen, set variable
                   </label>
                   <div className="flex gap-2">
-                    <Select value={option.setsVariable?.variableId || "none"} onValueChange={val => handleSetVariable(val === "none" ? null : val, true)}>
+                    <Select 
+                      value={option.setsVariable?.variableId || "none"} 
+                      onValueChange={val => {
+                        if (val === "none") {
+                          handleSetVariable(null, true);
+                        } else {
+                          const selectedVar = variables[val];
+                          const defaultVal = selectedVar ? getDefaultValueForType(selectedVar.type) : true;
+                          handleSetVariable(val, defaultVal);
+                        }
+                      }}
+                    >
                       <SelectTrigger className="h-8 text-xs flex-1">
                         <SelectValue placeholder="None" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
                         {variableList.map(v => <SelectItem key={v.id} value={v.id}>
-                            {v.name}
+                            {v.name} ({v.type})
                           </SelectItem>)}
                       </SelectContent>
                     </Select>
-                    {option.setsVariable && <Select value={option.setsVariable.value ? "true" : "false"} onValueChange={val => handleSetVariable(option.setsVariable!.variableId, val === "true")}>
-                        <SelectTrigger className="h-8 text-xs w-20">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="true">true</SelectItem>
-                          <SelectItem value="false">false</SelectItem>
-                        </SelectContent>
-                      </Select>}
+                    
+                    {/* Value input based on variable type */}
+                    {option.setsVariable && selectedVariable && (
+                      selectedVariable.type === "boolean" ? (
+                        <Select 
+                          value={option.setsVariable.value === true ? "true" : "false"} 
+                          onValueChange={val => handleVariableValueChange(val === "true")}
+                        >
+                          <SelectTrigger className="h-8 text-xs w-20">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="true">true</SelectItem>
+                            <SelectItem value="false">false</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : selectedVariable.type === "text" ? (
+                        <Input
+                          value={String(option.setsVariable.value)}
+                          onChange={e => handleVariableValueChange(e.target.value)}
+                          placeholder="Value..."
+                          className="h-8 text-xs w-24"
+                        />
+                      ) : selectedVariable.type === "number" ? (
+                        <Input
+                          type="number"
+                          value={String(option.setsVariable.value)}
+                          onChange={e => handleVariableValueChange(Number(e.target.value) || 0)}
+                          placeholder="0"
+                          className="h-8 text-xs w-20"
+                        />
+                      ) : null
+                    )}
                   </div>
                 </div>
 
