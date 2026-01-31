@@ -62,6 +62,8 @@ export interface BubbleBorderRadius {
 export interface ChatTheme {
   contactName: string;
   contactAvatar: string | null; // Base64 image or null for initials
+  avatarBackgroundColor: string; // HSL for avatar background when using initials
+  avatarTextColor: string; // HSL for avatar text/initials
   senderBubbleColor: string;
   senderTextColor: string;
   senderBorderRadius: BubbleBorderRadius;
@@ -111,6 +113,8 @@ export const DEFAULT_BORDER_RADIUS: BubbleBorderRadius = {
 export const DEFAULT_THEME: ChatTheme = {
   contactName: "Contact",
   contactAvatar: null,
+  avatarBackgroundColor: "214 100% 65%", // Primary blue
+  avatarTextColor: "0 0% 100%", // White
   senderBubbleColor: "214 100% 65%", // Primary blue
   senderTextColor: "0 0% 100%",
   senderBorderRadius: { topLeft: 16, topRight: 4, bottomRight: 16, bottomLeft: 16 },
