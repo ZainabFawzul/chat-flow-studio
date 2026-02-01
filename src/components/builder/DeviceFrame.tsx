@@ -25,15 +25,7 @@ export function DeviceFrame({ preset, children, className }: DeviceFrameProps) {
         <div className="relative flex flex-col bg-[#1a1a1a] rounded-[44px] p-2.5 shadow-2xl max-h-full" style={{ width: '380px', aspectRatio: '9/18' }}>
           {/* Phone bezel */}
           <div className="absolute inset-2.5 rounded-[36px] overflow-hidden bg-black">
-            {/* Dynamic Island - smaller and positioned to not interfere */}
-            <div className="absolute top-1.5 left-1/2 -translate-x-1/2 z-20">
-              <div className="w-20 h-5 bg-[#1a1a1a] rounded-full flex items-center justify-center gap-2 px-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#2a2a2a]" />
-                <div className="w-2 h-2 rounded-full bg-[#2a2a2a] ring-1 ring-[#3a3a3a]" />
-              </div>
-            </div>
-            
-            {/* Screen content - add top padding to account for dynamic island */}
+            {/* Screen content */}
             <div className="h-full w-full overflow-hidden rounded-[36px]">
               {children}
             </div>
