@@ -14,7 +14,7 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, MessageCircle, Play, Settings, AlertTriangle, MousePointerClick, Frame } from "lucide-react";
+import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
@@ -303,68 +303,114 @@ export function ThemeTab() {
           </div>
         </Section>
         {/* Frame Settings */}
-        <Section icon={<Frame className="h-4 w-4" />} title="Frame" id="frame-heading">
+        <Section icon={<Smartphone className="h-4 w-4" />} title="Frame" id="frame-heading">
           <div className="flex flex-col gap-5">
             
-            {/* Corner Radius */}
+            {/* Frame Preset */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label htmlFor="frame-radius" className="text-sm font-medium">
-                  Corner Radius
-                </Label>
-                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                  {theme.frameBorderRadius ?? 16}px
-                </span>
-              </div>
-              <Slider 
-                id="frame-radius" 
-                min={0} 
-                max={32} 
-                step={1} 
-                value={[theme.frameBorderRadius ?? 16]} 
-                onValueChange={([value]) => updateTheme({ frameBorderRadius: value })} 
-                aria-label="Frame corner radius" 
-                className="py-2" 
-              />
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>Square</span>
-                <span>Round</span>
+              <Label className="mb-3 block text-sm font-medium">Device Frame</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { value: 'none' as const, label: 'None', icon: Square },
+                  { value: 'phone' as const, label: 'Phone', icon: Smartphone },
+                  { value: 'tablet' as const, label: 'Tablet', icon: Tablet },
+                ].map(({ value, label, icon: Icon }) => (
+                  <button
+                    key={value}
+                    onClick={() => updateTheme({ framePreset: value })}
+                    className={cn(
+                      "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
+                      (theme.framePreset ?? 'none') === value
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="text-xs font-medium">{label}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Border Width */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label htmlFor="frame-border-width" className="text-sm font-medium">
-                  Border Width
-                </Label>
-                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                  {theme.frameBorderWidth ?? 1}px
-                </span>
-              </div>
-              <Slider 
-                id="frame-border-width" 
-                min={0} 
-                max={4} 
-                step={1} 
-                value={[theme.frameBorderWidth ?? 1]} 
-                onValueChange={([value]) => updateTheme({ frameBorderWidth: value })} 
-                aria-label="Frame border width" 
-                className="py-2" 
-              />
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>None</span>
-                <span>Thick</span>
-              </div>
-            </div>
+            {/* Custom Frame Options - only show when preset is 'none' */}
+            {(theme.framePreset ?? 'none') === 'none' && (
+              <>
+                {/* Corner Radius */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <Label htmlFor="frame-radius" className="text-sm font-medium">
+                      Corner Radius
+                    </Label>
+                    <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
+                      {theme.frameBorderRadius ?? 16}px
+                    </span>
+                  </div>
+                  <Slider 
+                    id="frame-radius" 
+                    min={0} 
+                    max={32} 
+                    step={1} 
+                    value={[theme.frameBorderRadius ?? 16]} 
+                    onValueChange={([value]) => updateTheme({ frameBorderRadius: value })} 
+                    aria-label="Frame corner radius" 
+                    className="py-2" 
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>Square</span>
+                    <span>Round</span>
+                  </div>
+                </div>
 
-            {/* Border Color */}
-            <ColorPicker
-              id="frame-border-color"
-              label="Border Color"
-              value={theme.frameBorderColor ?? "220 13% 91%"}
-              onChange={value => updateTheme({ frameBorderColor: value })}
-            />
+                {/* Border Width */}
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <Label htmlFor="frame-border-width" className="text-sm font-medium">
+                      Border Width
+                    </Label>
+                    <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
+                      {theme.frameBorderWidth ?? 1}px
+                    </span>
+                  </div>
+                  <Slider 
+                    id="frame-border-width" 
+                    min={0} 
+                    max={4} 
+                    step={1} 
+                    value={[theme.frameBorderWidth ?? 1]} 
+                    onValueChange={([value]) => updateTheme({ frameBorderWidth: value })} 
+                    aria-label="Frame border width" 
+                    className="py-2" 
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>None</span>
+                    <span>Thick</span>
+                  </div>
+                </div>
+
+                {/* Border Color */}
+                <ColorPicker
+                  id="frame-border-color"
+                  label="Border Color"
+                  value={theme.frameBorderColor ?? "220 13% 91%"}
+                  onChange={value => updateTheme({ frameBorderColor: value })}
+                />
+                
+                {/* Preview */}
+                <div className="mt-2">
+                  <div 
+                    className="h-24 bg-secondary/30 flex items-center justify-center"
+                    style={{
+                      borderRadius: `${theme.frameBorderRadius ?? 16}px`,
+                      border: (theme.frameBorderWidth ?? 1) > 0 
+                        ? `${theme.frameBorderWidth ?? 1}px solid hsl(${theme.frameBorderColor ?? '220 13% 91%'})`
+                        : 'none',
+                    }}
+                  >
+                    <span className="text-xs text-muted-foreground">Frame Preview</span>
+                  </div>
+                </div>
+              </>
+            )}
             
             {/* Font Size */}
             <div>
@@ -398,21 +444,6 @@ export function ThemeTab() {
               <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
                 showResetButton: checked
               })} />
-            </div>
-
-            {/* Preview */}
-            <div className="mt-2">
-              <div 
-                className="h-24 bg-secondary/30 flex items-center justify-center"
-                style={{
-                  borderRadius: `${theme.frameBorderRadius ?? 16}px`,
-                  border: (theme.frameBorderWidth ?? 1) > 0 
-                    ? `${theme.frameBorderWidth ?? 1}px solid hsl(${theme.frameBorderColor ?? '220 13% 91%'})`
-                    : 'none',
-                }}
-              >
-                <span className="text-xs text-muted-foreground">Frame Preview</span>
-              </div>
             </div>
           </div>
         </Section>

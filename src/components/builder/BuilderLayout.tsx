@@ -7,15 +7,18 @@
  * @usage Rendered by Index page component
  */
 
-import { ScenarioProvider } from "@/context/ScenarioContext";
+import { ScenarioProvider, useScenario } from "@/context/ScenarioContext";
 import { TopBar } from "./TopBar";
 import { LeftPanel } from "./LeftPanel";
 import { ChatPreview } from "./ChatPreview";
+import { DeviceFrame } from "./DeviceFrame";
 import { OnboardingWalkthrough } from "./OnboardingWalkthrough";
 import { useWalkthrough } from "@/hooks/use-walkthrough";
 
 function BuilderContent() {
   const walkthrough = useWalkthrough();
+  const { scenario } = useScenario();
+  const framePreset = scenario.theme.framePreset ?? 'none';
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -35,8 +38,13 @@ function BuilderContent() {
         </aside>
         
         {/* Right Panel - 40% for Chat Preview */}
-        <section className="w-2/5 min-w-0 lg:min-w-[320px] overflow-hidden" aria-label="Chat preview">
-          <ChatPreview />
+        <section 
+          className="w-2/5 min-w-0 lg:min-w-[320px] overflow-hidden bg-muted/30" 
+          aria-label="Chat preview"
+        >
+          <DeviceFrame preset={framePreset}>
+            <ChatPreview />
+          </DeviceFrame>
         </section>
       </main>
 
