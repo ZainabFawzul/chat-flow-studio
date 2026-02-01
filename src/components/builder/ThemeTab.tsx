@@ -302,6 +302,46 @@ export function ThemeTab() {
             </div>
           </div>
         </Section>
+        {/* Settings - Typography, Controls */}
+        <Section icon={<Settings className="h-4 w-4" />} title="Settings" id="settings-heading">
+          <div className="flex flex-col gap-5">
+            
+            {/* Font Size */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <Label htmlFor="font-size" className="text-sm font-medium">
+                  Message Size
+                </Label>
+                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
+                  {theme.fontSize}px
+                </span>
+              </div>
+              <Slider id="font-size" min={12} max={20} step={1} value={[theme.fontSize]} onValueChange={([value]) => updateTheme({
+                fontSize: value
+              })} aria-label="Font size" className="py-2" />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>Small</span>
+                <span>Large</span>
+              </div>
+            </div>
+            
+            {/* Show Reset Button */}
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-0.5">
+                <Label htmlFor="show-reset" className="text-sm font-medium">
+                  Show Reset Button
+                </Label>
+                <span className="text-xs text-muted-foreground">
+                  Allow users to restart the conversation
+                </span>
+              </div>
+              <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
+                showResetButton: checked
+              })} />
+            </div>
+          </div>
+        </Section>
+
         {/* Sender Bubbles */}
         <Section icon={<MessageCircle className="h-4 w-4" />} title="Your Messages" id="sender-heading">
           <div className="flex flex-col gap-[20px]">
@@ -495,46 +535,6 @@ export function ThemeTab() {
                   Option 2
                 </span>
               </div>
-            </div>
-          </div>
-        </Section>
-
-        {/* Settings - Typography, Controls */}
-        <Section icon={<Settings className="h-4 w-4" />} title="Settings" id="settings-heading">
-          <div className="flex flex-col gap-5">
-            
-            {/* Font Size */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label htmlFor="font-size" className="text-sm font-medium">
-                  Message Size
-                </Label>
-                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                  {theme.fontSize}px
-                </span>
-              </div>
-              <Slider id="font-size" min={12} max={20} step={1} value={[theme.fontSize]} onValueChange={([value]) => updateTheme({
-                fontSize: value
-              })} aria-label="Font size" className="py-2" />
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>Small</span>
-                <span>Large</span>
-              </div>
-            </div>
-            
-            {/* Show Reset Button */}
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col gap-0.5">
-                <Label htmlFor="show-reset" className="text-sm font-medium">
-                  Show Reset Button
-                </Label>
-                <span className="text-xs text-muted-foreground">
-                  Allow users to restart the conversation
-                </span>
-              </div>
-              <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
-                showResetButton: checked
-              })} />
             </div>
           </div>
         </Section>
