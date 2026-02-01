@@ -179,7 +179,7 @@ export function ThemeTab() {
             {/* Avatar Colors (only shown when no custom image) */}
             {!theme.contactAvatar && (
               <>
-                <div className="flex gap-md">
+                <div className="flex gap-4">
                   <ColorPicker
                     id="avatar-bg"
                     label="Avatar Background"
@@ -238,7 +238,7 @@ export function ThemeTab() {
             </div>
 
             {/* Button Colors */}
-            <div className="flex gap-md">
+            <div className="flex gap-4">
               <ColorPicker 
                 id="start-btn-bg" 
                 label="Button Color" 
@@ -305,7 +305,7 @@ export function ThemeTab() {
         {/* Sender Bubbles */}
         <Section icon={<MessageCircle className="h-4 w-4" />} title="Your Messages" id="sender-heading">
           <div className="flex flex-col gap-[20px]">
-            <div className="flex gap-md">
+            <div className="flex gap-4">
               <ColorPicker id="sender-bg" label="Bubble" value={theme.senderBubbleColor} onChange={value => updateTheme({
               senderBubbleColor: value
             })} />
@@ -340,7 +340,7 @@ export function ThemeTab() {
         {/* Receiver Bubbles */}
         <Section icon={<MessageCircle className="h-4 w-4" />} title="Contact Messages" id="receiver-heading">
           <div className="flex flex-col gap-[20px]">
-            <div className="flex gap-md">
+            <div className="flex gap-4">
               <ColorPicker id="receiver-bg" label="Bubble" value={theme.receiverBubbleColor} onChange={value => updateTheme({
               receiverBubbleColor: value
             })} />
@@ -390,7 +390,7 @@ export function ThemeTab() {
             </div>
 
             {/* Panel Background & Label Color */}
-            <div className="flex gap-md">
+            <div className="flex gap-4">
               <ColorPicker
                 id="response-panel-bg"
                 label="Panel Background"
@@ -412,7 +412,7 @@ export function ThemeTab() {
             />
 
             {/* Option Bubble & Text */}
-            <div className="flex gap-md">
+            <div className="flex gap-4">
               <ColorPicker
                 id="response-option-bg"
                 label="Option Background"
