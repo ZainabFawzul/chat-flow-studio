@@ -183,7 +183,7 @@ export function ThemeTab() {
                   <ColorPicker
                     id="avatar-bg"
                     label="Avatar Background"
-                    value={theme.avatarBackgroundColor ?? "214 100% 65%"}
+                    value={theme.avatarBackgroundColor ?? "221 83% 40%"}
                     onChange={value => updateTheme({ avatarBackgroundColor: value })}
                   />
                   <ColorPicker
@@ -194,7 +194,7 @@ export function ThemeTab() {
                   />
                 </div>
                 <ContrastWarning
-                  bgColor={theme.avatarBackgroundColor ?? "214 100% 65%"}
+                  bgColor={theme.avatarBackgroundColor ?? "221 83% 40%"}
                   textColor={theme.avatarTextColor ?? "0 0% 100%"}
                 />
               </>
@@ -242,7 +242,7 @@ export function ThemeTab() {
               <ColorPicker 
                 id="start-btn-bg" 
                 label="Button Color" 
-                value={theme.startButtonColor ?? "214 100% 65%"} 
+                value={theme.startButtonColor ?? "221 83% 40%"} 
                 onChange={value => updateTheme({ startButtonColor: value })} 
               />
               <ColorPicker 
@@ -255,7 +255,7 @@ export function ThemeTab() {
 
             {/* Contrast Warning */}
             <ContrastWarning 
-              bgColor={theme.startButtonColor ?? "214 100% 65%"} 
+              bgColor={theme.startButtonColor ?? "221 83% 40%"} 
               textColor={theme.startButtonTextColor ?? "0 0% 100%"} 
             />
 
@@ -290,10 +290,10 @@ export function ThemeTab() {
               <button
                 className="inline-flex items-center gap-2 px-5 py-2.5 font-medium"
                 style={{
-                  backgroundColor: `hsl(${theme.startButtonColor ?? '214 100% 65%'})`,
+                  backgroundColor: `hsl(${theme.startButtonColor ?? '221 83% 40%'})`,
                   color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
                   borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
-                  boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '214 100% 65%'} / 0.25)`,
+                  boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '221 83% 40%'} / 0.25)`,
                 }}
               >
                 <Play className="h-4 w-4" />
@@ -400,7 +400,7 @@ export function ThemeTab() {
               <ColorPicker
                 id="response-label-color"
                 label="Label Color"
-                value={theme.responsePanelLabelColor ?? "220 9% 46%"}
+                value={theme.responsePanelLabelColor ?? "220 9% 35%"}
                 onChange={value => updateTheme({ responsePanelLabelColor: value })}
               />
             </div>
@@ -408,7 +408,7 @@ export function ThemeTab() {
             {/* Contrast Warning for Panel Label */}
             <ContrastWarning
               bgColor={theme.responsePanelBackground ?? "0 0% 100%"}
-              textColor={theme.responsePanelLabelColor ?? "220 9% 46%"}
+              textColor={theme.responsePanelLabelColor ?? "220 9% 35%"}
             />
 
             {/* Option Bubble & Text */}
@@ -422,7 +422,7 @@ export function ThemeTab() {
               <ColorPicker
                 id="response-option-text"
                 label="Option Text"
-                value={theme.responseOptionTextColor ?? "220 9% 20%"}
+                value={theme.responseOptionTextColor ?? "222 47% 11%"}
                 onChange={value => updateTheme({ responseOptionTextColor: value })}
               />
             </div>
@@ -430,7 +430,7 @@ export function ThemeTab() {
             {/* Contrast Warning */}
             <ContrastWarning
               bgColor={theme.responseOptionBackground ?? "0 0% 100%"}
-              textColor={theme.responseOptionTextColor ?? "220 9% 20%"}
+              textColor={theme.responseOptionTextColor ?? "222 47% 11%"}
             />
 
             {/* Option Border Radius */}
