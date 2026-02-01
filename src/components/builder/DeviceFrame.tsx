@@ -22,28 +22,31 @@ export function DeviceFrame({ preset, children, className }: DeviceFrameProps) {
   if (preset === 'phone') {
     return (
       <div className={cn("flex items-center justify-center p-4 h-full", className)}>
-        <div className="relative flex flex-col bg-[#1a1a1a] rounded-[40px] p-2 shadow-2xl max-h-full" style={{ width: '320px', aspectRatio: '9/19.5' }}>
+        <div className="relative flex flex-col bg-[#1a1a1a] rounded-[44px] p-2.5 shadow-2xl max-h-full" style={{ width: '380px', aspectRatio: '9/18' }}>
           {/* Phone bezel */}
-          <div className="absolute inset-2 rounded-[32px] overflow-hidden bg-black">
-            {/* Dynamic Island / Notch */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center">
-              <div className="w-24 h-7 bg-[#1a1a1a] rounded-b-2xl flex items-center justify-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#2a2a2a]" />
-                <div className="w-3 h-3 rounded-full bg-[#2a2a2a] ring-1 ring-[#3a3a3a]" />
+          <div className="absolute inset-2.5 rounded-[36px] overflow-hidden bg-black">
+            {/* Dynamic Island - smaller and positioned to not interfere */}
+            <div className="absolute top-1.5 left-1/2 -translate-x-1/2 z-20">
+              <div className="w-20 h-5 bg-[#1a1a1a] rounded-full flex items-center justify-center gap-2 px-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#2a2a2a]" />
+                <div className="w-2 h-2 rounded-full bg-[#2a2a2a] ring-1 ring-[#3a3a3a]" />
               </div>
             </div>
             
-            {/* Screen content */}
-            <div className="h-full w-full overflow-hidden rounded-[32px]">
+            {/* Screen content - add top padding to account for dynamic island */}
+            <div className="h-full w-full overflow-hidden rounded-[36px]">
               {children}
             </div>
           </div>
           
           {/* Side buttons */}
-          <div className="absolute -left-[3px] top-24 w-[3px] h-8 bg-[#2a2a2a] rounded-l-sm" />
-          <div className="absolute -left-[3px] top-36 w-[3px] h-12 bg-[#2a2a2a] rounded-l-sm" />
-          <div className="absolute -left-[3px] top-52 w-[3px] h-12 bg-[#2a2a2a] rounded-l-sm" />
-          <div className="absolute -right-[3px] top-32 w-[3px] h-16 bg-[#2a2a2a] rounded-r-sm" />
+          <div className="absolute -left-[3px] top-28 w-[3px] h-8 bg-[#2a2a2a] rounded-l-sm" />
+          <div className="absolute -left-[3px] top-40 w-[3px] h-14 bg-[#2a2a2a] rounded-l-sm" />
+          <div className="absolute -left-[3px] top-56 w-[3px] h-14 bg-[#2a2a2a] rounded-l-sm" />
+          <div className="absolute -right-[3px] top-36 w-[3px] h-20 bg-[#2a2a2a] rounded-r-sm" />
+          
+          {/* Home indicator */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-28 h-1 bg-white/20 rounded-full z-20" />
         </div>
       </div>
     );
