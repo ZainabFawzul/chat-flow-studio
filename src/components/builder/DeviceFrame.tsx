@@ -50,11 +50,6 @@ export function DeviceFrame({ preset, children, className }: DeviceFrameProps) {
         <div className="relative flex bg-[#1a1a1a] rounded-[24px] p-2 shadow-2xl max-w-full max-h-full" style={{ width: '100%', maxWidth: '600px', aspectRatio: '4/3' }}>
           {/* Tablet bezel */}
           <div className="absolute inset-2 rounded-[16px] overflow-hidden bg-black">
-            {/* Camera */}
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#2a2a2a] ring-1 ring-[#3a3a3a]" />
-            </div>
-            
             {/* Screen content */}
             <div className="h-full w-full overflow-hidden rounded-[16px]">
               {children}
