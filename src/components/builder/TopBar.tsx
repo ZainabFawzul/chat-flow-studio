@@ -16,12 +16,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { generateExportZip } from "@/lib/exportZip";
 import { Separator } from "@/components/ui/separator";
-
 interface TopBarProps {
   onRestartWalkthrough?: () => void;
 }
-
-export function TopBar({ onRestartWalkthrough }: TopBarProps) {
+export function TopBar({
+  onRestartWalkthrough
+}: TopBarProps) {
   const {
     scenario,
     importScenario
@@ -117,7 +117,7 @@ export function TopBar({ onRestartWalkthrough }: TopBarProps) {
         <div className="flex items-center gap-3">
           <img src={chatScenarioIcon} alt="Chat Scenario" className="h-10 w-10 object-contain" />
           <div>
-            <h1 className="text-lg font-semibold text-foreground tracking-tight">Branching Chat Builder</h1>
+            <h1 className="text-lg font-semibold text-foreground tracking-tight">Chatatouille: The Branching Chat Builder</h1>
             <p className="text-xs text-muted-foreground">Design branching conversations and export as ZIP.</p>
           </div>
         </div>
@@ -125,13 +125,7 @@ export function TopBar({ onRestartWalkthrough }: TopBarProps) {
         <nav className="flex items-center gap-3" aria-label="Main actions">
           <input ref={fileInputRef} type="file" accept=".json" className="sr-only" onChange={handleFileChange} aria-label="Import scenario file" />
           
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={onRestartWalkthrough}
-            className="gap-2 rounded-xl text-muted-foreground hover:text-foreground"
-            aria-label="Show help walkthrough"
-          >
+          <Button variant="ghost" size="sm" onClick={onRestartWalkthrough} className="gap-2 rounded-xl text-muted-foreground hover:text-foreground" aria-label="Show help walkthrough">
             <HelpCircle className="h-4 w-4" aria-hidden="true" />
             <span>Help</span>
           </Button>
@@ -150,13 +144,7 @@ export function TopBar({ onRestartWalkthrough }: TopBarProps) {
             </Button>
           </div>
           
-          <Button 
-            variant="default" 
-            size="sm" 
-            onClick={() => setIsFinalizeDialogOpen(true)} 
-            className="gap-2 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
-            data-walkthrough="finalize-button"
-          >
+          <Button variant="default" size="sm" onClick={() => setIsFinalizeDialogOpen(true)} className="gap-2 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all" data-walkthrough="finalize-button">
             <Package className="h-4 w-4" aria-hidden="true" />
             <span>Finalize</span>
           </Button>
