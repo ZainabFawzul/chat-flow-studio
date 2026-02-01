@@ -89,6 +89,10 @@ export interface ChatTheme {
   responseOptionBorderRadius: number;
   // Controls
   showResetButton: boolean;
+  // Frame customization
+  frameBorderRadius: number; // 0-32px
+  frameBorderWidth: number; // 0-4px
+  frameBorderColor: string; // HSL
 }
 
 export interface ScenarioData {
@@ -140,6 +144,10 @@ export const DEFAULT_THEME: ChatTheme = {
   responseOptionBorderRadius: 12,
   // Controls
   showResetButton: true,
+  // Frame customization
+  frameBorderRadius: 16,
+  frameBorderWidth: 1,
+  frameBorderColor: "220 13% 91%", // Light gray border
 };
 
 export const createEmptyScenario = (): ScenarioData => ({

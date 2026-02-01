@@ -173,13 +173,20 @@ export function ChatPreview() {
   const startButtonText = theme.startButtonText ?? "Start";
   const showResetButton = theme.showResetButton ?? true;
 
+  // Frame styling with fallbacks
+  const frameBorderRadius = theme.frameBorderRadius ?? 16;
+  const frameBorderWidth = theme.frameBorderWidth ?? 1;
+  const frameBorderColor = theme.frameBorderColor ?? "220 13% 91%";
+
   return (
     <div
-      className="flex h-full flex-col"
+      className="flex h-full flex-col overflow-hidden"
       style={{
         backgroundColor: `hsl(${theme.chatBackground})`,
         fontFamily: theme.fontFamily,
         fontSize: `${theme.fontSize}px`,
+        borderRadius: `${frameBorderRadius}px`,
+        border: frameBorderWidth > 0 ? `${frameBorderWidth}px solid hsl(${frameBorderColor})` : 'none',
       }}
     >
       {/* Chat Header - Modern messaging app style */}
