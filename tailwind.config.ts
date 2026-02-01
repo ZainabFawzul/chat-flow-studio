@@ -84,6 +84,9 @@ export default {
           "receiver-text": "hsl(var(--chat-receiver-text))",
           background: "hsl(var(--chat-background))",
         },
+        toggle: {
+          active: "hsl(var(--toggle-active))",
+        },
       },
       spacing: {
         "xs": "4px",
