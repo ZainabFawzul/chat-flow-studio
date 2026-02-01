@@ -90,6 +90,7 @@ export interface ChatTheme {
   // Controls
   showResetButton: boolean;
   // Frame customization
+  framePreset: 'none' | 'phone' | 'tablet';
   frameBorderRadius: number; // 0-32px
   frameBorderWidth: number; // 0-4px
   frameBorderColor: string; // HSL
@@ -145,6 +146,7 @@ export const DEFAULT_THEME: ChatTheme = {
   // Controls
   showResetButton: true,
   // Frame customization
+  framePreset: 'none',
   frameBorderRadius: 16,
   frameBorderWidth: 1,
   frameBorderColor: "220 13% 91%", // Light gray border
