@@ -221,6 +221,7 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
             onClick={onToggleExpand}
             className="h-10 w-10 rounded-xl bg-card shadow-lg"
             aria-label={isExpanded ? "Exit fullscreen" : "Enter fullscreen"}
+            data-walkthrough="expand-button"
           >
             {isExpanded ? (
               <Minimize2 className="h-4 w-4" />

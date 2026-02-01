@@ -70,10 +70,12 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
 
         <div className="w-px h-6 bg-border" />
 
-        <VariablesTrigger 
-          onClick={() => setIsVariablesPanelOpen(true)}
-          variableCount={variableCount}
-        />
+        <div data-walkthrough="variables-button">
+          <VariablesTrigger 
+            onClick={() => setIsVariablesPanelOpen(true)}
+            variableCount={variableCount}
+          />
+        </div>
 
         <VariablesPanel 
           isOpen={isVariablesPanelOpen}

@@ -6,13 +6,25 @@
  * @usage Rendered in BuilderLayout left panel
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeTab } from "./ThemeTab";
 import { FlowCanvas } from "./FlowCanvas";
 
-export function LeftPanel() {
+interface LeftPanelProps {
+  requestedTab?: "theme" | "canvas" | null;
+}
+
+export function LeftPanel({ requestedTab }: LeftPanelProps) {
   const [isCanvasExpanded, setIsCanvasExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("theme");
+
+  // Handle walkthrough tab switching
+  useEffect(() => {
+    if (requestedTab) {
+      setActiveTab(requestedTab);
+    }
+  }, [requestedTab]);
 
   const toggleCanvasExpand = () => {
     setIsCanvasExpanded(!isCanvasExpanded);
@@ -25,18 +37,20 @@ export function LeftPanel() {
 
   return (
     <aside className="flex h-full w-full flex-col bg-background" aria-label="Builder panel">
-      <Tabs defaultValue="theme" className="flex h-full flex-col">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-full flex-col">
         <div className="px-4 pt-4">
           <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-secondary/50 rounded-xl" aria-label="Builder tabs">
             <TabsTrigger 
               value="theme" 
               className="rounded-lg text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all"
+              data-walkthrough="theme-tab"
             >
               Theme
             </TabsTrigger>
             <TabsTrigger 
               value="canvas" 
               className="rounded-lg text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all"
+              data-walkthrough="canvas-tab"
             >
               Canvas
             </TabsTrigger>

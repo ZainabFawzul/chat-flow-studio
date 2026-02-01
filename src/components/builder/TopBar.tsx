@@ -119,17 +119,25 @@ export function TopBar() {
         <nav className="flex items-center gap-3" aria-label="Main actions">
           <input ref={fileInputRef} type="file" accept=".json" className="sr-only" onChange={handleFileChange} aria-label="Import scenario file" />
           
-          <Button variant="secondary" size="sm" onClick={handleImportClick} className="gap-2 rounded-xl">
-            <Upload className="h-4 w-4" aria-hidden="true" />
-            <span>Import</span>
-          </Button>
+          <div className="flex items-center gap-3" data-walkthrough="import-export">
+            <Button variant="secondary" size="sm" onClick={handleImportClick} className="gap-2 rounded-xl">
+              <Upload className="h-4 w-4" aria-hidden="true" />
+              <span>Import</span>
+            </Button>
+            
+            <Button variant="secondary" size="sm" onClick={handleExportJSON} className="gap-2 rounded-xl">
+              <Download className="h-4 w-4" aria-hidden="true" />
+              <span>Export</span>
+            </Button>
+          </div>
           
-          <Button variant="secondary" size="sm" onClick={handleExportJSON} className="gap-2 rounded-xl">
-            <Download className="h-4 w-4" aria-hidden="true" />
-            <span>Export</span>
-          </Button>
-          
-          <Button variant="default" size="sm" onClick={() => setIsFinalizeDialogOpen(true)} className="gap-2 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all">
+          <Button 
+            variant="default" 
+            size="sm" 
+            onClick={() => setIsFinalizeDialogOpen(true)} 
+            className="gap-2 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
+            data-walkthrough="finalize-button"
+          >
             <Package className="h-4 w-4" aria-hidden="true" />
             <span>Finalize</span>
           </Button>
