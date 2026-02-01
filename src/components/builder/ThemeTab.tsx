@@ -303,7 +303,7 @@ export function ThemeTab() {
           </div>
         </Section>
         {/* Settings - Typography, Controls */}
-        <Section icon={<Settings className="h-4 w-4" />} title="Settings" id="settings-heading">
+        <Section icon={<Settings className="h-4 w-4" />} title="Frame" id="settings-heading">
           <div className="flex flex-col gap-5">
             
             {/* Font Size */}
