@@ -6,7 +6,7 @@
  * @usage Rendered in BuilderLayout header
  */
 
-import { Download, Upload, Package } from "lucide-react";
+import { Download, Upload, Package, HelpCircle } from "lucide-react";
 import chatScenarioIcon from "@/assets/chatscenario.png";
 import { Button } from "@/components/ui/button";
 import { useScenario } from "@/context/ScenarioContext";
@@ -15,7 +15,13 @@ import { ScenarioData } from "@/types/scenario";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { generateExportZip } from "@/lib/exportZip";
-export function TopBar() {
+import { Separator } from "@/components/ui/separator";
+
+interface TopBarProps {
+  onRestartWalkthrough?: () => void;
+}
+
+export function TopBar({ onRestartWalkthrough }: TopBarProps) {
   const {
     scenario,
     importScenario
@@ -118,6 +124,19 @@ export function TopBar() {
         
         <nav className="flex items-center gap-3" aria-label="Main actions">
           <input ref={fileInputRef} type="file" accept=".json" className="sr-only" onChange={handleFileChange} aria-label="Import scenario file" />
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onRestartWalkthrough}
+            className="gap-2 rounded-xl text-muted-foreground hover:text-foreground"
+            aria-label="Show help walkthrough"
+          >
+            <HelpCircle className="h-4 w-4" aria-hidden="true" />
+            <span>Help</span>
+          </Button>
+          
+          <Separator orientation="vertical" className="h-6" />
           
           <div className="flex items-center gap-3" data-walkthrough="import-export">
             <Button variant="secondary" size="sm" onClick={handleImportClick} className="gap-2 rounded-xl">
