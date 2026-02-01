@@ -306,28 +306,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     }
 
     .end-indicator {
-      display: flex;
-      justify-content: center;
-      padding-top: 1rem;
-    }
-
-    .end-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      border-radius: 1.25rem;
-      background: #10b98126;
-      color: #10b981;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-
-    .end-badge-dot {
-      width: 0.5rem;
-      height: 0.5rem;
-      border-radius: 50%;
-      background: #10b981;
+      display: none;
     }
 
     .response-options {

@@ -339,15 +339,6 @@ export function ChatPreview() {
               </div>
             )}
 
-            {/* End state messages */}
-            {(isConversationEnded || isDeadEnd) && (
-              <div className="flex justify-center pt-4">
-                <span className="inline-flex items-center gap-2 rounded-full bg-success/15 px-4 py-2 text-sm font-medium text-success">
-                  <span className="h-2 w-2 rounded-full bg-success" />
-                  {isConversationEnded ? "Conversation Complete" : "End of Branch"}
-                </span>
-              </div>
-            )}
           </div>
         )}
       </div>
