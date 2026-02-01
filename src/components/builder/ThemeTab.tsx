@@ -205,6 +205,11 @@ export function ThemeTab() {
         {/* Start Screen */}
         <Section icon={<Play className="h-4 w-4" />} title="Start Screen" id="start-screen-heading">
           <div className="flex flex-col gap-5">
+            {/* Chat Background */}
+            <ColorPicker id="chat-bg" label="Background Color" value={theme.chatBackground} onChange={value => updateTheme({
+              chatBackground: value
+            })} />
+
             <div>
               <Label htmlFor="start-title" className="mb-2 block text-sm font-medium">
                 Title
@@ -494,13 +499,9 @@ export function ThemeTab() {
           </div>
         </Section>
 
-        {/* Settings - merged Background, Typography, Controls */}
+        {/* Settings - Typography, Controls */}
         <Section icon={<Settings className="h-4 w-4" />} title="Settings" id="settings-heading">
           <div className="flex flex-col gap-5">
-            {/* Chat Background */}
-            <ColorPicker id="chat-bg" label="Chat Background" value={theme.chatBackground} onChange={value => updateTheme({
-              chatBackground: value
-            })} />
             
             {/* Font Size */}
             <div>
