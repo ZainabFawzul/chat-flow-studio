@@ -209,7 +209,7 @@ export function VariablesTrigger({
         <Button variant="ghost" size="sm" onClick={onClick} className="gap-2 rounded-lg h-9 px-3 text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]">
           <ToggleLeft className="h-4 w-4" />
           Variables
-          {variableCount > 0 && <span className="ml-1 rounded-full bg-primary/20 text-primary text-xs px-1.5 py-0.5 font-medium">
+          {variableCount > 0 && <span className="ml-1 rounded-full text-xs px-1.5 py-0.5 font-medium bg-[#ff708a]/[0.37] text-card-foreground">
               {variableCount}
             </span>}
         </Button>
