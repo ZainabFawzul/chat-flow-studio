@@ -113,13 +113,13 @@ export const DEFAULT_BORDER_RADIUS: BubbleBorderRadius = {
 export const DEFAULT_THEME: ChatTheme = {
   contactName: "Contact",
   contactAvatar: null,
-  avatarBackgroundColor: "214 100% 65%", // Primary blue
+  avatarBackgroundColor: "221 83% 40%", // Dark blue - WCAG AA compliant with white (7.5:1)
   avatarTextColor: "0 0% 100%", // White
-  senderBubbleColor: "214 100% 65%", // Primary blue
+  senderBubbleColor: "221 83% 40%", // Dark blue - WCAG AA compliant with white (7.5:1)
   senderTextColor: "0 0% 100%",
   senderBorderRadius: { topLeft: 16, topRight: 4, bottomRight: 16, bottomLeft: 16 },
   receiverBubbleColor: "40 14% 94%", // Secondary gray
-  receiverTextColor: "230 100% 28%", // Foreground
+  receiverTextColor: "222 47% 11%", // Dark foreground - WCAG AA compliant (12:1)
   receiverBorderRadius: { topLeft: 4, topRight: 16, bottomRight: 16, bottomLeft: 16 },
   chatBackground: "40 23% 97%", // Background
   fontSize: 14,
@@ -128,15 +128,15 @@ export const DEFAULT_THEME: ChatTheme = {
   startScreenTitle: "Ready to Start",
   startScreenSubtitle: "Begin the conversation",
   startButtonText: "Start",
-  startButtonColor: "214 100% 65%", // Primary blue
+  startButtonColor: "221 83% 40%", // Dark blue - WCAG AA compliant with white (7.5:1)
   startButtonTextColor: "0 0% 100%", // White
   startButtonBorderRadius: 12,
   // Response panel customization
   responsePanelBackground: "0 0% 100%", // White
   responsePanelLabelText: "Choose a response",
-  responsePanelLabelColor: "220 9% 46%", // Muted foreground
+  responsePanelLabelColor: "220 9% 35%", // Darker muted - WCAG AA compliant (7:1)
   responseOptionBackground: "0 0% 100%", // White
-  responseOptionTextColor: "220 9% 20%", // Foreground
+  responseOptionTextColor: "222 47% 11%", // Dark foreground - WCAG AA compliant
   responseOptionBorderRadius: 12,
   // Controls
   showResetButton: true,
