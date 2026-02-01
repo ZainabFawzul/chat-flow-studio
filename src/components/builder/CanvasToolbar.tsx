@@ -60,7 +60,7 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
               className="gap-2 rounded-lg h-9"
             >
               <Plus className="h-4 w-4" />
-              Add Node
+              New Message
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
