@@ -99,7 +99,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       font-family: ${theme.fontFamily};
       font-size: clamp(0.875rem, 1rem, 1.125rem);
       line-height: 1.5;
-      background-color: hsl(${theme.chatBackground});
+      background-color: transparent;
       height: 100vh;
       display: flex;
       flex-direction: column;
@@ -125,7 +125,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       max-width: 37.5rem;
       margin: 0 auto;
       width: 100%;
-      background: #ffffff;
+      background: hsl(${theme.chatBackground});
       box-shadow: 0 0 1.25rem #0000001a;
     }
 
