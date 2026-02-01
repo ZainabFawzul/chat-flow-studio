@@ -14,45 +14,13 @@ import { ChatMessage, ScenarioVariable, VariableValue } from "@/types/scenario";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Flag,
-  Plus,
-  Trash2,
-  Eye,
-  MousePointerClick,
-} from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Flag, Plus, Trash2, Eye, MousePointerClick } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { ResponseOptionRow } from "./ResponseOptionRow";
-
 interface MessageFlowNodeData {
   message: ChatMessage;
   isRoot: boolean;
@@ -60,44 +28,48 @@ interface MessageFlowNodeData {
   pendingConnection: PendingConnection | null;
   variables: Record<string, ScenarioVariable>;
 }
-
-function MessageFlowNodeComponent({ data, selected }: NodeProps) {
+function MessageFlowNodeComponent({
+  data,
+  selected
+}: NodeProps) {
   const nodeData = data as unknown as MessageFlowNodeData;
-  const { message, isRoot, nodeNumber, pendingConnection, variables } = nodeData;
-  
+  const {
+    message,
+    isRoot,
+    nodeNumber,
+    pendingConnection,
+    variables
+  } = nodeData;
   const {
     updateMessage,
     deleteMessage,
     toggleEndpoint,
     addResponseOption,
     completeConnection,
-    setMessageCondition,
+    setMessageCondition
   } = useScenario();
-
   const [newOptionText, setNewOptionText] = useState("");
-
   const handleAddOption = () => {
     if (newOptionText.trim()) {
       addResponseOption(message.id, newOptionText.trim());
       setNewOptionText("");
     }
   };
-
   const isComplete = message.isEndpoint || message.responseOptions.length > 0;
   const isConnecting = pendingConnection !== null;
   const isPendingSource = pendingConnection?.sourceMessageId === message.id;
   const canReceiveConnection = isConnecting && !isPendingSource;
-
   const variableList = Object.values(variables || {});
-
   const handleMessageCondition = (variableId: string | null, requiredValue: VariableValue) => {
     if (variableId) {
-      setMessageCondition(message.id, { variableId, requiredValue });
+      setMessageCondition(message.id, {
+        variableId,
+        requiredValue
+      });
     } else {
       setMessageCondition(message.id, null);
     }
   };
-
   const handleMessageConditionValueChange = (requiredValue: VariableValue) => {
     if (message.condition) {
       setMessageCondition(message.id, {
@@ -106,22 +78,21 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
       });
     }
   };
-
   const getMessageConditionVariable = () => {
     if (!message.condition) return null;
     return variables?.[message.condition.variableId] || null;
   };
-
   const messageConditionVariable = getMessageConditionVariable();
-
   const getDefaultValueForType = (type: string): VariableValue => {
     switch (type) {
-      case "text": return "";
-      case "number": return 0;
-      default: return true;
+      case "text":
+        return "";
+      case "number":
+        return 0;
+      default:
+        return true;
     }
   };
-
   const formatDisplayValue = (value: VariableValue): string => {
     if (typeof value === "boolean") return value ? "true" : "false";
     if (typeof value === "string") return value || '""';
@@ -138,34 +109,15 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
 
   // During connection mode, disable tab navigation for internal elements
   const internalTabIndex = isConnecting ? -1 : undefined;
-
-  return (
-    <TooltipProvider>
-      <div
-        className={cn(
-          "w-[320px] rounded-2xl border-2 bg-card shadow-lg transition-all",
-          selected ? "border-primary shadow-primary/20" : "border-border/50",
-          isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
-          canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none"
-        )}
-        onClick={canReceiveConnection ? () => completeConnection(message.id) : undefined}
-        onKeyDown={handleKeyDown}
-        tabIndex={canReceiveConnection ? 0 : -1}
-        role={canReceiveConnection ? "button" : undefined}
-        aria-label={canReceiveConnection ? `Connect to message ${nodeNumber}: ${message.content.slice(0, 50)}` : undefined}
-        data-connection-target={canReceiveConnection ? message.id : undefined}
-      >
+  return <TooltipProvider>
+      <div className={cn("w-[320px] rounded-2xl border-2 bg-card shadow-lg transition-all", selected ? "border-primary shadow-primary/20" : "border-border/50", isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background", canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none")} onClick={canReceiveConnection ? () => completeConnection(message.id) : undefined} onKeyDown={handleKeyDown} tabIndex={canReceiveConnection ? 0 : -1} role={canReceiveConnection ? "button" : undefined} aria-label={canReceiveConnection ? `Connect to message ${nodeNumber}: ${message.content.slice(0, 50)}` : undefined} data-connection-target={canReceiveConnection ? message.id : undefined}>
         {/* Input handle for connections */}
-        <Handle
-          type="target"
-          position={Position.Left}
-          className="!w-3 !h-3 !bg-primary !border-2 !border-background"
-        />
+        <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-primary !border-2 !border-background" />
 
         {/* Header */}
         <div className="flex items-center justify-between gap-2 p-3 border-b border-border/30">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-sm">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg font-bold text-sm bg-[#a8b7ff] text-sidebar-foreground">
               {nodeNumber}
             </div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -173,8 +125,7 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
             </span>
             
             {/* Message condition badge */}
-            {message.condition && variables?.[message.condition.variableId] && (
-              <Tooltip>
+            {message.condition && variables?.[message.condition.variableId] && <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="flex items-center gap-0.5 text-[10px] bg-info/20 text-info px-1.5 py-0.5 rounded font-medium">
                     <Eye className="h-2.5 w-2.5" />
@@ -184,34 +135,22 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                 <TooltipContent side="top">
                   <p>Requires: {variables[message.condition.variableId].name} = {formatDisplayValue(message.condition.requiredValue)}</p>
                 </TooltipContent>
-              </Tooltip>
-            )}
+              </Tooltip>}
 
             {/* Connection mode indicator */}
-            {canReceiveConnection && (
-              <span className="flex items-center gap-1 text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded font-medium animate-pulse" aria-hidden="true">
+            {canReceiveConnection && <span className="flex items-center gap-1 text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded font-medium animate-pulse" aria-hidden="true">
                 <MousePointerClick className="h-2.5 w-2.5" />
                 Press Enter to connect
-              </span>
-            )}
+              </span>}
           </div>
 
           <div className="flex items-center gap-1">
             {/* Message condition popover */}
-            {variableList.length > 0 && !isRoot && (
-              <Popover>
+            {variableList.length > 0 && !isRoot && <Popover>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant={message.condition ? "secondary" : "ghost"}
-                        size="icon"
-                        tabIndex={internalTabIndex}
-                        className={cn(
-                          "h-7 w-7 rounded-lg",
-                          message.condition ? "bg-info/20 text-info hover:bg-[#A7B5FF] hover:text-[#00178F]" : "text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]"
-                        )}
-                      >
+                      <Button variant={message.condition ? "secondary" : "ghost"} size="icon" tabIndex={internalTabIndex} className={cn("h-7 w-7 rounded-lg", message.condition ? "bg-info/20 text-info hover:bg-[#A7B5FF] hover:text-[#00178F]" : "text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]")}>
                         <Eye className="h-3.5 w-3.5" />
                       </Button>
                     </PopoverTrigger>
@@ -226,38 +165,28 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                       Show message only if
                     </label>
                     <div className="flex gap-2">
-                      <Select
-                        value={message.condition?.variableId || "none"}
-                        onValueChange={(val) => {
-                          if (val === "none") {
-                            handleMessageCondition(null, true);
-                          } else {
-                            const selectedVar = variables?.[val];
-                            const defaultVal = selectedVar ? getDefaultValueForType(selectedVar.type) : true;
-                            handleMessageCondition(val, defaultVal);
-                          }
-                        }}
-                      >
+                      <Select value={message.condition?.variableId || "none"} onValueChange={val => {
+                    if (val === "none") {
+                      handleMessageCondition(null, true);
+                    } else {
+                      const selectedVar = variables?.[val];
+                      const defaultVal = selectedVar ? getDefaultValueForType(selectedVar.type) : true;
+                      handleMessageCondition(val, defaultVal);
+                    }
+                  }}>
                         <SelectTrigger className="h-8 text-xs flex-1">
                           <SelectValue placeholder="Always visible" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">Always visible</SelectItem>
-                          {variableList.map((v) => (
-                            <SelectItem key={v.id} value={v.id}>
+                          {variableList.map(v => <SelectItem key={v.id} value={v.id}>
                               {v.name} ({v.type})
-                            </SelectItem>
-                          ))}
+                            </SelectItem>)}
                         </SelectContent>
                       </Select>
                       
                       {/* Condition value input based on variable type */}
-                      {message.condition && messageConditionVariable && (
-                        messageConditionVariable.type === "boolean" ? (
-                          <Select
-                            value={message.condition.requiredValue === true ? "true" : "false"}
-                            onValueChange={(val) => handleMessageConditionValueChange(val === "true")}
-                          >
+                      {message.condition && messageConditionVariable && (messageConditionVariable.type === "boolean" ? <Select value={message.condition.requiredValue === true ? "true" : "false"} onValueChange={val => handleMessageConditionValueChange(val === "true")}>
                             <SelectTrigger className="h-8 text-xs w-20">
                               <SelectValue />
                             </SelectTrigger>
@@ -265,53 +194,20 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                               <SelectItem value="true">= true</SelectItem>
                               <SelectItem value="false">= false</SelectItem>
                             </SelectContent>
-                          </Select>
-                        ) : messageConditionVariable.type === "text" ? (
-                          <Input
-                            value={String(message.condition.requiredValue)}
-                            onChange={(e) => handleMessageConditionValueChange(e.target.value)}
-                            placeholder="Value..."
-                            className="h-8 text-xs w-24"
-                          />
-                        ) : messageConditionVariable.type === "number" ? (
-                          <Input
-                            type="number"
-                            value={String(message.condition.requiredValue)}
-                            onChange={(e) => handleMessageConditionValueChange(Number(e.target.value) || 0)}
-                            placeholder="0"
-                            className="h-8 text-xs w-20"
-                          />
-                        ) : null
-                      )}
+                          </Select> : messageConditionVariable.type === "text" ? <Input value={String(message.condition.requiredValue)} onChange={e => handleMessageConditionValueChange(e.target.value)} placeholder="Value..." className="h-8 text-xs w-24" /> : messageConditionVariable.type === "number" ? <Input type="number" value={String(message.condition.requiredValue)} onChange={e => handleMessageConditionValueChange(Number(e.target.value) || 0)} placeholder="0" className="h-8 text-xs w-20" /> : null)}
                     </div>
                   </div>
                 </PopoverContent>
-              </Popover>
-            )}
+              </Popover>}
 
-            <Button
-              variant={message.isEndpoint ? "secondary" : "ghost"}
-              size="sm"
-              onClick={() => toggleEndpoint(message.id)}
-              tabIndex={internalTabIndex}
-              className={cn(
-                "gap-1 text-xs rounded-lg h-7 px-2",
-                message.isEndpoint && "bg-success/20 text-success hover:bg-success/30"
-              )}
-            >
+            <Button variant={message.isEndpoint ? "secondary" : "ghost"} size="sm" onClick={() => toggleEndpoint(message.id)} tabIndex={internalTabIndex} className={cn("gap-1 text-xs rounded-lg h-7 px-2", message.isEndpoint && "bg-success/20 text-success hover:bg-success/30")}>
               <Flag className="h-3 w-3" />
               {message.isEndpoint ? "End" : "End"}
             </Button>
 
-            {!isRoot && (
-              <AlertDialog>
+            {!isRoot && <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    tabIndex={internalTabIndex}
-                    className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
-                  >
+                  <Button variant="ghost" size="icon" tabIndex={internalTabIndex} className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]">
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </AlertDialogTrigger>
@@ -324,89 +220,48 @@ function MessageFlowNodeComponent({ data, selected }: NodeProps) {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => deleteMessage(message.id)}
-                      className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
+                    <AlertDialogAction onClick={() => deleteMessage(message.id)} className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90">
                       Delete
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
-              </AlertDialog>
-            )}
+              </AlertDialog>}
           </div>
         </div>
 
         {/* Content */}
         <div className="p-3">
-          <Textarea
-            value={message.content}
-            onChange={(e) => updateMessage(message.id, e.target.value)}
-            placeholder="Enter the contact's message..."
-            tabIndex={internalTabIndex}
-            className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag"
-          />
+          <Textarea value={message.content} onChange={e => updateMessage(message.id, e.target.value)} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag" />
 
           {/* Status indicators */}
-          {!isComplete && (
-            <div className="mt-2">
+          {!isComplete && <div className="mt-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-medium text-warning">
                 Add response options
               </span>
-            </div>
-          )}
+            </div>}
         </div>
 
         {/* Response Options */}
-        {!message.isEndpoint && (
-          <div className="border-t border-border/30 p-3 space-y-2">
+        {!message.isEndpoint && <div className="border-t border-border/30 p-3 space-y-2">
             <span className="text-xs font-medium text-muted-foreground">Response Options</span>
             
-            {message.responseOptions.map((option, index) => (
-              <ResponseOptionRow
-                key={option.id}
-                option={option}
-                index={index}
-                messageId={message.id}
-                variables={variables || {}}
-                pendingConnection={pendingConnection}
-                isConnecting={isConnecting}
-                internalTabIndex={internalTabIndex}
-              />
-            ))}
+            {message.responseOptions.map((option, index) => <ResponseOptionRow key={option.id} option={option} index={index} messageId={message.id} variables={variables || {}} pendingConnection={pendingConnection} isConnecting={isConnecting} internalTabIndex={internalTabIndex} />)}
 
             {/* Add new option */}
             <div className="flex items-center gap-2 rounded-lg border border-dashed border-border/50 p-2">
-              <Input
-                value={newOptionText}
-                onChange={(e) => setNewOptionText(e.target.value)}
-                placeholder="New response..."
-                tabIndex={internalTabIndex}
-                className="flex-1 h-7 text-xs border-0 bg-transparent focus-visible:ring-0 nodrag"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleAddOption();
-                  }
-                }}
-              />
-              <Button
-                variant="default"
-                size="sm"
-                onClick={handleAddOption}
-                disabled={!newOptionText.trim()}
-                tabIndex={internalTabIndex}
-                className="h-7 px-2 text-xs rounded-md"
-              >
+              <Input value={newOptionText} onChange={e => setNewOptionText(e.target.value)} placeholder="New response..." tabIndex={internalTabIndex} className="flex-1 h-7 text-xs border-0 bg-transparent focus-visible:ring-0 nodrag" onKeyDown={e => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleAddOption();
+            }
+          }} />
+              <Button variant="default" size="sm" onClick={handleAddOption} disabled={!newOptionText.trim()} tabIndex={internalTabIndex} className="h-7 px-2 text-xs rounded-md">
                 <Plus className="h-3 w-3 mr-1" />
                 Add
               </Button>
             </div>
-          </div>
-        )}
+          </div>}
       </div>
-    </TooltipProvider>
-  );
+    </TooltipProvider>;
 }
-
 export const MessageFlowNode = memo(MessageFlowNodeComponent);
