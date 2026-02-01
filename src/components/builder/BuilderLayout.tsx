@@ -27,7 +27,7 @@ function BuilderContent() {
         Skip to main content
       </a>
       
-      <TopBar />
+      <TopBar onRestartWalkthrough={walkthrough.startWalkthrough} />
       <main id="main-content" className="flex flex-1 overflow-hidden">
         {/* Left Panel - 60% for Canvas/Theme */}
         <aside className="w-3/5 min-w-0 lg:min-w-[480px] border-r border-border/50" aria-label="Builder panel">
