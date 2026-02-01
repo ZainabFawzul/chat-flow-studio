@@ -234,28 +234,29 @@ export function ChatPreview() {
                 <Play className="h-10 w-10 text-muted-foreground/50" />
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
-                {rootMessage ? startTitle : "No Messages Yet"}
+                {startTitle}
               </h3>
               <p className="text-sm text-muted-foreground mb-4">
-                {rootMessage 
-                  ? startSubtitle
-                  : "Add messages in the Messages tab to get started"
-                }
+                {startSubtitle}
               </p>
-              {rootMessage && (
-                <button
-                  onClick={handleStart}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 font-medium transition-all"
-                  style={{
-                    backgroundColor: `hsl(${theme.startButtonColor ?? '214 100% 65%'})`,
-                    color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
-                    borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
-                    boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '214 100% 65%'} / 0.25)`,
-                  }}
-                >
-                  <Play className="h-4 w-4" aria-hidden="true" />
-                  {startButtonText}
-                </button>
+              <button
+                onClick={rootMessage ? handleStart : undefined}
+                disabled={!rootMessage}
+                className="inline-flex items-center gap-2 px-5 py-2.5 font-medium transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: `hsl(${theme.startButtonColor ?? '214 100% 65%'})`,
+                  color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
+                  borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
+                  boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '214 100% 65%'} / 0.25)`,
+                }}
+              >
+                <Play className="h-4 w-4" aria-hidden="true" />
+                {startButtonText}
+              </button>
+              {!rootMessage && (
+                <p className="text-xs text-muted-foreground mt-4">
+                  Add messages to enable the start button
+                </p>
               )}
             </div>
           </div>
