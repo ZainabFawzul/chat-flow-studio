@@ -8,7 +8,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, RotateCcw, HelpCircle } from "lucide-react";
+import { Plus, RotateCcw } from "lucide-react";
 import { useScenario } from "@/context/ScenarioContext";
 import {
   Tooltip,
@@ -120,26 +120,6 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
           </AlertDialogContent>
         </AlertDialog>
 
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-9 w-9 rounded-lg text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]"
-            >
-              <HelpCircle className="h-4 w-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-[250px]">
-            <div className="space-y-1 text-xs">
-              <p><strong>Drag</strong> nodes to reposition</p>
-              <p><strong>Connect</strong> response options by dragging from circles</p>
-              <p><strong>Click</strong> to select nodes</p>
-              <p><strong>Scroll</strong> to zoom in/out</p>
-              <p><strong>Variables</strong> enable conditional response visibility</p>
-            </div>
-          </TooltipContent>
-        </Tooltip>
       </div>
     </TooltipProvider>
   );
