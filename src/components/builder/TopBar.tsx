@@ -6,7 +6,8 @@
  * @usage Rendered in BuilderLayout header
  */
 
-import { Download, Upload, MessageSquare, Package } from "lucide-react";
+import { Download, Upload, Package } from "lucide-react";
+import chatScenarioIcon from "@/assets/chatscenario.png";
 import { Button } from "@/components/ui/button";
 import { useScenario } from "@/context/ScenarioContext";
 import { useRef, useState } from "react";
@@ -108,9 +109,7 @@ export function TopBar() {
   return <>
       <header className="flex h-16 items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur-xl px-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-lg shadow-primary/25">
-            <MessageSquare className="h-5 w-5 text-primary-foreground" aria-hidden="true" />
-          </div>
+          <img src={chatScenarioIcon} alt="Chat Scenario" className="h-10 w-10 object-contain" />
           <div>
             <h1 className="text-lg font-semibold text-foreground tracking-tight">Branching Chat Builder</h1>
             <p className="text-xs text-muted-foreground">Design branching conversations and export as ZIP.</p>
