@@ -230,9 +230,6 @@ export function ChatPreview() {
         {!isPlaying ? (
           <div className="flex h-full items-center justify-center">
             <div className="text-center max-w-sm">
-              <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-secondary/50 mx-auto mb-4">
-                <Play className="h-10 w-10 text-muted-foreground/50" />
-              </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 {startTitle}
               </h3>
