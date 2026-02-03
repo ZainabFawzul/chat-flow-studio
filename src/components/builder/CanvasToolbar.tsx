@@ -50,7 +50,11 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
 
   return (
     <TooltipProvider>
-      <div className="flex items-center gap-2 p-2 bg-card border border-border rounded-xl shadow-lg">
+      <div 
+        className="flex items-center gap-2 p-2 bg-card border border-border rounded-xl shadow-lg"
+        role="toolbar"
+        aria-label="Canvas toolbar. Tab to navigate buttons, then Tab again to move to message nodes."
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -58,6 +62,8 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
               size="sm"
               onClick={handleAddNode}
               className="gap-2 rounded-lg h-9"
+              tabIndex={0}
+              data-walkthrough="new-message-button"
             >
               <Plus className="h-4 w-4" />
               New Message
@@ -92,6 +98,7 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
                   variant="ghost"
                   size="icon"
                   className="h-9 w-9 rounded-lg text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]"
+                  tabIndex={0}
                 >
                   <RotateCcw className="h-4 w-4" />
                 </Button>

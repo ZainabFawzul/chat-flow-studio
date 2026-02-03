@@ -7,7 +7,7 @@
  * @usage Registered as custom node type in FlowCanvas
  */
 
-import { memo, useState } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 import { Handle, Position, NodeProps } from "@xyflow/react";
 import { useScenario, PendingConnection } from "@/context/ScenarioContext";
 import { ChatMessage, ScenarioVariable, VariableValue } from "@/types/scenario";
@@ -49,6 +49,9 @@ function MessageFlowNodeComponent({
     setMessageCondition
   } = useScenario();
   const [newOptionText, setNewOptionText] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const nodeRef = useRef<HTMLDivElement>(null);
+
   const handleAddOption = () => {
     if (newOptionText.trim()) {
       addResponseOption(message.id, newOptionText.trim());
@@ -99,18 +102,75 @@ function MessageFlowNodeComponent({
     return String(value);
   };
 
-  // Handle keyboard activation for connection targets
+  // Handle keyboard activation for connection targets or entering edit mode
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (canReceiveConnection && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
       completeConnection(message.id);
+      return;
+    }
+    
+    // Enter edit mode when pressing Enter on a focused node
+    if (!isEditing && (e.key === "Enter" || e.key === " ") && !canReceiveConnection) {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsEditing(true);
+      return;
+    }
+    
+    // Exit edit mode on Escape
+    if (isEditing && e.key === "Escape") {
+      e.preventDefault();
+      setIsEditing(false);
+      nodeRef.current?.focus();
     }
   };
 
-  // During connection mode, disable tab navigation for internal elements
-  const internalTabIndex = isConnecting ? -1 : undefined;
+  // Exit edit mode when focus leaves the node entirely
+  useEffect(() => {
+    const handleFocusOut = (e: FocusEvent) => {
+      if (isEditing && nodeRef.current && !nodeRef.current.contains(e.relatedTarget as Node)) {
+        setIsEditing(false);
+      }
+    };
+    
+    nodeRef.current?.addEventListener('focusout', handleFocusOut);
+    return () => nodeRef.current?.removeEventListener('focusout', handleFocusOut);
+  }, [isEditing]);
+
+  // Internal elements are only tabbable when in edit mode and not connecting
+  const internalTabIndex = (isEditing && !isConnecting) ? 0 : -1;
   return <TooltipProvider>
-      <div className={cn("w-[320px] rounded-2xl border-2 bg-card shadow-lg transition-all", selected ? "border-primary shadow-primary/20" : "border-border/50", isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background", canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none")} onClick={canReceiveConnection ? () => completeConnection(message.id) : undefined} onKeyDown={handleKeyDown} tabIndex={canReceiveConnection ? 0 : -1} role={canReceiveConnection ? "button" : undefined} aria-label={canReceiveConnection ? `Connect to message ${nodeNumber}: ${message.content.slice(0, 50)}` : undefined} data-connection-target={canReceiveConnection ? message.id : undefined}>
+      <div 
+        ref={nodeRef}
+        className={cn(
+          "w-[320px] rounded-2xl border-2 bg-card shadow-lg transition-all",
+          selected ? "border-primary shadow-primary/20" : "border-border/50",
+          isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
+          canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none",
+          isEditing && "ring-2 ring-primary focus:outline-none"
+        )}
+        onClick={canReceiveConnection ? () => completeConnection(message.id) : undefined}
+        onKeyDown={handleKeyDown}
+        tabIndex={0}
+        role="group"
+        aria-label={
+          canReceiveConnection 
+            ? `Connect to message ${nodeNumber}: ${message.content.slice(0, 50)}`
+            : `Message ${nodeNumber}${isRoot ? " (Start)" : ""}: ${message.content.slice(0, 50)}. Press Enter to edit.`
+        }
+        aria-expanded={isEditing}
+        aria-describedby={`node-${message.id}-instructions`}
+        data-connection-target={canReceiveConnection ? message.id : undefined}
+        data-message-node={message.id}
+      >
+        {/* Screen reader instructions */}
+        <span id={`node-${message.id}-instructions`} className="sr-only">
+          {isEditing 
+            ? "Editing mode. Tab through fields to edit message content and response options. Press Escape to exit editing."
+            : "Press Enter or Space to edit this message. Press Tab to move to the next message node."
+          }
+        </span>
         {/* Input handle for connections */}
         <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-primary !border-2 !border-background" />
 
