@@ -44,6 +44,7 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
               value="theme" 
               className="rounded-lg text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all"
               data-walkthrough="theme-tab"
+              tabIndex={0}
             >
               Theme
             </TabsTrigger>
@@ -51,6 +52,7 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
               value="canvas" 
               className="rounded-lg text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all"
               data-walkthrough="canvas-tab"
+              tabIndex={0}
             >
               Canvas
             </TabsTrigger>
