@@ -13,10 +13,11 @@ import { FlowCanvas } from "./FlowCanvas";
 
 interface LeftPanelProps {
   requestedTab?: "theme" | "canvas" | null;
+  isCanvasExpanded: boolean;
+  onToggleCanvasExpand: () => void;
 }
 
-export function LeftPanel({ requestedTab }: LeftPanelProps) {
-  const [isCanvasExpanded, setIsCanvasExpanded] = useState(false);
+export function LeftPanel({ requestedTab, isCanvasExpanded, onToggleCanvasExpand }: LeftPanelProps) {
   const [activeTab, setActiveTab] = useState<string>("theme");
 
   // Handle walkthrough tab switching
@@ -26,13 +27,9 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
     }
   }, [requestedTab]);
 
-  const toggleCanvasExpand = () => {
-    setIsCanvasExpanded(!isCanvasExpanded);
-  };
-
   // When canvas is expanded, render it in fullscreen mode
   if (isCanvasExpanded) {
-    return <FlowCanvas isExpanded={true} onToggleExpand={toggleCanvasExpand} />;
+    return <FlowCanvas isExpanded={true} onToggleExpand={onToggleCanvasExpand} />;
   }
 
   return (
@@ -65,7 +62,7 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
         
         <TabsContent value="canvas" className="flex-1 overflow-hidden mt-0 p-0">
           <div className="h-full">
-            <FlowCanvas isExpanded={false} onToggleExpand={toggleCanvasExpand} />
+            <FlowCanvas isExpanded={false} onToggleExpand={onToggleCanvasExpand} />
           </div>
         </TabsContent>
       </Tabs>
