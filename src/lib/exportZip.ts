@@ -95,6 +95,12 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
   const responseOptionTextColor = theme.responseOptionTextColor ?? "220 9% 20%";
   const responseOptionBorderRadius = theme.responseOptionBorderRadius ?? 12;
 
+  // Frame settings
+  const framePreset = theme.framePreset ?? 'none';
+  const frameBorderRadius = theme.frameBorderRadius ?? 16;
+  const frameBorderWidth = theme.frameBorderWidth ?? 1;
+  const frameBorderColor = theme.frameBorderColor ?? "220 13% 91%";
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,6 +127,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
+      ${framePreset !== 'none' ? 'align-items: center; justify-content: center; padding: 1rem;' : ''}
     }
 
     /* Skip link for keyboard navigation */
@@ -161,16 +168,126 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       outline-offset: 2px;
     }
 
+    /* Device frame wrapper */
+    .device-frame {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    .device-frame.phone {
+      position: relative;
+      background: #1a1a1a;
+      border-radius: 44px;
+      padding: 10px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      width: 380px;
+      max-width: 100%;
+      aspect-ratio: 9 / 18;
+      max-height: 100%;
+    }
+
+    .device-frame.phone .frame-inner {
+      position: absolute;
+      inset: 10px;
+      border-radius: 36px;
+      overflow: hidden;
+      background: black;
+    }
+
+    .device-frame.phone .chat-container {
+      height: 100%;
+      width: 100%;
+      border-radius: 36px;
+    }
+
+    /* Phone side buttons */
+    .phone-button-left-1 {
+      position: absolute;
+      left: -3px;
+      top: 112px;
+      width: 3px;
+      height: 32px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+    }
+    .phone-button-left-2 {
+      position: absolute;
+      left: -3px;
+      top: 160px;
+      width: 3px;
+      height: 56px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+    }
+    .phone-button-left-3 {
+      position: absolute;
+      left: -3px;
+      top: 224px;
+      width: 3px;
+      height: 56px;
+      background: #2a2a2a;
+      border-radius: 2px 0 0 2px;
+    }
+    .phone-button-right {
+      position: absolute;
+      right: -3px;
+      top: 144px;
+      width: 3px;
+      height: 80px;
+      background: #2a2a2a;
+      border-radius: 0 2px 2px 0;
+    }
+    .phone-home-indicator {
+      position: absolute;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 112px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+      z-index: 20;
+    }
+
+    .device-frame.tablet {
+      position: relative;
+      background: #1a1a1a;
+      border-radius: 24px;
+      padding: 8px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      width: 100%;
+      max-width: 600px;
+      aspect-ratio: 4 / 3;
+      max-height: 100%;
+    }
+
+    .device-frame.tablet .frame-inner {
+      position: absolute;
+      inset: 8px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: black;
+    }
+
+    .device-frame.tablet .chat-container {
+      height: 100%;
+      width: 100%;
+      border-radius: 16px;
+    }
+
     .chat-container {
       display: flex;
       flex-direction: column;
       height: 100vh;
       height: 100dvh;
-      max-width: 37.5rem;
+      max-width: ${framePreset === 'none' ? '37.5rem' : '100%'};
       margin: 0 auto;
       width: 100%;
       background: hsl(${theme.chatBackground});
-      box-shadow: 0 0 1.25rem #0000001a;
+      box-shadow: ${framePreset === 'none' ? '0 0 1.25rem #0000001a' : 'none'};
+      ${framePreset === 'none' ? `border-radius: ${frameBorderRadius / 16}rem; border: ${frameBorderWidth}px solid hsl(${frameBorderColor});` : ''}
     }
 
     .chat-header {
@@ -576,7 +693,26 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
   <!-- Skip link for keyboard users -->
   <a href="#messages-area" class="skip-link" id="skip-link">Skip to conversation</a>
   
+  ${framePreset === 'phone' ? `
+  <div class="device-frame phone">
+    <div class="frame-inner">
+      <div class="chat-container" id="app" role="region" aria-label="Interactive chat conversation with ${escapeHTML(theme.contactName)}"></div>
+    </div>
+    <div class="phone-button-left-1"></div>
+    <div class="phone-button-left-2"></div>
+    <div class="phone-button-left-3"></div>
+    <div class="phone-button-right"></div>
+    <div class="phone-home-indicator"></div>
+  </div>
+  ` : framePreset === 'tablet' ? `
+  <div class="device-frame tablet">
+    <div class="frame-inner">
+      <div class="chat-container" id="app" role="region" aria-label="Interactive chat conversation with ${escapeHTML(theme.contactName)}"></div>
+    </div>
+  </div>
+  ` : `
   <div class="chat-container" id="app" role="region" aria-label="Interactive chat conversation with ${escapeHTML(theme.contactName)}"></div>
+  `}
   
   <!-- Hidden live region for screen reader announcements -->
   <div aria-live="assertive" aria-atomic="true" class="sr-only" id="status-announcer"></div>
@@ -638,6 +774,9 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
         return message.responseOptions.filter(opt => checkCondition(opt.condition));
       }
 
+      // Frame preset
+      const framePreset = ${JSON.stringify(framePreset)};
+
       // Announce status changes to screen readers
       function announceStatus(message) {
         const announcer = document.getElementById('status-announcer');
@@ -645,6 +784,21 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
           announcer.textContent = '';
           setTimeout(function() { announcer.textContent = message; }, 50);
         }
+      }
+
+      // Check for auto-advance (message with no responses but has direct connection)
+      function checkAutoAdvance(msg, callback) {
+        if (msg && msg.responseOptions.length === 0 && !msg.isEndpoint && msg.nextMessageId) {
+          const nextMsg = messages[msg.nextMessageId];
+          if (nextMsg && checkCondition(nextMsg.condition)) {
+            setTimeout(function() {
+              currentMessageId = msg.nextMessageId;
+              addContactMessage(msg.nextMessageId, nextMsg.content, callback);
+            }, isRegularMode ? 500 : 300);
+            return true;
+          }
+        }
+        return false;
       }
 
       // Focus management helper
@@ -670,8 +824,9 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
         const rootMessage = rootMessageId ? messages[rootMessageId] : null;
 
         const visibleOptions = getVisibleOptions(currentMessage);
+        // Only ended if: endpoint OR (no visible responses AND no direct connection)
         const isEnded = isPlaying && currentMessage && !isTyping &&
-          (currentMessage.isEndpoint || visibleOptions.length === 0);
+          (currentMessage.isEndpoint || (visibleOptions.length === 0 && !currentMessage.nextMessageId));
         const isDeadEnd = isPlaying && !currentMessageId && chatHistory.length > 0 && !isTyping;
 
         // Update aria-label with contact name
@@ -784,6 +939,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       }
 
       function addContactMessage(messageId, content, callback) {
+        const msg = messages[messageId];
+        
         if (isRegularMode) {
           // In regular mode, show message immediately without typing indicator
           chatHistory.push({
@@ -792,9 +949,13 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
             isUser: false
           });
           announceStatus('New message');
-          if (callback) callback();
           render();
-          focusElement('.option-btn', '#messages-area');
+          
+          // Check for auto-advance before calling callback
+          if (!checkAutoAdvance(msg, callback)) {
+            if (callback) callback();
+            focusElement('.option-btn', '#messages-area');
+          }
         } else {
           // In chat mode, show typing indicator first
           isTyping = true;
@@ -809,11 +970,14 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
             });
             isTyping = false;
             announceStatus('New message from ' + theme.contactName);
-            if (callback) callback();
             render();
             
-            // Focus first option if available, otherwise focus messages area
-            focusElement('.option-btn', '#messages-area');
+            // Check for auto-advance before calling callback
+            if (!checkAutoAdvance(msg, callback)) {
+              if (callback) callback();
+              // Focus first option if available, otherwise focus messages area
+              focusElement('.option-btn', '#messages-area');
+            }
           }, 1000);
         }
       }
