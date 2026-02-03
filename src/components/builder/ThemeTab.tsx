@@ -9,7 +9,6 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Slider } from "@/components/ui/slider";
 import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
@@ -238,21 +237,18 @@ export function ThemeTab() {
 
             {/* Button Shape */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label htmlFor="start-btn-radius" className="text-sm font-medium">
-                  Button Corner Radius
-                </Label>
-                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                  {theme.startButtonBorderRadius ?? 12}px
-                </span>
-              </div>
-              <Slider id="start-btn-radius" min={0} max={24} step={1} value={[theme.startButtonBorderRadius ?? 12]} onValueChange={([value]) => updateTheme({
-              startButtonBorderRadius: value
-            })} aria-label="Button border radius" className="py-2" />
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>Square</span>
-                <span>Round</span>
-              </div>
+              <Label htmlFor="start-btn-radius" className="mb-2 block text-sm font-medium">
+                Button Corner Radius (px)
+              </Label>
+              <Input
+                id="start-btn-radius"
+                type="number"
+                min={0}
+                max={24}
+                value={theme.startButtonBorderRadius ?? 12}
+                onChange={e => updateTheme({ startButtonBorderRadius: Number(e.target.value) })}
+                className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+              />
             </div>
 
             {/* Preview */}
@@ -351,40 +347,34 @@ export function ThemeTab() {
             {(theme.framePreset ?? 'none') === 'none' && <>
                 {/* Corner Radius */}
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <Label htmlFor="frame-radius" className="text-sm font-medium">
-                      Corner Radius
-                    </Label>
-                    <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                      {theme.frameBorderRadius ?? 16}px
-                    </span>
-                  </div>
-                  <Slider id="frame-radius" min={0} max={32} step={1} value={[theme.frameBorderRadius ?? 16]} onValueChange={([value]) => updateTheme({
-                frameBorderRadius: value
-              })} aria-label="Frame corner radius" className="py-2" />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>Square</span>
-                    <span>Round</span>
-                  </div>
+                  <Label htmlFor="frame-radius" className="mb-2 block text-sm font-medium">
+                    Corner Radius (px)
+                  </Label>
+                  <Input
+                    id="frame-radius"
+                    type="number"
+                    min={0}
+                    max={32}
+                    value={theme.frameBorderRadius ?? 16}
+                    onChange={e => updateTheme({ frameBorderRadius: Number(e.target.value) })}
+                    className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+                  />
                 </div>
 
                 {/* Border Width */}
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <Label htmlFor="frame-border-width" className="text-sm font-medium">
-                      Border Width
-                    </Label>
-                    <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                      {theme.frameBorderWidth ?? 1}px
-                    </span>
-                  </div>
-                  <Slider id="frame-border-width" min={0} max={4} step={1} value={[theme.frameBorderWidth ?? 1]} onValueChange={([value]) => updateTheme({
-                frameBorderWidth: value
-              })} aria-label="Frame border width" className="py-2" />
-                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                    <span>None</span>
-                    <span>Thick</span>
-                  </div>
+                  <Label htmlFor="frame-border-width" className="mb-2 block text-sm font-medium">
+                    Border Width (px)
+                  </Label>
+                  <Input
+                    id="frame-border-width"
+                    type="number"
+                    min={0}
+                    max={4}
+                    value={theme.frameBorderWidth ?? 1}
+                    onChange={e => updateTheme({ frameBorderWidth: Number(e.target.value) })}
+                    className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+                  />
                 </div>
 
                 {/* Border Color */}
@@ -405,21 +395,18 @@ export function ThemeTab() {
             
             {/* Font Size */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label htmlFor="font-size" className="text-sm font-medium">
-                  Message Size
-                </Label>
-                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                  {theme.fontSize}px
-                </span>
-              </div>
-              <Slider id="font-size" min={12} max={20} step={1} value={[theme.fontSize]} onValueChange={([value]) => updateTheme({
-              fontSize: value
-            })} aria-label="Font size" className="py-2" />
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>Small</span>
-                <span>Large</span>
-              </div>
+              <Label htmlFor="font-size" className="mb-2 block text-sm font-medium">
+                Message Size (px)
+              </Label>
+              <Input
+                id="font-size"
+                type="number"
+                min={12}
+                max={20}
+                value={theme.fontSize}
+                onChange={e => updateTheme({ fontSize: Number(e.target.value) })}
+                className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+              />
             </div>
             
             {/* Show Reset Button */}
@@ -550,21 +537,18 @@ export function ThemeTab() {
 
             {/* Option Border Radius */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label htmlFor="response-option-radius" className="text-sm font-medium">
-                  Option Corner Radius
-                </Label>
-                <span className="text-sm font-mono text-muted-foreground bg-secondary/50 px-2 py-0.5 rounded-md">
-                  {theme.responseOptionBorderRadius ?? 12}px
-                </span>
-              </div>
-              <Slider id="response-option-radius" min={0} max={24} step={1} value={[theme.responseOptionBorderRadius ?? 12]} onValueChange={([value]) => updateTheme({
-              responseOptionBorderRadius: value
-            })} aria-label="Response option border radius" className="py-2" />
-              <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                <span>Square</span>
-                <span>Round</span>
-              </div>
+              <Label htmlFor="response-option-radius" className="mb-2 block text-sm font-medium">
+                Option Corner Radius (px)
+              </Label>
+              <Input
+                id="response-option-radius"
+                type="number"
+                min={0}
+                max={24}
+                value={theme.responseOptionBorderRadius ?? 12}
+                onChange={e => updateTheme({ responseOptionBorderRadius: Number(e.target.value) })}
+                className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
+              />
             </div>
 
             {/* Preview */}
