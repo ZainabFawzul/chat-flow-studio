@@ -13,7 +13,7 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, MessageSquare, FileText, ExternalLink } from "lucide-react";
+import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, MessageSquare, FileText } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
@@ -328,7 +328,7 @@ export function ThemeTab() {
                   <Label htmlFor="rise-completion" className="text-sm font-medium">
                     Rise 360 Completion
                   </Label>
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                  
                 </div>
                 <span className="text-xs text-muted-foreground">Autocomplete the next Continue Button in Articulate Rise.</span>
               </div>
