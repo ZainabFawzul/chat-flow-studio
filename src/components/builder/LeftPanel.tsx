@@ -37,7 +37,7 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
 
   return (
     <div className="flex h-full w-full flex-col bg-background">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-full flex-col">
+      <Tabs value={activeTab} onValueChange={setActiveTab} activationMode="manual" className="flex h-full flex-col">
         <div className="px-4 pt-4" role="navigation" aria-label="Builder tabs">
           <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-secondary/50 rounded-xl">
             <TabsTrigger 
