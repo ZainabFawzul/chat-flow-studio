@@ -98,6 +98,19 @@ export function ChatPreview() {
       // In regular mode, show message immediately without typing indicator
       setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
       callback?.();
+      
+      // Check for auto-advance (message with no responses but has direct connection)
+      const msg = messages[messageId];
+      if (msg && msg.responseOptions.length === 0 && !msg.isEndpoint && msg.nextMessageId) {
+        const nextMsg = messages[msg.nextMessageId];
+        if (nextMsg) {
+          // Short delay before auto-advancing
+          typingTimeoutRef.current = setTimeout(() => {
+            setCurrentMessageId(msg.nextMessageId!);
+            addContactMessage(msg.nextMessageId!, nextMsg.content);
+          }, 500);
+        }
+      }
     } else {
       // In chat mode, show typing indicator first
       setTypingMessageId(messageId);
@@ -107,6 +120,19 @@ export function ChatPreview() {
         setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
         setTypingMessageId(null);
         callback?.();
+        
+        // Check for auto-advance (message with no responses but has direct connection)
+        const msg = messages[messageId];
+        if (msg && msg.responseOptions.length === 0 && !msg.isEndpoint && msg.nextMessageId) {
+          const nextMsg = messages[msg.nextMessageId];
+          if (nextMsg) {
+            // Short delay before auto-advancing to next message
+            typingTimeoutRef.current = setTimeout(() => {
+              setCurrentMessageId(msg.nextMessageId!);
+              addContactMessage(msg.nextMessageId!, nextMsg.content);
+            }, 300);
+          }
+        }
       }, 1000);
     }
   };
@@ -163,10 +189,11 @@ export function ChatPreview() {
     }
   };
 
+  // Conversation ended when: endpoint reached, OR no responses and no direct connection
   const isConversationEnded =
     isPlaying &&
     currentMessage &&
-    (currentMessage.isEndpoint || currentMessage.responseOptions.length === 0) &&
+    (currentMessage.isEndpoint || (currentMessage.responseOptions.length === 0 && !currentMessage.nextMessageId)) &&
     !typingMessageId;
 
   const isDeadEnd =
@@ -374,8 +401,8 @@ export function ChatPreview() {
         )}
       </div>
 
-      {/* Response Options */}
-      {isPlaying && currentMessage && !currentMessage.isEndpoint && !typingMessageId && (
+      {/* Response Options - only show when there are response options to choose from */}
+      {isPlaying && currentMessage && !currentMessage.isEndpoint && currentMessage.responseOptions.length > 0 && !typingMessageId && (
         <div 
           className="border-t border-border/30 backdrop-blur-xl p-4" 
           role="group" 
