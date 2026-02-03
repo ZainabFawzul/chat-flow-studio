@@ -7,6 +7,7 @@
  * @usage Rendered by Index page component
  */
 
+import { useState } from "react";
 import { ScenarioProvider, useScenario } from "@/context/ScenarioContext";
 import { TopBar } from "./TopBar";
 import { LeftPanel } from "./LeftPanel";
@@ -19,6 +20,7 @@ function BuilderContent() {
   const walkthrough = useWalkthrough();
   const { scenario } = useScenario();
   const framePreset = scenario.theme.framePreset ?? 'none';
+  const [isCanvasExpanded, setIsCanvasExpanded] = useState(false);
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -30,38 +32,49 @@ function BuilderContent() {
         Skip to main content
       </a>
       
-      <TopBar onRestartWalkthrough={walkthrough.startWalkthrough} />
+      {!isCanvasExpanded && <TopBar onRestartWalkthrough={walkthrough.startWalkthrough} />}
       <main id="main-content" className="flex flex-1 overflow-hidden">
-        {/* Left Panel - 60% for Canvas/Theme */}
-        <section className="w-3/5 min-w-0 lg:min-w-[480px] border-r border-border/50" aria-label="Builder controls">
-          <LeftPanel requestedTab={walkthrough.requestedTab} />
+        {/* Left Panel - Full width when canvas expanded, 60% otherwise */}
+        <section 
+          className={isCanvasExpanded ? "w-full" : "w-3/5 min-w-0 lg:min-w-[480px] border-r border-border/50"} 
+          aria-label="Builder controls"
+        >
+          <LeftPanel 
+            requestedTab={walkthrough.requestedTab} 
+            isCanvasExpanded={isCanvasExpanded}
+            onToggleCanvasExpand={() => setIsCanvasExpanded(!isCanvasExpanded)}
+          />
         </section>
         
-        {/* Right Panel - 40% for Chat Preview */}
-        <section 
-          className="w-2/5 min-w-0 lg:min-w-[320px] overflow-hidden bg-muted/30" 
-          aria-label="Chat preview"
-        >
-          <DeviceFrame preset={framePreset}>
-            <ChatPreview />
-          </DeviceFrame>
-        </section>
+        {/* Right Panel - Hidden when canvas expanded */}
+        {!isCanvasExpanded && (
+          <section 
+            className="w-2/5 min-w-0 lg:min-w-[320px] overflow-hidden bg-muted/30" 
+            aria-label="Chat preview"
+          >
+            <DeviceFrame preset={framePreset}>
+              <ChatPreview />
+            </DeviceFrame>
+          </section>
+        )}
       </main>
 
-      {/* Footer */}
-      <footer className="flex items-center justify-center py-2 px-4 border-t border-border/50 bg-background text-sm text-muted-foreground">
-        <p>
-          Made with love by Zainab Fawzul. If you'd like to suggest a feature,{' '}
-          <a 
-            href="https://www.linkedin.com/in/zainab-fawzul" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-primary hover:underline"
-          >
-            reach out!
-          </a>
-        </p>
-      </footer>
+      {/* Footer - Hidden when canvas expanded */}
+      {!isCanvasExpanded && (
+        <footer className="flex items-center justify-center py-2 px-4 border-t border-border/50 bg-background text-sm text-muted-foreground">
+          <p>
+            Made with love by Zainab Fawzul. If you'd like to suggest a feature,{' '}
+            <a 
+              href="https://www.linkedin.com/in/zainab-fawzul" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+            >
+              reach out!
+            </a>
+          </p>
+        </footer>
+      )}
 
       {/* Onboarding Walkthrough */}
       <OnboardingWalkthrough
