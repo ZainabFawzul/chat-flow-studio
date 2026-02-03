@@ -147,13 +147,10 @@ export function ThemeTab() {
                 <div className="relative group">
                   <Avatar className="h-14 w-14 ring-2 ring-border/50 ring-offset-2 ring-offset-background transition-all group-hover:ring-primary/50">
                     {theme.contactAvatar ? <AvatarImage src={theme.contactAvatar} alt={theme.contactName} /> : null}
-                    <AvatarFallback 
-                      className="font-semibold"
-                      style={{
-                        backgroundColor: `hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'})`,
-                        color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
-                      }}
-                    >
+                    <AvatarFallback className="font-semibold" style={{
+                    backgroundColor: `hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'})`,
+                    color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`
+                  }}>
                       {getInitials(theme.contactName)}
                     </AvatarFallback>
                   </Avatar>
@@ -177,28 +174,17 @@ export function ThemeTab() {
             </div>
             
             {/* Avatar Colors (only shown when no custom image) */}
-            {!theme.contactAvatar && (
-              <>
+            {!theme.contactAvatar && <>
                 <div className="flex gap-4">
-                  <ColorPicker
-                    id="avatar-bg"
-                    label="Avatar Background"
-                    value={theme.avatarBackgroundColor ?? "221 83% 40%"}
-                    onChange={value => updateTheme({ avatarBackgroundColor: value })}
-                  />
-                  <ColorPicker
-                    id="avatar-text"
-                    label="Avatar Text"
-                    value={theme.avatarTextColor ?? "0 0% 100%"}
-                    onChange={value => updateTheme({ avatarTextColor: value })}
-                  />
+                  <ColorPicker id="avatar-bg" label="Avatar Background" value={theme.avatarBackgroundColor ?? "221 83% 40%"} onChange={value => updateTheme({
+                avatarBackgroundColor: value
+              })} />
+                  <ColorPicker id="avatar-text" label="Avatar Text" value={theme.avatarTextColor ?? "0 0% 100%"} onChange={value => updateTheme({
+                avatarTextColor: value
+              })} />
                 </div>
-                <ContrastWarning
-                  bgColor={theme.avatarBackgroundColor ?? "221 83% 40%"}
-                  textColor={theme.avatarTextColor ?? "0 0% 100%"}
-                />
-              </>
-            )}
+                <ContrastWarning bgColor={theme.avatarBackgroundColor ?? "221 83% 40%"} textColor={theme.avatarTextColor ?? "0 0% 100%"} />
+              </>}
           </div>
         </Section>
 
@@ -207,8 +193,8 @@ export function ThemeTab() {
           <div className="flex flex-col gap-5">
             {/* Chat Background */}
             <ColorPicker id="chat-bg" label="Background Color" value={theme.chatBackground} onChange={value => updateTheme({
-              chatBackground: value
-            })} />
+            chatBackground: value
+          })} />
 
             <div>
               <Label htmlFor="start-title" className="mb-2 block text-sm font-medium">
@@ -239,25 +225,16 @@ export function ThemeTab() {
 
             {/* Button Colors */}
             <div className="flex gap-4">
-              <ColorPicker 
-                id="start-btn-bg" 
-                label="Button Color" 
-                value={theme.startButtonColor ?? "221 83% 40%"} 
-                onChange={value => updateTheme({ startButtonColor: value })} 
-              />
-              <ColorPicker 
-                id="start-btn-text" 
-                label="Button Text" 
-                value={theme.startButtonTextColor ?? "0 0% 100%"} 
-                onChange={value => updateTheme({ startButtonTextColor: value })} 
-              />
+              <ColorPicker id="start-btn-bg" label="Button Color" value={theme.startButtonColor ?? "221 83% 40%"} onChange={value => updateTheme({
+              startButtonColor: value
+            })} />
+              <ColorPicker id="start-btn-text" label="Button Text" value={theme.startButtonTextColor ?? "0 0% 100%"} onChange={value => updateTheme({
+              startButtonTextColor: value
+            })} />
             </div>
 
             {/* Contrast Warning */}
-            <ContrastWarning 
-              bgColor={theme.startButtonColor ?? "221 83% 40%"} 
-              textColor={theme.startButtonTextColor ?? "0 0% 100%"} 
-            />
+            <ContrastWarning bgColor={theme.startButtonColor ?? "221 83% 40%"} textColor={theme.startButtonTextColor ?? "0 0% 100%"} />
 
             {/* Button Shape */}
             <div>
@@ -269,16 +246,9 @@ export function ThemeTab() {
                   {theme.startButtonBorderRadius ?? 12}px
                 </span>
               </div>
-              <Slider 
-                id="start-btn-radius" 
-                min={0} 
-                max={24} 
-                step={1} 
-                value={[theme.startButtonBorderRadius ?? 12]} 
-                onValueChange={([value]) => updateTheme({ startButtonBorderRadius: value })} 
-                aria-label="Button border radius" 
-                className="py-2" 
-              />
+              <Slider id="start-btn-radius" min={0} max={24} step={1} value={[theme.startButtonBorderRadius ?? 12]} onValueChange={([value]) => updateTheme({
+              startButtonBorderRadius: value
+            })} aria-label="Button border radius" className="py-2" />
               <div className="flex justify-between text-xs text-muted-foreground mt-1">
                 <span>Square</span>
                 <span>Round</span>
@@ -287,15 +257,12 @@ export function ThemeTab() {
 
             {/* Preview */}
             <div className="mt-2 flex justify-center">
-              <button
-                className="inline-flex items-center gap-2 px-5 py-2.5 font-medium"
-                style={{
-                  backgroundColor: `hsl(${theme.startButtonColor ?? '221 83% 40%'})`,
-                  color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
-                  borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
-                  boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '221 83% 40%'} / 0.25)`,
-                }}
-              >
+              <button className="inline-flex items-center gap-2 px-5 py-2.5 font-medium" style={{
+              backgroundColor: `hsl(${theme.startButtonColor ?? '221 83% 40%'})`,
+              color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
+              borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
+              boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '221 83% 40%'} / 0.25)`
+            }}>
                 <Play className="h-4 w-4" />
                 {theme.startButtonText ?? "Start"}
               </button>
@@ -310,25 +277,28 @@ export function ThemeTab() {
             <div>
               <Label className="mb-3 block text-sm font-medium">Conversation Style</Label>
               <div className="grid grid-cols-2 gap-2">
-                {[
-                  { value: 'chat' as const, label: 'Chat', icon: MessageCircle, description: 'Header & typing indicator' },
-                  { value: 'regular' as const, label: 'Regular', icon: FileText, description: 'Clean, no header' },
-                ].map(({ value, label, icon: Icon, description }) => (
-                  <button
-                    key={value}
-                    onClick={() => updateTheme({ conversationType: value })}
-                    className={cn(
-                      "flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center",
-                      (theme.conversationType ?? 'chat') === value
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
-                    )}
-                  >
+                {[{
+                value: 'chat' as const,
+                label: 'Chat',
+                icon: MessageCircle,
+                description: 'Header & typing indicator'
+              }, {
+                value: 'regular' as const,
+                label: 'Regular',
+                icon: FileText,
+                description: 'Clean, no header'
+              }].map(({
+                value,
+                label,
+                icon: Icon,
+                description
+              }) => <button key={value} onClick={() => updateTheme({
+                conversationType: value
+              })} className={cn("flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center", (theme.conversationType ?? 'chat') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
                     <Icon className="h-5 w-5" />
                     <span className="text-xs font-medium">{label}</span>
                     <span className="text-[10px] opacity-70">{description}</span>
-                  </button>
-                ))}
+                  </button>)}
               </div>
             </div>
 
@@ -341,46 +311,44 @@ export function ThemeTab() {
                   </Label>
                   <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
                 </div>
-                <span className="text-xs text-muted-foreground">
-                  Notify Rise when conversation ends
-                </span>
+                <span className="text-xs text-muted-foreground">Autocomplete the next Continue Button in Articulate Rise.</span>
               </div>
-              <Switch 
-                id="rise-completion" 
-                checked={theme.enableRiseCompletion ?? false} 
-                onCheckedChange={checked => updateTheme({ enableRiseCompletion: checked })} 
-              />
+              <Switch id="rise-completion" checked={theme.enableRiseCompletion ?? false} onCheckedChange={checked => updateTheme({
+              enableRiseCompletion: checked
+            })} />
             </div>
             
             {/* Device Frame */}
             <div>
               <Label className="mb-3 block text-sm font-medium">Device Frame</Label>
               <div className="grid grid-cols-3 gap-2">
-                {[
-                  { value: 'none' as const, label: 'None', icon: Square },
-                  { value: 'phone' as const, label: 'Phone', icon: Smartphone },
-                  { value: 'tablet' as const, label: 'Tablet', icon: Tablet },
-                ].map(({ value, label, icon: Icon }) => (
-                  <button
-                    key={value}
-                    onClick={() => updateTheme({ framePreset: value })}
-                    className={cn(
-                      "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
-                      (theme.framePreset ?? 'none') === value
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
-                    )}
-                  >
+                {[{
+                value: 'none' as const,
+                label: 'None',
+                icon: Square
+              }, {
+                value: 'phone' as const,
+                label: 'Phone',
+                icon: Smartphone
+              }, {
+                value: 'tablet' as const,
+                label: 'Tablet',
+                icon: Tablet
+              }].map(({
+                value,
+                label,
+                icon: Icon
+              }) => <button key={value} onClick={() => updateTheme({
+                framePreset: value
+              })} className={cn("flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all", (theme.framePreset ?? 'none') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
                     <Icon className="h-5 w-5" />
                     <span className="text-xs font-medium">{label}</span>
-                  </button>
-                ))}
+                  </button>)}
               </div>
             </div>
 
             {/* Custom Frame Options - only show when preset is 'none' */}
-            {(theme.framePreset ?? 'none') === 'none' && (
-              <>
+            {(theme.framePreset ?? 'none') === 'none' && <>
                 {/* Corner Radius */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
@@ -391,16 +359,9 @@ export function ThemeTab() {
                       {theme.frameBorderRadius ?? 16}px
                     </span>
                   </div>
-                  <Slider 
-                    id="frame-radius" 
-                    min={0} 
-                    max={32} 
-                    step={1} 
-                    value={[theme.frameBorderRadius ?? 16]} 
-                    onValueChange={([value]) => updateTheme({ frameBorderRadius: value })} 
-                    aria-label="Frame corner radius" 
-                    className="py-2" 
-                  />
+                  <Slider id="frame-radius" min={0} max={32} step={1} value={[theme.frameBorderRadius ?? 16]} onValueChange={([value]) => updateTheme({
+                frameBorderRadius: value
+              })} aria-label="Frame corner radius" className="py-2" />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>Square</span>
                     <span>Round</span>
@@ -417,16 +378,9 @@ export function ThemeTab() {
                       {theme.frameBorderWidth ?? 1}px
                     </span>
                   </div>
-                  <Slider 
-                    id="frame-border-width" 
-                    min={0} 
-                    max={4} 
-                    step={1} 
-                    value={[theme.frameBorderWidth ?? 1]} 
-                    onValueChange={([value]) => updateTheme({ frameBorderWidth: value })} 
-                    aria-label="Frame border width" 
-                    className="py-2" 
-                  />
+                  <Slider id="frame-border-width" min={0} max={4} step={1} value={[theme.frameBorderWidth ?? 1]} onValueChange={([value]) => updateTheme({
+                frameBorderWidth: value
+              })} aria-label="Frame border width" className="py-2" />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>None</span>
                     <span>Thick</span>
@@ -434,29 +388,20 @@ export function ThemeTab() {
                 </div>
 
                 {/* Border Color */}
-                <ColorPicker
-                  id="frame-border-color"
-                  label="Border Color"
-                  value={theme.frameBorderColor ?? "220 13% 91%"}
-                  onChange={value => updateTheme({ frameBorderColor: value })}
-                />
+                <ColorPicker id="frame-border-color" label="Border Color" value={theme.frameBorderColor ?? "220 13% 91%"} onChange={value => updateTheme({
+              frameBorderColor: value
+            })} />
                 
                 {/* Preview */}
                 <div className="mt-2">
-                  <div 
-                    className="h-24 bg-secondary/30 flex items-center justify-center"
-                    style={{
-                      borderRadius: `${theme.frameBorderRadius ?? 16}px`,
-                      border: (theme.frameBorderWidth ?? 1) > 0 
-                        ? `${theme.frameBorderWidth ?? 1}px solid hsl(${theme.frameBorderColor ?? '220 13% 91%'})`
-                        : 'none',
-                    }}
-                  >
+                  <div className="h-24 bg-secondary/30 flex items-center justify-center" style={{
+                borderRadius: `${theme.frameBorderRadius ?? 16}px`,
+                border: (theme.frameBorderWidth ?? 1) > 0 ? `${theme.frameBorderWidth ?? 1}px solid hsl(${theme.frameBorderColor ?? '220 13% 91%'})` : 'none'
+              }}>
                     <span className="text-xs text-muted-foreground">Frame Preview</span>
                   </div>
                 </div>
-              </>
-            )}
+              </>}
             
             {/* Font Size */}
             <div>
@@ -469,8 +414,8 @@ export function ThemeTab() {
                 </span>
               </div>
               <Slider id="font-size" min={12} max={20} step={1} value={[theme.fontSize]} onValueChange={([value]) => updateTheme({
-                fontSize: value
-              })} aria-label="Font size" className="py-2" />
+              fontSize: value
+            })} aria-label="Font size" className="py-2" />
               <div className="flex justify-between text-xs text-muted-foreground mt-1">
                 <span>Small</span>
                 <span>Large</span>
@@ -488,8 +433,8 @@ export function ThemeTab() {
                 </span>
               </div>
               <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
-                showResetButton: checked
-              })} />
+              showResetButton: checked
+            })} />
             </div>
           </div>
         </Section>
@@ -572,58 +517,36 @@ export function ThemeTab() {
               <Label htmlFor="response-label" className="mb-2 block text-sm font-medium">
                 Label Text
               </Label>
-              <Input
-                id="response-label"
-                value={theme.responsePanelLabelText ?? "Choose a response"}
-                onChange={e => updateTheme({ responsePanelLabelText: e.target.value })}
-                placeholder="Choose a response"
-                className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
-              />
+              <Input id="response-label" value={theme.responsePanelLabelText ?? "Choose a response"} onChange={e => updateTheme({
+              responsePanelLabelText: e.target.value
+            })} placeholder="Choose a response" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
 
             {/* Panel Background & Label Color */}
             <div className="flex gap-4">
-              <ColorPicker
-                id="response-panel-bg"
-                label="Panel Background"
-                value={theme.responsePanelBackground ?? "0 0% 100%"}
-                onChange={value => updateTheme({ responsePanelBackground: value })}
-              />
-              <ColorPicker
-                id="response-label-color"
-                label="Label Color"
-                value={theme.responsePanelLabelColor ?? "220 9% 35%"}
-                onChange={value => updateTheme({ responsePanelLabelColor: value })}
-              />
+              <ColorPicker id="response-panel-bg" label="Panel Background" value={theme.responsePanelBackground ?? "0 0% 100%"} onChange={value => updateTheme({
+              responsePanelBackground: value
+            })} />
+              <ColorPicker id="response-label-color" label="Label Color" value={theme.responsePanelLabelColor ?? "220 9% 35%"} onChange={value => updateTheme({
+              responsePanelLabelColor: value
+            })} />
             </div>
 
             {/* Contrast Warning for Panel Label */}
-            <ContrastWarning
-              bgColor={theme.responsePanelBackground ?? "0 0% 100%"}
-              textColor={theme.responsePanelLabelColor ?? "220 9% 35%"}
-            />
+            <ContrastWarning bgColor={theme.responsePanelBackground ?? "0 0% 100%"} textColor={theme.responsePanelLabelColor ?? "220 9% 35%"} />
 
             {/* Option Bubble & Text */}
             <div className="flex gap-4">
-              <ColorPicker
-                id="response-option-bg"
-                label="Option Background"
-                value={theme.responseOptionBackground ?? "0 0% 100%"}
-                onChange={value => updateTheme({ responseOptionBackground: value })}
-              />
-              <ColorPicker
-                id="response-option-text"
-                label="Option Text"
-                value={theme.responseOptionTextColor ?? "222 47% 11%"}
-                onChange={value => updateTheme({ responseOptionTextColor: value })}
-              />
+              <ColorPicker id="response-option-bg" label="Option Background" value={theme.responseOptionBackground ?? "0 0% 100%"} onChange={value => updateTheme({
+              responseOptionBackground: value
+            })} />
+              <ColorPicker id="response-option-text" label="Option Text" value={theme.responseOptionTextColor ?? "222 47% 11%"} onChange={value => updateTheme({
+              responseOptionTextColor: value
+            })} />
             </div>
 
             {/* Contrast Warning */}
-            <ContrastWarning
-              bgColor={theme.responseOptionBackground ?? "0 0% 100%"}
-              textColor={theme.responseOptionTextColor ?? "222 47% 11%"}
-            />
+            <ContrastWarning bgColor={theme.responseOptionBackground ?? "0 0% 100%"} textColor={theme.responseOptionTextColor ?? "222 47% 11%"} />
 
             {/* Option Border Radius */}
             <div>
@@ -635,16 +558,9 @@ export function ThemeTab() {
                   {theme.responseOptionBorderRadius ?? 12}px
                 </span>
               </div>
-              <Slider
-                id="response-option-radius"
-                min={0}
-                max={24}
-                step={1}
-                value={[theme.responseOptionBorderRadius ?? 12]}
-                onValueChange={([value]) => updateTheme({ responseOptionBorderRadius: value })}
-                aria-label="Response option border radius"
-                className="py-2"
-              />
+              <Slider id="response-option-radius" min={0} max={24} step={1} value={[theme.responseOptionBorderRadius ?? 12]} onValueChange={([value]) => updateTheme({
+              responseOptionBorderRadius: value
+            })} aria-label="Response option border radius" className="py-2" />
               <div className="flex justify-between text-xs text-muted-foreground mt-1">
                 <span>Square</span>
                 <span>Round</span>
@@ -652,38 +568,28 @@ export function ThemeTab() {
             </div>
 
             {/* Preview */}
-            <div
-              className="mt-2 p-4 border border-border/30"
-              style={{
-                backgroundColor: `hsl(${theme.responsePanelBackground ?? '0 0% 100%'})`,
-                borderRadius: '12px',
-              }}
-            >
-              <p
-                className="mb-3 text-xs font-medium uppercase tracking-wide"
-                style={{ color: `hsl(${theme.responsePanelLabelColor ?? '220 9% 46%'})` }}
-              >
+            <div className="mt-2 p-4 border border-border/30" style={{
+            backgroundColor: `hsl(${theme.responsePanelBackground ?? '0 0% 100%'})`,
+            borderRadius: '12px'
+          }}>
+              <p className="mb-3 text-xs font-medium uppercase tracking-wide" style={{
+              color: `hsl(${theme.responsePanelLabelColor ?? '220 9% 46%'})`
+            }}>
                 {theme.responsePanelLabelText ?? "Choose a response"}
               </p>
               <div className="flex flex-wrap gap-2">
-                <span
-                  className="px-3 py-1.5 text-sm font-medium border border-border/50"
-                  style={{
-                    backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
-                    color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
-                    borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
-                  }}
-                >
+                <span className="px-3 py-1.5 text-sm font-medium border border-border/50" style={{
+                backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
+                color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
+                borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`
+              }}>
                   Option 1
                 </span>
-                <span
-                  className="px-3 py-1.5 text-sm font-medium border border-border/50"
-                  style={{
-                    backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
-                    color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
-                    borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
-                  }}
-                >
+                <span className="px-3 py-1.5 text-sm font-medium border border-border/50" style={{
+                backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
+                color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
+                borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`
+              }}>
                   Option 2
                 </span>
               </div>
@@ -695,24 +601,27 @@ export function ThemeTab() {
 }
 
 // Contrast warning component
-function ContrastWarning({ bgColor, textColor }: { bgColor: string; textColor: string }) {
-  const { ratio, level } = getContrastLevel(bgColor, textColor);
-  
+function ContrastWarning({
+  bgColor,
+  textColor
+}: {
+  bgColor: string;
+  textColor: string;
+}) {
+  const {
+    ratio,
+    level
+  } = getContrastLevel(bgColor, textColor);
   if (level === "aa" || level === "aaa") return null;
-  
-  return (
-    <div className="flex items-start gap-2 p-2.5 rounded-lg bg-destructive/10 border border-destructive/20">
+  return <div className="flex items-start gap-2 p-2.5 rounded-lg bg-destructive/10 border border-destructive/20">
       <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium text-destructive">
           Low contrast ({ratio.toFixed(1)}:1)
         </p>
         <p className="text-xs text-muted-foreground">
-          {level === "aa-large" 
-            ? "Only meets WCAG AA for large text. Increase contrast for better accessibility."
-            : "Does not meet WCAG 2.1 AA standards. Adjust colors for accessibility."}
+          {level === "aa-large" ? "Only meets WCAG AA for large text. Increase contrast for better accessibility." : "Does not meet WCAG 2.1 AA standards. Adjust colors for accessibility."}
         </p>
       </div>
-    </div>
-  );
+    </div>;
 }
