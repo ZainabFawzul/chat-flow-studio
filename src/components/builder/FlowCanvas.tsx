@@ -19,6 +19,7 @@ import {
   NodeChange,
   Panel,
   applyNodeChanges,
+  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useScenario } from "@/context/ScenarioContext";
@@ -41,7 +42,9 @@ interface FlowCanvasProps {
   onToggleExpand: () => void;
 }
 
-export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
+// Inner component to access ReactFlow instance
+function FlowCanvasInner({ isExpanded, onToggleExpand }: FlowCanvasProps) {
+  const reactFlowInstance = useReactFlow();
   const {
     scenario,
     updateNodePosition,
@@ -107,6 +110,15 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
       focusedNodeIndexRef.current = -1; // Start at -1 so first Tab goes to index 0
     }
   }, [pendingConnection]);
+
+  // Fit view when expansion state changes
+  useEffect(() => {
+    // Small delay to allow the container to resize
+    const timer = setTimeout(() => {
+      reactFlowInstance.fitView({ padding: 0.2 });
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [isExpanded, reactFlowInstance]);
 
   // Get the pending option text for the banner
   const pendingOptionText = useMemo(() => {
@@ -264,7 +276,6 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
           showZoom
           showFitView
           showInteractive={false}
-          aria-hidden="true"
         />
 
         {/* Connection mode banner */}
@@ -297,5 +308,16 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         )}
       </ReactFlow>
     </div>
+  );
+}
+
+// Wrapper component that provides ReactFlowProvider
+import { ReactFlowProvider } from "@xyflow/react";
+
+export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
+  return (
+    <ReactFlowProvider>
+      <FlowCanvasInner isExpanded={isExpanded} onToggleExpand={onToggleExpand} />
+    </ReactFlowProvider>
   );
 }
