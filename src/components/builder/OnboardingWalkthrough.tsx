@@ -333,23 +333,13 @@ export function OnboardingWalkthrough({
             </Button>
           )}
           
-          {/* Progress dots */}
-          <div 
-            className="flex items-center gap-1.5" 
-            role="group"
+          {/* Progress indicator */}
+          <span 
+            className="text-sm text-muted-foreground font-medium tabular-nums"
             aria-label={`Step ${progressIndex + 1} of ${totalSteps}`}
-            aria-hidden="true"
           >
-            {Array.from({ length: totalSteps }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "w-1.5 h-1.5 rounded-full transition-colors",
-                  i === progressIndex ? "bg-primary" : "bg-muted-foreground/30"
-                )}
-              />
-            ))}
-          </div>
+            {progressIndex + 1}/{totalSteps}
+          </span>
           
           <Button
             size="sm"
