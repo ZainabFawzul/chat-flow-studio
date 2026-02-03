@@ -16,11 +16,11 @@ import {
   Connection,
   Edge,
   Node,
+   type ReactFlowInstance,
   BackgroundVariant,
   NodeChange,
   Panel,
   applyNodeChanges,
-  useReactFlow,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useScenario } from "@/context/ScenarioContext";
@@ -43,21 +43,6 @@ interface FlowCanvasProps {
   onToggleExpand: () => void;
 }
 
-// Helper component to trigger fitView when expansion changes
-function FitViewOnExpand({ isExpanded }: { isExpanded: boolean }) {
-  const { fitView } = useReactFlow();
-  
-  useEffect(() => {
-    // Small delay to allow the container to resize
-    const timer = setTimeout(() => {
-      fitView({ padding: 0.2 });
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [isExpanded, fitView]);
-  
-  return null;
-}
-
 function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   const {
     scenario,
@@ -70,6 +55,7 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const focusedNodeIndexRef = useRef<number>(0);
+  const reactFlowInstanceRef = useRef<ReactFlowInstance | null>(null);
   
   // Track selected node ID for expand/collapse behavior
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -158,6 +144,20 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
     }));
   }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables, selectedNodeId]);
 
+  // Ensure nodes are visible when entering expanded mode.
+  // Using onInit avoids injecting custom children into <ReactFlow> (which can trigger ref warnings).
+  useEffect(() => {
+    if (!isExpanded) return;
+    const instance = reactFlowInstanceRef.current;
+    if (!instance) return;
+
+    const timer = window.setTimeout(() => {
+      instance.fitView({ padding: 0.2 });
+    }, 150);
+
+    return () => window.clearTimeout(timer);
+  }, [isExpanded, nodes.length]);
+
   // Convert response options to React Flow edges
   const edges: Edge[] = useMemo(() => {
     const edgeList: Edge[] = [];
@@ -224,7 +224,7 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   return (
     <div 
       ref={containerRef}
-      className={`relative ${isExpanded ? "fixed inset-0 z-50 bg-background" : "h-full"}`}
+      className="relative h-full w-full bg-background"
       role="application"
       aria-label="Message flow canvas. Use Tab to navigate to controls, or click to interact with the canvas."
     >
@@ -260,6 +260,9 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         edges={edges}
         onNodesChange={onNodesChange}
         onConnect={onConnect}
+        onInit={(instance) => {
+          reactFlowInstanceRef.current = instance;
+        }}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         fitView
@@ -283,7 +286,6 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
           showFitView
           showInteractive={false}
         />
-        <FitViewOnExpand isExpanded={isExpanded} />
 
         {/* Connection mode banner */}
         {pendingConnection && (
