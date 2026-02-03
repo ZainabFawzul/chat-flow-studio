@@ -25,7 +25,7 @@ import { MessageFlowNode } from "./MessageFlowNode";
 import { ResponseEdge } from "./ResponseEdge";
 import { CanvasToolbar } from "./CanvasToolbar";
 import { Button } from "@/components/ui/button";
-import { Maximize2, Minimize2, Link2, X, ArrowLeft } from "lucide-react";
+import { Maximize2, Minimize2, Link2, X } from "lucide-react";
 
 const nodeTypes = {
   messageNode: MessageFlowNode,
@@ -38,10 +38,9 @@ const edgeTypes = {
 interface FlowCanvasProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
-  onBackToTabs?: () => void;
 }
 
-export function FlowCanvas({ isExpanded, onToggleExpand, onBackToTabs }: FlowCanvasProps) {
+export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   const {
     scenario,
     updateNodePosition,
@@ -215,19 +214,7 @@ export function FlowCanvas({ isExpanded, onToggleExpand, onBackToTabs }: FlowCan
           showInteractive={false}
         />
         
-        <Panel position="top-left" className="m-4 flex gap-2">
-          {!isExpanded && onBackToTabs && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onBackToTabs}
-              className="h-10 px-3 rounded-xl bg-card shadow-lg gap-2"
-              aria-label="Return to tab navigation"
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              <span className="sr-only sm:not-sr-only">Tabs</span>
-            </Button>
-          )}
+        <Panel position="top-left" className="m-4">
           <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} />
         </Panel>
 

@@ -6,7 +6,7 @@
  * @usage Rendered in BuilderLayout left panel
  */
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ThemeTab } from "./ThemeTab";
 import { FlowCanvas } from "./FlowCanvas";
@@ -18,7 +18,6 @@ interface LeftPanelProps {
 export function LeftPanel({ requestedTab }: LeftPanelProps) {
   const [isCanvasExpanded, setIsCanvasExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<string>("theme");
-  const themeTabRef = useRef<HTMLButtonElement>(null);
 
   // Handle walkthrough tab switching
   useEffect(() => {
@@ -29,10 +28,6 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
 
   const toggleCanvasExpand = () => {
     setIsCanvasExpanded(!isCanvasExpanded);
-  };
-
-  const handleBackToTabs = () => {
-    themeTabRef.current?.focus();
   };
 
   // When canvas is expanded, render it in fullscreen mode
@@ -46,7 +41,6 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
         <div className="px-4 pt-4" role="navigation" aria-label="Builder tabs">
           <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-secondary/50 rounded-xl">
             <TabsTrigger 
-              ref={themeTabRef}
               value="theme" 
               className="rounded-lg text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all"
               data-walkthrough="theme-tab"
@@ -71,7 +65,7 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
         
         <TabsContent value="canvas" className="flex-1 overflow-hidden mt-0 p-0">
           <div className="h-full">
-            <FlowCanvas isExpanded={false} onToggleExpand={toggleCanvasExpand} onBackToTabs={handleBackToTabs} />
+            <FlowCanvas isExpanded={false} onToggleExpand={toggleCanvasExpand} />
           </div>
         </TabsContent>
       </Tabs>
