@@ -48,6 +48,21 @@ function BuilderContent() {
         </section>
       </main>
 
+      {/* Footer */}
+      <footer className="flex items-center justify-center py-2 px-4 border-t border-border/50 bg-background text-sm text-muted-foreground">
+        <p>
+          Made with love by Zainab Fawzul. If you'd like to suggest a feature,{' '}
+          <a 
+            href="https://www.linkedin.com/in/zainab-fawzul" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            reach out!
+          </a>
+        </p>
+      </footer>
+
       {/* Onboarding Walkthrough */}
       <OnboardingWalkthrough
         isActive={walkthrough.isActive}
