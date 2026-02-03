@@ -16,8 +16,8 @@ import {
   Edge,
   Node,
   BackgroundVariant,
-  Panel,
   NodeChange,
+  Panel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useScenario } from "@/context/ScenarioContext";
@@ -181,10 +181,37 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   return (
     <div 
       ref={containerRef}
-      className={`${isExpanded ? "fixed inset-0 z-50 bg-background" : "h-full"}`}
+      className={`relative ${isExpanded ? "fixed inset-0 z-50 bg-background" : "h-full"}`}
       role="application"
       aria-label="Message flow canvas. Use Tab to navigate to controls, or click to interact with the canvas."
     >
+      {/* FIRST in DOM = First in focus order */}
+      <div 
+        className="absolute top-4 left-4 z-10"
+        role="region" 
+        aria-label="Canvas controls. Tab through toolbar buttons first, then Tab to move through message nodes."
+      >
+        <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} />
+      </div>
+
+      <div className="absolute top-4 right-4 z-10">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={onToggleExpand}
+          className="h-10 w-10 rounded-xl bg-card shadow-lg"
+          aria-label={isExpanded ? "Exit fullscreen" : "Enter fullscreen"}
+          data-walkthrough="expand-button"
+        >
+          {isExpanded ? (
+            <Minimize2 className="h-4 w-4" />
+          ) : (
+            <Maximize2 className="h-4 w-4" />
+          )}
+        </Button>
+      </div>
+
+      {/* ReactFlow fills the container - toolbar is BEFORE this in DOM */}
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -208,37 +235,14 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
           className="bg-background"
         />
         <Controls
-          className="bg-card border border-border rounded-xl shadow-lg"
+          className="bg-card border border-border rounded-xl shadow-lg [&_button]:focus:outline-none"
           showZoom
           showFitView
           showInteractive={false}
+          aria-hidden="true"
         />
-        
-        {/* Toolbar panel - rendered first for focus order */}
-        <Panel position="top-left" className="m-4">
-          <div role="region" aria-label="Canvas controls. Tab through toolbar buttons first, then Tab to move through message nodes.">
-            <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} />
-          </div>
-        </Panel>
 
-        <Panel position="top-right" className="m-4">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToggleExpand}
-            className="h-10 w-10 rounded-xl bg-card shadow-lg"
-            aria-label={isExpanded ? "Exit fullscreen" : "Enter fullscreen"}
-            data-walkthrough="expand-button"
-          >
-            {isExpanded ? (
-              <Minimize2 className="h-4 w-4" />
-            ) : (
-              <Maximize2 className="h-4 w-4" />
-            )}
-          </Button>
-        </Panel>
-
-        {/* Connection mode banner with screen reader announcements */}
+        {/* Connection mode banner */}
         {pendingConnection && (
           <Panel position="top-center" className="mt-4">
             <div 
