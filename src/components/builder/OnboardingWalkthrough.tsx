@@ -10,6 +10,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { WALKTHROUGH_STEPS } from "@/hooks/use-walkthrough";
 
 interface SpotlightRect {
   top: number;
@@ -49,25 +50,19 @@ export function OnboardingWalkthrough({
   const dialogRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
-  // Calculate current progress index for dots
+  // Calculate current progress index for dots dynamically based on WALKTHROUGH_STEPS
   const getProgressIndex = useCallback(() => {
     let index = 0;
-    const steps = [
-      { subSteps: undefined }, // theme
-      { subSteps: [0, 1] }, // canvas with 2 sub-steps
-      { subSteps: undefined }, // save-work
-      { subSteps: undefined }, // finalize
-    ];
-    
     for (let i = 0; i < currentStep; i++) {
-      index += 1;
-      if (i === 1) index += 2; // canvas has 2 sub-steps
+      index += 1; // Main step
+      const step = WALKTHROUGH_STEPS[i];
+      if (step.subSteps) {
+        index += step.subSteps.length;
+      }
     }
-    
-    if (currentStep === 1 && currentSubStep >= 0) {
+    if (currentSubStep >= 0) {
       index += currentSubStep + 1;
     }
-    
     return index;
   }, [currentStep, currentSubStep]);
 

@@ -163,6 +163,7 @@ function MessageFlowNodeComponent({
         aria-describedby={`node-${message.id}-instructions`}
         data-connection-target={canReceiveConnection ? message.id : undefined}
         data-message-node={message.id}
+        data-walkthrough="message-card"
       >
         {/* Screen reader instructions */}
         <span id={`node-${message.id}-instructions`} className="sr-only">
@@ -302,13 +303,13 @@ function MessageFlowNodeComponent({
         </div>
 
         {/* Response Options */}
-        {!message.isEndpoint && <div className="border-t border-border/30 p-3 space-y-2">
+        {!message.isEndpoint && <div className="border-t border-border/30 p-3 space-y-2" data-walkthrough="response-options-section">
             <span className="text-xs font-medium text-muted-foreground">Response Options</span>
             
             {message.responseOptions.map((option, index) => <ResponseOptionRow key={option.id} option={option} index={index} messageId={message.id} variables={variables || {}} pendingConnection={pendingConnection} isConnecting={isConnecting} internalTabIndex={internalTabIndex} />)}
 
             {/* Add new option */}
-            <div className="flex items-center gap-2 rounded-lg border border-dashed border-border/50 p-2">
+            <div className="flex items-center gap-2 rounded-lg border border-dashed border-border/50 p-2" data-walkthrough="add-response-input">
               <Input value={newOptionText} onChange={e => setNewOptionText(e.target.value)} placeholder="New response..." tabIndex={internalTabIndex} className="flex-1 h-7 text-xs border-0 bg-transparent focus-visible:ring-0 nodrag" onKeyDown={e => {
             if (e.key === "Enter") {
               e.preventDefault();
