@@ -292,6 +292,35 @@ export function ThemeTab() {
               </div>
             </div>
 
+            {/* Device Frame */}
+            <div>
+              <Label className="mb-3 block text-sm font-medium">Device Frame</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {[{
+                value: 'none' as const,
+                label: 'None',
+                icon: Square
+              }, {
+                value: 'phone' as const,
+                label: 'Phone',
+                icon: Smartphone
+              }, {
+                value: 'tablet' as const,
+                label: 'Tablet',
+                icon: Tablet
+              }].map(({
+                value,
+                label,
+                icon: Icon
+              }) => <button key={value} onClick={() => updateTheme({
+                framePreset: value
+              })} className={cn("flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all", (theme.framePreset ?? 'none') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
+                    <Icon className="h-5 w-5" />
+                    <span className="text-xs font-medium">{label}</span>
+                  </button>)}
+              </div>
+            </div>
+
             {/* Rise 360 Integration */}
             <div className="flex items-center justify-between rounded-xl p-3 bg-primary-foreground">
               <div className="flex flex-col gap-0.5">
@@ -321,35 +350,6 @@ export function ThemeTab() {
               <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
               showResetButton: checked
             })} />
-            </div>
-            
-            {/* Device Frame */}
-            <div>
-              <Label className="mb-3 block text-sm font-medium">Device Frame</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {[{
-                value: 'none' as const,
-                label: 'None',
-                icon: Square
-              }, {
-                value: 'phone' as const,
-                label: 'Phone',
-                icon: Smartphone
-              }, {
-                value: 'tablet' as const,
-                label: 'Tablet',
-                icon: Tablet
-              }].map(({
-                value,
-                label,
-                icon: Icon
-              }) => <button key={value} onClick={() => updateTheme({
-                framePreset: value
-              })} className={cn("flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all", (theme.framePreset ?? 'none') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
-                    <Icon className="h-5 w-5" />
-                    <span className="text-xs font-medium">{label}</span>
-                  </button>)}
-              </div>
             </div>
 
             {/* Custom Frame Options - only show when preset is 'none' */}
