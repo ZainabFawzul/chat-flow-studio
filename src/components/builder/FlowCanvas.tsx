@@ -150,7 +150,7 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         nodeNumber: index + 1,
         pendingConnection,
         variables: scenario.variables || {},
-        isCondensed: zoomLevel < 0.5, // Show condensed view when zoomed out significantly
+        isCondensed: zoomLevel < 0.4, // Show condensed view when zoomed below 40%
       },
     }));
   }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables, selectedNodeId, zoomLevel]);
