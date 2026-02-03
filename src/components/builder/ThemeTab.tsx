@@ -14,7 +14,7 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square } from "lucide-react";
+import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, MessageSquare, FileText, ExternalLink } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
@@ -306,7 +306,53 @@ export function ThemeTab() {
         <Section icon={<Smartphone className="h-4 w-4" />} title="Frame" id="frame-heading">
           <div className="flex flex-col gap-5">
             
-            {/* Frame Preset */}
+            {/* Conversation Type */}
+            <div>
+              <Label className="mb-3 block text-sm font-medium">Conversation Style</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: 'chat' as const, label: 'Chat', icon: MessageCircle, description: 'Header & typing indicator' },
+                  { value: 'regular' as const, label: 'Regular', icon: FileText, description: 'Clean, no header' },
+                ].map(({ value, label, icon: Icon, description }) => (
+                  <button
+                    key={value}
+                    onClick={() => updateTheme({ conversationType: value })}
+                    className={cn(
+                      "flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center",
+                      (theme.conversationType ?? 'chat') === value
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="text-xs font-medium">{label}</span>
+                    <span className="text-[10px] opacity-70">{description}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Rise 360 Integration */}
+            <div className="flex items-center justify-between rounded-xl bg-secondary/30 p-3">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="rise-completion" className="text-sm font-medium">
+                    Rise 360 Completion
+                  </Label>
+                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  Notify Rise when conversation ends
+                </span>
+              </div>
+              <Switch 
+                id="rise-completion" 
+                checked={theme.enableRiseCompletion ?? false} 
+                onCheckedChange={checked => updateTheme({ enableRiseCompletion: checked })} 
+              />
+            </div>
+            
+            {/* Device Frame */}
             <div>
               <Label className="mb-3 block text-sm font-medium">Device Frame</Label>
               <div className="grid grid-cols-3 gap-2">

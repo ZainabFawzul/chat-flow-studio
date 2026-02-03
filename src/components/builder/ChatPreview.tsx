@@ -92,15 +92,23 @@ export function ChatPreview() {
   };
 
   const addContactMessage = (messageId: string, content: string, callback?: () => void) => {
-    // Show typing indicator
-    setTypingMessageId(messageId);
+    const isRegular = (theme.conversationType ?? 'chat') === 'regular';
     
-    // After delay, show actual message
-    typingTimeoutRef.current = setTimeout(() => {
+    if (isRegular) {
+      // In regular mode, show message immediately without typing indicator
       setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
-      setTypingMessageId(null);
       callback?.();
-    }, 1000);
+    } else {
+      // In chat mode, show typing indicator first
+      setTypingMessageId(messageId);
+      
+      // After delay, show actual message
+      typingTimeoutRef.current = setTimeout(() => {
+        setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
+        setTypingMessageId(null);
+        callback?.();
+      }, 1000);
+    }
   };
 
   const handleStart = () => {
@@ -172,6 +180,7 @@ export function ChatPreview() {
   const startSubtitle = theme.startScreenSubtitle ?? "Begin the conversation";
   const startButtonText = theme.startButtonText ?? "Start";
   const showResetButton = theme.showResetButton ?? true;
+  const isRegularMode = (theme.conversationType ?? 'chat') === 'regular';
 
   // Frame styling with fallbacks
   const frameBorderRadius = theme.frameBorderRadius ?? 16;
@@ -189,48 +198,65 @@ export function ChatPreview() {
         border: frameBorderWidth > 0 ? `${frameBorderWidth}px solid hsl(${frameBorderColor})` : 'none',
       }}
     >
-      {/* Chat Header - Modern messaging app style */}
-      <header className="flex items-center gap-4 border-b border-border/30 bg-card/90 backdrop-blur-xl px-5 py-3.5">
-        <Avatar className="h-11 w-11 ring-2 ring-border/50 ring-offset-2 ring-offset-card">
-          {theme.contactAvatar && (
-            <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
-          )}
-          <AvatarFallback
-            className="text-sm font-semibold"
-            style={{
-              background: `linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'}), hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'} / 0.7))`,
-              color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
-            }}
+      {/* Chat Header - Only show in chat mode */}
+      {!isRegularMode && (
+        <header className="flex items-center gap-4 border-b border-border/30 bg-card/90 backdrop-blur-xl px-5 py-3.5">
+          <Avatar className="h-11 w-11 ring-2 ring-border/50 ring-offset-2 ring-offset-card">
+            {theme.contactAvatar && (
+              <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
+            )}
+            <AvatarFallback
+              className="text-sm font-semibold"
+              style={{
+                background: `linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'}), hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'} / 0.7))`,
+                color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
+              }}
+            >
+              {getInitials(theme.contactName)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-semibold text-foreground truncate">{theme.contactName}</h2>
+            <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <span className={cn(
+                "inline-block h-2 w-2 rounded-full",
+                isPlaying ? "bg-success animate-pulse" : "bg-muted-foreground/30"
+              )} />
+              {isPlaying ? "Active now" : "Preview mode"}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {isPlaying ? (
+              showResetButton && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleReset} 
+                  className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80"
+                >
+                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                  Reset
+                </Button>
+              )
+            ) : null}
+          </div>
+        </header>
+      )}
+
+      {/* Minimal header for regular mode - just reset button when playing */}
+      {isRegularMode && isPlaying && showResetButton && (
+        <div className="flex justify-end p-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleReset} 
+            className="gap-2 rounded-xl text-muted-foreground hover:text-foreground"
           >
-            {getInitials(theme.contactName)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex-1 min-w-0">
-          <h2 className="font-semibold text-foreground truncate">{theme.contactName}</h2>
-          <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-            <span className={cn(
-              "inline-block h-2 w-2 rounded-full",
-              isPlaying ? "bg-success animate-pulse" : "bg-muted-foreground/30"
-            )} />
-            {isPlaying ? "Active now" : "Preview mode"}
-          </p>
+            <RotateCcw className="h-4 w-4" aria-hidden="true" />
+            Reset
+          </Button>
         </div>
-        <div className="flex items-center gap-2">
-          {isPlaying ? (
-            showResetButton && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={handleReset} 
-                className="gap-2 rounded-xl border-border/50 hover:bg-secondary/80"
-              >
-                <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                Reset
-              </Button>
-            )
-          ) : null}
-        </div>
-      </header>
+      )}
 
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto px-5 py-4">
@@ -274,7 +300,7 @@ export function ChatPreview() {
                   bubble.isUser ? "justify-end" : "justify-start"
                 )}
               >
-                {!bubble.isUser && (
+                {!bubble.isUser && !isRegularMode && (
                   <Avatar className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
                     {theme.contactAvatar && (
                       <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
