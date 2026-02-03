@@ -306,7 +306,7 @@ function MessageFlowNodeComponent({
         {!message.isEndpoint && <div className="border-t border-border/30 p-3 space-y-2" data-walkthrough="response-options-section">
             <span className="text-xs font-medium text-muted-foreground">Response Options</span>
             
-            {message.responseOptions.map((option, index) => <ResponseOptionRow key={option.id} option={option} index={index} messageId={message.id} variables={variables || {}} pendingConnection={pendingConnection} isConnecting={isConnecting} internalTabIndex={internalTabIndex} isExpanded={selected} />)}
+            {message.responseOptions.map((option, index) => <ResponseOptionRow key={option.id} option={option} index={index} messageId={message.id} variables={variables || {}} pendingConnection={pendingConnection} isConnecting={isConnecting} internalTabIndex={internalTabIndex} isExpanded={selected === true} />)}
 
             {/* Add new option */}
             <div className="flex items-center gap-2 rounded-lg border border-dashed border-border/50 p-2" data-walkthrough="add-response-input">
