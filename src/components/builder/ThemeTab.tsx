@@ -322,7 +322,7 @@ export function ThemeTab() {
             </div>
 
             {/* Rise 360 Integration */}
-            <div className="flex items-center justify-between rounded-xl p-3 bg-primary-foreground">
+            <div className="flex items-center justify-between">
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="rise-completion" className="text-sm font-medium">
@@ -352,26 +352,51 @@ export function ThemeTab() {
             })} />
             </div>
 
+            {/* Message Size */}
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-0.5">
+                <Label htmlFor="font-size" className="text-sm font-medium">
+                  Message Size (px)
+                </Label>
+                <span className="text-xs text-muted-foreground">
+                  Font size for chat messages
+                </span>
+              </div>
+              <Input id="font-size" type="number" min={12} max={20} value={theme.fontSize} onChange={e => updateTheme({
+              fontSize: Number(e.target.value)
+            })} className="h-10 w-20 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors text-center" />
+            </div>
+
             {/* Custom Frame Options - only show when preset is 'none' */}
             {(theme.framePreset ?? 'none') === 'none' && <>
                 {/* Corner Radius */}
-                <div>
-                  <Label htmlFor="frame-radius" className="mb-2 block text-sm font-medium">
-                    Corner Radius (px)
-                  </Label>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <Label htmlFor="frame-radius" className="text-sm font-medium">
+                      Corner Radius (px)
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      Frame border radius
+                    </span>
+                  </div>
                   <Input id="frame-radius" type="number" min={0} max={32} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
                 frameBorderRadius: Number(e.target.value)
-              })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+              })} className="h-10 w-20 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors text-center" />
                 </div>
 
                 {/* Border Width */}
-                <div>
-                  <Label htmlFor="frame-border-width" className="mb-2 block text-sm font-medium">
-                    Border Width (px)
-                  </Label>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <Label htmlFor="frame-border-width" className="text-sm font-medium">
+                      Border Width (px)
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      Frame border thickness
+                    </span>
+                  </div>
                   <Input id="frame-border-width" type="number" min={0} max={4} value={theme.frameBorderWidth ?? 1} onChange={e => updateTheme({
                 frameBorderWidth: Number(e.target.value)
-              })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+              })} className="h-10 w-20 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors text-center" />
                 </div>
 
                 {/* Border Color */}
@@ -389,16 +414,6 @@ export function ThemeTab() {
                   </div>
                 </div>
               </>}
-            
-            {/* Font Size */}
-            <div>
-              <Label htmlFor="font-size" className="mb-2 block text-sm font-medium">
-                Message Size (px)
-              </Label>
-              <Input id="font-size" type="number" min={12} max={20} value={theme.fontSize} onChange={e => updateTheme({
-              fontSize: Number(e.target.value)
-            })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
-            </div>
             
           </div>
         </Section>
