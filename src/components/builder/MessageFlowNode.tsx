@@ -154,7 +154,7 @@ function MessageFlowNodeComponent({
             <div
               ref={nodeRef}
               className={cn(
-                "w-16 h-16 rounded-2xl border-2 bg-card shadow-lg transition-all flex items-center justify-center",
+                "w-16 h-16 rounded-2xl border-2 bg-card shadow-lg transition-all flex items-center justify-center relative",
                 selected ? "border-primary shadow-primary/20" : "border-border/50",
                 isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
                 canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none"
@@ -166,14 +166,34 @@ function MessageFlowNodeComponent({
               data-connection-target={canReceiveConnection ? message.id : undefined}
               data-message-node={message.id}
             >
+              {/* Input handle */}
               <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-primary !border-2 !border-background" />
+              
               <span className={cn(
                 "text-xl font-bold",
                 isRoot ? "text-primary" : "text-foreground"
               )}>
                 {nodeNumber}
               </span>
-              <Handle type="source" position={Position.Right} id="direct" className="!w-2 !h-2 !bg-primary !border-2 !border-background" />
+              
+              {/* Output handles - one for each response option + direct connection */}
+              {message.responseOptions.map((option, index) => (
+                <Handle 
+                  key={option.id}
+                  type="source" 
+                  position={Position.Right} 
+                  id={option.id}
+                  className="!w-2 !h-2 !bg-primary !border-2 !border-background !opacity-0"
+                  style={{ top: `${30 + index * 10}%` }}
+                />
+              ))}
+              {/* Direct connection handle */}
+              <Handle 
+                type="source" 
+                position={Position.Right} 
+                id="direct" 
+                className="!w-2 !h-2 !bg-primary !border-2 !border-background"
+              />
             </div>
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-[200px]">
