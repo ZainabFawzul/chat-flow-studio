@@ -27,6 +27,7 @@ interface MessageFlowNodeData {
   nodeNumber: number;
   pendingConnection: PendingConnection | null;
   variables: Record<string, ScenarioVariable>;
+  isCondensed?: boolean;
 }
 function MessageFlowNodeComponent({
   data,
@@ -38,7 +39,8 @@ function MessageFlowNodeComponent({
     isRoot,
     nodeNumber,
     pendingConnection,
-    variables
+    variables,
+    isCondensed = false,
   } = nodeData;
   const {
     updateMessage,
@@ -143,6 +145,46 @@ function MessageFlowNodeComponent({
 
   // Internal elements are only tabbable when in edit mode and not connecting
   const internalTabIndex = (isEditing && !isConnecting) ? 0 : -1;
+  // Condensed view when zoomed out significantly
+  if (isCondensed) {
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div
+              ref={nodeRef}
+              className={cn(
+                "w-16 h-16 rounded-2xl border-2 bg-card shadow-lg transition-all flex items-center justify-center",
+                selected ? "border-primary shadow-primary/20" : "border-border/50",
+                isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
+                canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none"
+              )}
+              onClick={canReceiveConnection ? () => completeConnection(message.id) : undefined}
+              tabIndex={0}
+              role="group"
+              aria-label={`Message ${nodeNumber}${isRoot ? " (Start)" : ""}`}
+              data-connection-target={canReceiveConnection ? message.id : undefined}
+              data-message-node={message.id}
+            >
+              <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-primary !border-2 !border-background" />
+              <span className={cn(
+                "text-xl font-bold",
+                isRoot ? "text-primary" : "text-foreground"
+              )}>
+                {nodeNumber}
+              </span>
+              <Handle type="source" position={Position.Right} id="direct" className="!w-2 !h-2 !bg-primary !border-2 !border-background" />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[200px]">
+            <p className="font-medium">{isRoot ? "Start: " : ""}Message {nodeNumber}</p>
+            <p className="text-xs text-muted-foreground truncate">{message.content.slice(0, 50)}{message.content.length > 50 ? "..." : ""}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  }
+
   return <TooltipProvider>
       <div 
         ref={nodeRef}

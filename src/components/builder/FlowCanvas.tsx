@@ -16,11 +16,13 @@ import {
   Connection,
   Edge,
   Node,
-   type ReactFlowInstance,
+  type ReactFlowInstance,
   BackgroundVariant,
   NodeChange,
   Panel,
   applyNodeChanges,
+  useOnViewportChange,
+  type Viewport,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useScenario } from "@/context/ScenarioContext";
@@ -59,6 +61,14 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   
   // Track selected node ID for expand/collapse behavior
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  
+  // Track zoom level for condensed node display
+  const [zoomLevel, setZoomLevel] = useState(1);
+  
+  // Update zoom level when viewport changes
+  useOnViewportChange({
+    onEnd: (viewport: Viewport) => setZoomLevel(viewport.zoom),
+  });
 
   // Get list of valid target node IDs (all nodes except the source)
   const targetNodeIds = useMemo(() => {
@@ -140,9 +150,10 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         nodeNumber: index + 1,
         pendingConnection,
         variables: scenario.variables || {},
+        isCondensed: zoomLevel < 0.5, // Show condensed view when zoomed out significantly
       },
     }));
-  }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables, selectedNodeId]);
+  }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables, selectedNodeId, zoomLevel]);
 
   // Ensure nodes are visible when entering expanded mode.
   // Using onInit avoids injecting custom children into <ReactFlow> (which can trigger ref warnings).
@@ -267,6 +278,8 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         edgeTypes={edgeTypes}
         fitView
         fitViewOptions={{ padding: 0.2 }}
+        minZoom={0.1}
+        maxZoom={2}
         className="bg-secondary/20"
         proOptions={{ hideAttribution: true }}
         deleteKeyCode={null}
