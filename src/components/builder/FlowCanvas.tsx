@@ -198,7 +198,7 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         proOptions={{ hideAttribution: true }}
         deleteKeyCode={null}
         selectionKeyCode={null}
-        tabIndex={0}
+        tabIndex={-1}
         aria-label="Flow canvas area"
       >
         <Background
@@ -214,8 +214,11 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
           showInteractive={false}
         />
         
+        {/* Toolbar panel - rendered first for focus order */}
         <Panel position="top-left" className="m-4">
-          <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} />
+          <div role="region" aria-label="Canvas controls. Tab through toolbar buttons first, then Tab to move through message nodes.">
+            <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} />
+          </div>
         </Panel>
 
         <Panel position="top-right" className="m-4">
