@@ -94,6 +94,10 @@ export interface ChatTheme {
   frameBorderRadius: number; // 0-32px
   frameBorderWidth: number; // 0-4px
   frameBorderColor: string; // HSL
+  // Conversation type
+  conversationType: 'chat' | 'regular'; // 'chat' shows header & typing, 'regular' is cleaner
+  // Rise 360 integration
+  enableRiseCompletion: boolean; // Post completion message to parent frame
 }
 
 export interface ScenarioData {
@@ -150,6 +154,10 @@ export const DEFAULT_THEME: ChatTheme = {
   frameBorderRadius: 16,
   frameBorderWidth: 1,
   frameBorderColor: "220 13% 91%", // Light gray border
+  // Conversation type
+  conversationType: 'chat',
+  // Rise 360 integration
+  enableRiseCompletion: false,
 };
 
 export const createEmptyScenario = (): ScenarioData => ({

@@ -78,6 +78,11 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
   const startButtonTextColor = theme.startButtonTextColor ?? "0 0% 100%";
   const startButtonBorderRadius = theme.startButtonBorderRadius ?? 12;
   const showResetButton = theme.showResetButton ?? true;
+  
+  // Conversation type and Rise integration
+  const conversationType = theme.conversationType ?? 'chat';
+  const isRegularMode = conversationType === 'regular';
+  const enableRiseCompletion = theme.enableRiseCompletion ?? false;
 
   // Escape for safe JSON embedding in script
   const scenarioJSON = JSON.stringify({ messages, variables, rootMessageId, theme });
@@ -533,6 +538,38 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
         font-size: 0.8125rem;
       }
     }
+
+    /* Regular mode - minimal reset button */
+    .regular-reset-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 0.5rem;
+    }
+
+    .regular-reset-btn {
+      padding: 0.375rem 0.75rem;
+      border-radius: 0.75rem;
+      border: none;
+      background: transparent;
+      color: #6b7280;
+      cursor: pointer;
+      font-size: 0.875rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      transition: all 0.2s;
+    }
+
+    .regular-reset-btn:hover {
+      color: #1f2937;
+      background: #f3f4f6;
+    }
+
+    .regular-reset-btn:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
   </style>
 </head>
 <body>
@@ -560,6 +597,21 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       const startSubtitle = ${JSON.stringify(startSubtitle)};
       const startButtonText = ${JSON.stringify(startButtonText)};
       const showResetButton = ${JSON.stringify(showResetButton)};
+      
+      // Conversation type and Rise integration
+      const isRegularMode = ${JSON.stringify(isRegularMode)};
+      const enableRiseCompletion = ${JSON.stringify(enableRiseCompletion)};
+      
+      // Rise 360 completion notification
+      function notifyRiseCompletion() {
+        if (enableRiseCompletion) {
+          try {
+            window.parent.postMessage({ type: 'complete' }, '*');
+          } catch (e) {
+            console.log('Rise completion notification sent');
+          }
+        }
+      }
 
       // Initialize variable state from defaults
       Object.values(variables || {}).forEach(v => {
@@ -627,25 +679,32 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
         let html = '';
 
-        // Header
-        html += '<header class="chat-header">';
-        html += '<div class="avatar" aria-hidden="true">';
-        if (theme.contactAvatar) {
-          html += '<img src="' + theme.contactAvatar + '" alt="">';
-        } else {
-          html += getInitials(theme.contactName);
+        // Header - only show in chat mode
+        if (!isRegularMode) {
+          html += '<header class="chat-header">';
+          html += '<div class="avatar" aria-hidden="true">';
+          if (theme.contactAvatar) {
+            html += '<img src="' + theme.contactAvatar + '" alt="">';
+          } else {
+            html += getInitials(theme.contactName);
+          }
+          html += '</div>';
+          html += '<div class="header-info">';
+          html += '<div class="header-name">' + theme.contactName + '</div>';
+          html += '<div class="header-status" aria-live="polite">';
+          html += '<span class="status-dot" aria-hidden="true"></span>';
+          html += '<span>' + (isPlaying ? 'Active now' : 'Click Start to begin') + '</span>';
+          html += '</div></div>';
+          if (isPlaying && showResetButton) {
+            html += '<button class="reset-btn" onclick="handleReset()" aria-label="Reset conversation">↻ Reset</button>';
+          }
+          html += '</header>';
+        } else if (isPlaying && showResetButton) {
+          // Minimal reset button for regular mode
+          html += '<div class="regular-reset-bar">';
+          html += '<button class="regular-reset-btn" onclick="handleReset()" aria-label="Reset conversation">↻ Reset</button>';
+          html += '</div>';
         }
-        html += '</div>';
-        html += '<div class="header-info">';
-        html += '<div class="header-name">' + theme.contactName + '</div>';
-        html += '<div class="header-status" aria-live="polite">';
-        html += '<span class="status-dot" aria-hidden="true"></span>';
-        html += '<span>' + (isPlaying ? 'Active now' : 'Click Start to begin') + '</span>';
-        html += '</div></div>';
-        if (isPlaying && showResetButton) {
-          html += '<button class="reset-btn" onclick="handleReset()" aria-label="Reset conversation">↻ Reset</button>';
-        }
-        html += '</header>';
 
         if (!isPlaying) {
           // Start screen
@@ -666,7 +725,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
             const ariaLabel = senderName + ' said: ' + escapeForAriaLabel(bubbleContent);
             
             html += '<div class="message-row ' + (bubble.isUser ? 'user' : 'contact') + '" role="article" aria-label="' + ariaLabel + '">';
-            if (!bubble.isUser) {
+            // Show avatar only in chat mode
+            if (!bubble.isUser && !isRegularMode) {
               html += '<div class="message-avatar" aria-hidden="true">';
               if (theme.contactAvatar) {
                 html += '<img src="' + theme.contactAvatar + '" alt="">';
@@ -680,8 +740,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
             html += '</div></div>';
           });
 
-          // Typing indicator with screen reader announcement
-          if (isTyping) {
+          // Typing indicator - only in chat mode
+          if (isTyping && !isRegularMode) {
             html += '<div class="message-row contact" role="status" aria-label="' + theme.contactName + ' is typing">';
             html += '<div class="message-avatar" aria-hidden="true">';
             if (theme.contactAvatar) {
@@ -724,24 +784,38 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       }
 
       function addContactMessage(messageId, content, callback) {
-        isTyping = true;
-        announceStatus(theme.contactName + ' is typing');
-        render();
-        
-        setTimeout(function() {
+        if (isRegularMode) {
+          // In regular mode, show message immediately without typing indicator
           chatHistory.push({
             id: messageId,
             content: content,
             isUser: false
           });
-          isTyping = false;
-          announceStatus('New message from ' + theme.contactName);
+          announceStatus('New message');
           if (callback) callback();
           render();
-          
-          // Focus first option if available, otherwise focus messages area
           focusElement('.option-btn', '#messages-area');
-        }, 1000);
+        } else {
+          // In chat mode, show typing indicator first
+          isTyping = true;
+          announceStatus(theme.contactName + ' is typing');
+          render();
+          
+          setTimeout(function() {
+            chatHistory.push({
+              id: messageId,
+              content: content,
+              isUser: false
+            });
+            isTyping = false;
+            announceStatus('New message from ' + theme.contactName);
+            if (callback) callback();
+            render();
+            
+            // Focus first option if available, otherwise focus messages area
+            focusElement('.option-btn', '#messages-area');
+          }, 1000);
+        }
       }
 
       window.handleStart = function() {
@@ -805,15 +879,23 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
           // Check if next message meets its condition
           if (checkCondition(nextMsg.condition)) {
             currentMessageId = option.nextMessageId;
-            addContactMessage(option.nextMessageId, nextMsg.content);
+            addContactMessage(option.nextMessageId, nextMsg.content, function() {
+              // Check if this new message is an endpoint
+              const newCurrentMessage = messages[option.nextMessageId];
+              if (newCurrentMessage && (newCurrentMessage.isEndpoint || getVisibleOptions(newCurrentMessage).length === 0)) {
+                notifyRiseCompletion();
+              }
+            });
           } else {
             currentMessageId = null;
             announceStatus('End of conversation branch');
+            notifyRiseCompletion();
             render();
           }
         } else {
           currentMessageId = null;
           announceStatus('Conversation complete');
+          notifyRiseCompletion();
           render();
         }
       };
