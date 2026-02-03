@@ -1,7 +1,7 @@
 /**
  * @file use-walkthrough.ts
  * @description Custom hook for managing onboarding walkthrough state with localStorage persistence
- * 
+ *
  * @dependencies React useState, useEffect, useCallback
  * @usage Import in BuilderLayout to control walkthrough flow
  */
@@ -27,7 +27,7 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     id: "theme",
     target: "theme-tab",
     title: "Theme Tab",
-    description: "Use the Theme tab to configure the appearance of your chat scenario.",
+    description: "Use the Theme tab to configure the appearance of your chat.",
     switchToTab: "theme",
   },
   {
@@ -37,43 +37,44 @@ export const WALKTHROUGH_STEPS: WalkthroughStep[] = [
     description: "The Canvas is where you can build and connect messages.",
     switchToTab: "canvas",
     subSteps: [
-      { target: "variables-button", description: "You can add variables and create conditional branches." },
-      { target: "expand-button", description: "You can also expand the canvas for focused building." },
+      { target: "variables-button", description: "Add variables and create conditional branches." },
+      { target: "expand-button", description: "Expand the canvas for focused building." },
     ],
   },
   {
     id: "message-card",
     target: "message-card",
     title: "Message Card",
-    description: "Each card represents a message from the contact. The header shows the message number and controls. Edit the message text in the content area below.",
+    description: "Each card is a message from the contact. Edit the message text here.",
     switchToTab: "canvas",
   },
   {
     id: "add-responses",
     target: "add-response-input",
     title: "Add Responses",
-    description: "Add response options that learners can choose. Type a response and click 'Add' or press Enter. Each message needs at least one response option to continue the conversation.",
+    description: "Type a response and select 'Add' or press Enter.",
     switchToTab: "canvas",
   },
   {
     id: "add-triggers",
     target: "trigger-button",
     title: "Add Triggers",
-    description: "Triggers let you set or check variables when a response is chosen. Use triggers to create conditional logic and branching paths based on learner choices.",
+    description: "Use triggers to create conditional logic and branching paths based on learner choices.",
     switchToTab: "canvas",
   },
   {
     id: "link-responses",
     target: "link-button",
     title: "Link Responses",
-    description: "Connect response options to other message nodes. Click the link icon, then select the target message to create the connection. This defines where the conversation goes next.",
+    description: "Use the link button to connect response options to other message nodes.",
     switchToTab: "canvas",
   },
   {
     id: "save-work",
     target: "import-export",
     title: "Save Your Work",
-    description: "Your work will not be saved. Be sure to export your scenario and re-import it to continue building where you left off.",
+    description:
+      "Your work will not be saved. Be sure to export your scenario and re-import it to continue building where you left off.",
   },
   {
     id: "finalize",
@@ -147,7 +148,7 @@ export function useWalkthrough(): UseWalkthroughReturn {
   const getCurrentTarget = useCallback(() => {
     const step = WALKTHROUGH_STEPS[currentStep];
     if (!step) return "";
-    
+
     if (currentSubStep >= 0 && step.subSteps && step.subSteps[currentSubStep]) {
       return step.subSteps[currentSubStep].target;
     }
@@ -157,7 +158,7 @@ export function useWalkthrough(): UseWalkthroughReturn {
   const getCurrentDescription = useCallback(() => {
     const step = WALKTHROUGH_STEPS[currentStep];
     if (!step) return "";
-    
+
     if (currentSubStep >= 0 && step.subSteps && step.subSteps[currentSubStep]) {
       return step.subSteps[currentSubStep].description;
     }
@@ -188,13 +189,13 @@ export function useWalkthrough(): UseWalkthroughReturn {
 
   const nextStep = useCallback(() => {
     const step = WALKTHROUGH_STEPS[currentStep];
-    
+
     // If we have sub-steps and haven't gone through them all
     if (step?.subSteps && currentSubStep < step.subSteps.length - 1) {
       setCurrentSubStep((prev) => prev + 1);
       return;
     }
-    
+
     // Move to next main step
     if (currentStep < WALKTHROUGH_STEPS.length - 1) {
       setCurrentStep((prev) => prev + 1);
@@ -211,13 +212,13 @@ export function useWalkthrough(): UseWalkthroughReturn {
       setCurrentSubStep((prev) => prev - 1);
       return;
     }
-    
+
     // If at main step but there were sub-steps shown, go to main step
     if (currentSubStep === 0) {
       setCurrentSubStep(-1);
       return;
     }
-    
+
     // Move to previous main step
     if (currentStep > 0) {
       const prevStep = WALKTHROUGH_STEPS[currentStep - 1];
