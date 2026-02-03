@@ -50,6 +50,7 @@ export interface ChatMessage {
   responseOptions: ResponseOption[];
   position: NodePosition;
   condition?: VariableCondition; // Message only shown if condition is met
+  nextMessageId?: string | null; // Direct connection for messages without responses
 }
 
 export interface BubbleBorderRadius {

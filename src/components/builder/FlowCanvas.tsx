@@ -111,6 +111,10 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   // Get the pending option text for the banner
   const pendingOptionText = useMemo(() => {
     if (!pendingConnection) return null;
+    // Direct message connection (no option)
+    if (!pendingConnection.optionId) {
+      return null;
+    }
     const message = scenario.messages[pendingConnection.sourceMessageId];
     if (!message) return null;
     const option = message.responseOptions.find(o => o.id === pendingConnection.optionId);
@@ -140,6 +144,7 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   const edges: Edge[] = useMemo(() => {
     const edgeList: Edge[] = [];
     Object.values(scenario.messages).forEach((message) => {
+      // Response option edges
       message.responseOptions.forEach((option) => {
         if (option.nextMessageId) {
           edgeList.push({
@@ -152,6 +157,17 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
           });
         }
       });
+      // Direct message-to-message edge
+      if (message.nextMessageId) {
+        edgeList.push({
+          id: `${message.id}-direct`,
+          source: message.id,
+          target: message.nextMessageId,
+          sourceHandle: "direct",
+          type: "responseEdge",
+          data: { label: "continues to" },
+        });
+      }
     });
     return edgeList;
   }, [scenario.messages]);
@@ -261,7 +277,10 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
             >
               <Link2 className="h-4 w-4" aria-hidden="true" />
               <span className="text-sm font-medium">
-                Connecting "{pendingOptionText}" — Tab to a message node and press Enter
+                {pendingOptionText 
+                  ? `Connecting "${pendingOptionText}" — Tab to a message node and press Enter`
+                  : "Connecting message — Tab to a message node and press Enter"
+                }
               </span>
               <Button
                 variant="ghost"
