@@ -308,6 +308,21 @@ export function ThemeTab() {
             })} />
             </div>
             
+            {/* Show Reset Button */}
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-0.5">
+                <Label htmlFor="show-reset" className="text-sm font-medium">
+                  Show Reset Button
+                </Label>
+                <span className="text-xs text-muted-foreground">
+                  Allow users to restart the conversation
+                </span>
+              </div>
+              <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
+              showResetButton: checked
+            })} />
+            </div>
+            
             {/* Device Frame */}
             <div>
               <Label className="mb-3 block text-sm font-medium">Device Frame</Label>
@@ -385,20 +400,6 @@ export function ThemeTab() {
             })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
             
-            {/* Show Reset Button */}
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col gap-0.5">
-                <Label htmlFor="show-reset" className="text-sm font-medium">
-                  Show Reset Button
-                </Label>
-                <span className="text-xs text-muted-foreground">
-                  Allow users to restart the conversation
-                </span>
-              </div>
-              <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
-              showResetButton: checked
-            })} />
-            </div>
           </div>
         </Section>
 
