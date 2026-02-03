@@ -6,9 +6,9 @@
  * @usage Rendered in BuilderLayout when walkthrough is active
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, X } from "lucide-react";
+import { ChevronRight, ChevronLeft, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SpotlightRect {
@@ -27,6 +27,7 @@ interface OnboardingWalkthroughProps {
   currentSubStep: number;
   totalSteps: number;
   onNext: () => void;
+  onPrevious?: () => void;
   onSkip: () => void;
 }
 
@@ -39,10 +40,14 @@ export function OnboardingWalkthrough({
   currentSubStep,
   totalSteps,
   onNext,
+  onPrevious,
   onSkip,
 }: OnboardingWalkthroughProps) {
   const [spotlightRect, setSpotlightRect] = useState<SpotlightRect | null>(null);
   const [tooltipPosition, setTooltipPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
 
   // Calculate current progress index for dots
   const getProgressIndex = useCallback(() => {
@@ -128,21 +133,74 @@ export function OnboardingWalkthrough({
     };
   }, [isActive, currentTarget, updateSpotlight]);
 
-  // Keyboard navigation
+  // Focus management: save previous focus and move focus to dialog
   useEffect(() => {
-    if (!isActive) return;
+    if (isActive && dialogRef.current) {
+      previousActiveElement.current = document.activeElement as HTMLElement;
+      // Focus the first focusable element in the dialog
+      const firstFocusable = dialogRef.current.querySelector<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (firstFocusable) {
+        firstFocusable.focus();
+      }
+    } else if (!isActive && previousActiveElement.current) {
+      // Return focus when dialog closes
+      previousActiveElement.current.focus();
+      previousActiveElement.current = null;
+    }
+  }, [isActive]);
+
+  // Focus trap and keyboard navigation
+  useEffect(() => {
+    if (!isActive || !dialogRef.current) return;
     
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
+        e.preventDefault();
         onSkip();
-      } else if (e.key === "Enter" || e.key === "ArrowRight") {
+        return;
+      }
+      
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
         onNext();
+        return;
+      }
+      
+      if (e.key === "ArrowLeft" && onPrevious) {
+        e.preventDefault();
+        onPrevious();
+        return;
+      }
+      
+      // Focus trap with Tab key
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+        
+        if (e.shiftKey) {
+          // Shift + Tab: if on first element, go to last
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab: if on last element, go to first
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
       }
     };
     
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isActive, onNext, onSkip]);
+  }, [isActive, onNext, onPrevious, onSkip]);
 
   if (!isActive || !spotlightRect) return null;
 
@@ -199,6 +257,7 @@ export function OnboardingWalkthrough({
 
       {/* Tooltip */}
       <div
+        ref={dialogRef}
         className={cn(
           "absolute z-[51] w-80 bg-card border border-border rounded-2xl shadow-2xl p-5",
           "animate-in fade-in-0 slide-in-from-bottom-2 duration-300"
@@ -226,17 +285,34 @@ export function OnboardingWalkthrough({
         </p>
         
         <div className="flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onSkip}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Skip
-          </Button>
+          {progressIndex > 0 && onPrevious ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPrevious}
+              className="gap-1 text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              Back
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onSkip}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Skip
+            </Button>
+          )}
           
           {/* Progress dots */}
-          <div className="flex items-center gap-1.5" aria-label={`Step ${progressIndex + 1} of ${totalSteps}`}>
+          <div 
+            className="flex items-center gap-1.5" 
+            role="group"
+            aria-label={`Step ${progressIndex + 1} of ${totalSteps}`}
+            aria-hidden="true"
+          >
             {Array.from({ length: totalSteps }).map((_, i) => (
               <div
                 key={i}
