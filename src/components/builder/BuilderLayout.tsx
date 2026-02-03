@@ -58,6 +58,7 @@ function BuilderContent() {
         currentSubStep={walkthrough.currentSubStep}
         totalSteps={walkthrough.totalSteps}
         onNext={walkthrough.nextStep}
+        onPrevious={walkthrough.previousStep}
         onSkip={walkthrough.skipWalkthrough}
       />
     </div>
