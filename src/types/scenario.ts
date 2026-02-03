@@ -160,16 +160,60 @@ export const DEFAULT_THEME: ChatTheme = {
   enableRiseCompletion: false,
 };
 
-export const createEmptyScenario = (): ScenarioData => ({
-  id: crypto.randomUUID(),
-  name: "Untitled Scenario",
-  theme: { ...DEFAULT_THEME },
-  messages: {},
-  variables: {},
-  rootMessageId: null,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-});
+export const createEmptyScenario = (): ScenarioData => {
+  // Create IDs upfront so we can link them
+  const variableId = crypto.randomUUID();
+  const message1Id = crypto.randomUUID();
+  const message2Id = crypto.randomUUID();
+  const option1Id = crypto.randomUUID();
+  const option2Id = crypto.randomUUID();
+  
+  const now = new Date().toISOString();
+  
+  return {
+    id: crypto.randomUUID(),
+    name: "Untitled Scenario",
+    theme: { ...DEFAULT_THEME },
+    messages: {
+      [message1Id]: {
+        id: message1Id,
+        content: "Hello! This is your first message from the contact.",
+        isEndpoint: false,
+        responseOptions: [
+          {
+            id: option1Id,
+            text: "Tell me more",
+            nextMessageId: message2Id,
+          },
+          {
+            id: option2Id,
+            text: "Not interested",
+            nextMessageId: null,
+          },
+        ],
+        position: { x: 100, y: 100 },
+      },
+      [message2Id]: {
+        id: message2Id,
+        content: "Great! Here's more information about the topic.",
+        isEndpoint: true,
+        responseOptions: [],
+        position: { x: 500, y: 100 },
+      },
+    },
+    variables: {
+      [variableId]: {
+        id: variableId,
+        name: "interested",
+        type: "boolean",
+        defaultValue: false,
+      },
+    },
+    rootMessageId: message1Id,
+    createdAt: now,
+    updatedAt: now,
+  };
+};
 
 export const createMessage = (content: string = "", position?: NodePosition): ChatMessage => ({
   id: crypto.randomUUID(),
