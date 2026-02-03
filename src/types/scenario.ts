@@ -88,6 +88,7 @@ export interface ChatTheme {
   responseOptionBackground: string;
   responseOptionTextColor: string;
   responseOptionBorderRadius: number;
+  responseOptionTextAlign: 'left' | 'center' | 'right';
   // Controls
   showResetButton: boolean;
   // Frame customization
@@ -148,6 +149,7 @@ export const DEFAULT_THEME: ChatTheme = {
   responseOptionBackground: "0 0% 100%", // White
   responseOptionTextColor: "222 47% 11%", // Dark foreground - WCAG AA compliant
   responseOptionBorderRadius: 12,
+  responseOptionTextAlign: 'center',
   // Controls
   showResetButton: true,
   // Frame customization

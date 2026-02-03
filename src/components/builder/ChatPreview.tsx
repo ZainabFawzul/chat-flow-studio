@@ -428,6 +428,7 @@ export function ChatPreview() {
                   backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
                   color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
                   borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
+                  textAlign: theme.responseOptionTextAlign ?? 'center',
                 }}
               >
                 {option.text || "Empty option"}

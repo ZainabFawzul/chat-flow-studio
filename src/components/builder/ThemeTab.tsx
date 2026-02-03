@@ -13,7 +13,7 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, MessageSquare, FileText } from "lucide-react";
+import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, MessageSquare, FileText, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
@@ -537,6 +537,32 @@ export function ThemeTab() {
             })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
 
+            {/* Text Alignment */}
+            <div>
+              <Label className="mb-3 block text-sm font-medium">Option Text Alignment</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { value: 'left' as const, label: 'Left', icon: AlignLeft },
+                  { value: 'center' as const, label: 'Center', icon: AlignCenter },
+                  { value: 'right' as const, label: 'Right', icon: AlignRight },
+                ].map(({ value, label, icon: Icon }) => (
+                  <button
+                    key={value}
+                    onClick={() => updateTheme({ responseOptionTextAlign: value })}
+                    className={cn(
+                      "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
+                      (theme.responseOptionTextAlign ?? 'center') === value
+                        ? "border-primary bg-primary/5 text-primary"
+                        : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
+                    )}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span className="text-xs font-medium">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Preview */}
             <div className="mt-2 p-4 border border-border/30" style={{
             backgroundColor: `hsl(${theme.responsePanelBackground ?? '0 0% 100%'})`,
@@ -551,14 +577,16 @@ export function ThemeTab() {
                 <span className="px-3 py-1.5 text-sm font-medium border border-border/50" style={{
                 backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
                 color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
-                borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`
+                borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
+                textAlign: theme.responseOptionTextAlign ?? 'center',
               }}>
                   Option 1
                 </span>
                 <span className="px-3 py-1.5 text-sm font-medium border border-border/50" style={{
                 backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
                 color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
-                borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`
+                borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
+                textAlign: theme.responseOptionTextAlign ?? 'center',
               }}>
                   Option 2
                 </span>
