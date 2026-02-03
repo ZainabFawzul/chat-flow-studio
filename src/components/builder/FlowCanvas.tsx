@@ -10,6 +10,7 @@
 import { useCallback, useMemo, useEffect, useRef, useState } from "react";
 import {
   ReactFlow,
+  ReactFlowProvider,
   Background,
   Controls,
   Connection,
@@ -42,9 +43,22 @@ interface FlowCanvasProps {
   onToggleExpand: () => void;
 }
 
-// Inner component to access ReactFlow instance
-function FlowCanvasInner({ isExpanded, onToggleExpand }: FlowCanvasProps) {
-  const reactFlowInstance = useReactFlow();
+// Helper component to trigger fitView when expansion changes
+function FitViewOnExpand({ isExpanded }: { isExpanded: boolean }) {
+  const { fitView } = useReactFlow();
+  
+  useEffect(() => {
+    // Small delay to allow the container to resize
+    const timer = setTimeout(() => {
+      fitView({ padding: 0.2 });
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [isExpanded, fitView]);
+  
+  return null;
+}
+
+function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   const {
     scenario,
     updateNodePosition,
@@ -111,14 +125,6 @@ function FlowCanvasInner({ isExpanded, onToggleExpand }: FlowCanvasProps) {
     }
   }, [pendingConnection]);
 
-  // Fit view when expansion state changes
-  useEffect(() => {
-    // Small delay to allow the container to resize
-    const timer = setTimeout(() => {
-      reactFlowInstance.fitView({ padding: 0.2 });
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [isExpanded, reactFlowInstance]);
 
   // Get the pending option text for the banner
   const pendingOptionText = useMemo(() => {
@@ -277,6 +283,7 @@ function FlowCanvasInner({ isExpanded, onToggleExpand }: FlowCanvasProps) {
           showFitView
           showInteractive={false}
         />
+        <FitViewOnExpand isExpanded={isExpanded} />
 
         {/* Connection mode banner */}
         {pendingConnection && (
@@ -312,12 +319,10 @@ function FlowCanvasInner({ isExpanded, onToggleExpand }: FlowCanvasProps) {
 }
 
 // Wrapper component that provides ReactFlowProvider
-import { ReactFlowProvider } from "@xyflow/react";
-
 export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   return (
     <ReactFlowProvider>
-      <FlowCanvasInner isExpanded={isExpanded} onToggleExpand={onToggleExpand} />
+      <FlowCanvasContent isExpanded={isExpanded} onToggleExpand={onToggleExpand} />
     </ReactFlowProvider>
   );
 }
