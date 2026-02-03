@@ -82,6 +82,14 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
   // Escape for safe JSON embedding in script
   const scenarioJSON = JSON.stringify({ messages, variables, rootMessageId, theme });
 
+  // Response panel theming with fallbacks
+  const responsePanelBackground = theme.responsePanelBackground ?? "0 0% 100%";
+  const responsePanelLabelColor = theme.responsePanelLabelColor ?? "220 9% 46%";
+  const responsePanelLabelText = theme.responsePanelLabelText ?? "Choose a response";
+  const responseOptionBackground = theme.responseOptionBackground ?? "0 0% 100%";
+  const responseOptionTextColor = theme.responseOptionTextColor ?? "220 9% 20%";
+  const responseOptionBorderRadius = theme.responseOptionBorderRadius ?? 12;
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,14 +103,38 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       box-sizing: border-box;
     }
 
+    html {
+      font-size: 100%;
+    }
+
     body {
       font-family: ${theme.fontFamily};
-      font-size: clamp(0.875rem, 1rem, 1.125rem);
-      line-height: 1.5;
+      font-size: clamp(0.875rem, 2.5vw, 1.125rem);
+      line-height: 1.6;
       background-color: transparent;
-      height: 100vh;
+      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
+    }
+
+    /* Skip link for keyboard navigation */
+    .skip-link {
+      position: absolute;
+      top: -3rem;
+      left: 0;
+      padding: 0.5rem 1rem;
+      background: #2563eb;
+      color: white;
+      z-index: 100;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 0 0 0.5rem 0;
+    }
+    .skip-link:focus {
+      top: 0;
+      outline: 2px solid #1d4ed8;
+      outline-offset: 2px;
     }
 
     /* Screen reader only utility */
@@ -118,10 +150,17 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       border: 0;
     }
 
+    /* Focus indicators for all interactive elements */
+    *:focus-visible {
+      outline: 2px solid #2563eb;
+      outline-offset: 2px;
+    }
+
     .chat-container {
       display: flex;
       flex-direction: column;
-      height: 100%;
+      height: 100vh;
+      height: 100dvh;
       max-width: 37.5rem;
       margin: 0 auto;
       width: 100%;
@@ -147,8 +186,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       justify-content: center;
       font-weight: 600;
       font-size: 0.875rem;
-      background: linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7));
-      color: hsl(${theme.senderTextColor});
+      background: linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? "214 100% 65%"}), hsl(${theme.avatarBackgroundColor ?? "214 100% 65%"} / 0.7));
+      color: hsl(${theme.avatarTextColor ?? "0 0% 100%"});
       flex-shrink: 0;
     }
 
@@ -161,11 +200,15 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
     .header-info {
       flex: 1;
+      min-width: 0;
     }
 
     .header-name {
       font-weight: 600;
       color: #1f2937;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .header-status {
@@ -207,6 +250,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     .reset-btn:focus-visible {
       outline: 2px solid #2563eb;
       outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
     }
 
     .chat-messages {
@@ -247,8 +291,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       justify-content: center;
       font-weight: 600;
       font-size: 0.6875rem;
-      background: linear-gradient(135deg, hsl(${theme.senderBubbleColor}), hsl(${theme.senderBubbleColor} / 0.7));
-      color: hsl(${theme.senderTextColor});
+      background: linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? "214 100% 65%"}), hsl(${theme.avatarBackgroundColor ?? "214 100% 65%"} / 0.7));
+      color: hsl(${theme.avatarTextColor ?? "0 0% 100%"});
     }
 
     .message-avatar img {
@@ -262,6 +306,9 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       max-width: 75%;
       padding: 0.625rem 1rem;
       box-shadow: 0 1px 2px #0000000d;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
     }
 
     .message-bubble.contact {
@@ -306,19 +353,38 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     }
 
     .end-indicator {
-      display: none;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .end-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: #f3f4f6;
+      border-radius: 2rem;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .end-badge-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: #10b981;
     }
 
     .response-options {
       border-top: 1px solid #e5e7eb;
       padding: 1rem;
-      background: white;
+      background: hsl(${responsePanelBackground});
     }
 
     .options-label {
       font-size: 0.6875rem;
       font-weight: 500;
-      color: #6b7280;
+      color: hsl(${responsePanelLabelColor});
       text-transform: uppercase;
       letter-spacing: 0.05em;
       margin-bottom: 0.75rem;
@@ -332,9 +398,10 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
     .option-btn {
       padding: 0.5rem 1rem;
-      border-radius: 0.75rem;
+      border-radius: ${responseOptionBorderRadius / 16}rem;
       border: 1px solid #e5e7eb;
-      background: white;
+      background: hsl(${responseOptionBackground});
+      color: hsl(${responseOptionTextColor});
       cursor: pointer;
       font-size: 0.875rem;
       transition: all 0.2s;
@@ -349,6 +416,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     .option-btn:focus-visible {
       outline: 2px solid #2563eb;
       outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
     }
 
     .option-btn:disabled {
@@ -361,6 +429,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 1rem;
     }
 
     .start-content {
@@ -422,6 +491,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     .start-btn:focus-visible {
       outline: 2px solid #2563eb;
       outline-offset: 2px;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2);
     }
 
     .start-btn:disabled {
@@ -429,10 +499,48 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       cursor: not-allowed;
       transform: none;
     }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 480px) {
+      .chat-header {
+        padding: 0.625rem 0.75rem;
+        gap: 0.625rem;
+      }
+      .chat-messages {
+        padding: 0.75rem;
+        gap: 0.75rem;
+      }
+      .response-options {
+        padding: 0.75rem;
+      }
+      .message-bubble {
+        max-width: 85%;
+      }
+      .avatar {
+        width: 2.25rem;
+        height: 2.25rem;
+      }
+      .message-avatar {
+        width: 1.75rem;
+        height: 1.75rem;
+        margin-right: 0.5rem;
+      }
+      .start-content {
+        padding: 1rem;
+      }
+      .reset-btn {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.8125rem;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="chat-container" id="app" role="region" aria-label="Chat conversation"></div>
+  <!-- Skip link for keyboard users -->
+  <a href="#messages-area" class="skip-link" id="skip-link">Skip to conversation</a>
+  
+  <div class="chat-container" id="app" role="region" aria-label="Interactive chat conversation with ${escapeHTML(theme.contactName)}"></div>
+  
   <!-- Hidden live region for screen reader announcements -->
   <div aria-live="assertive" aria-atomic="true" class="sr-only" id="status-announcer"></div>
 
@@ -599,12 +707,12 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
           // Response options (hide while typing)
           if (currentMessage && !currentMessage.isEndpoint && visibleOptions.length > 0 && !isTyping) {
-            html += '<nav class="response-options" role="group" aria-label="Response options">';
-            html += '<div class="options-label" id="options-label" aria-hidden="true">Choose a response</div>';
-            html += '<div class="options-container">';
+            html += '<nav class="response-options" role="group" aria-labelledby="options-label" aria-describedby="options-instruction">';
+            html += '<p class="options-label" id="options-label">' + ${JSON.stringify(responsePanelLabelText)} + '</p>';
+            html += '<p class="sr-only" id="options-instruction">Use Tab to navigate between options, Enter or Space to select</p>';
+            html += '<div class="options-container" role="list">';
             visibleOptions.forEach(function(opt, index) {
-              const isFirst = index === 0;
-              html += '<button class="option-btn" id="option-' + opt.id + '" onclick="handleSelect(\\'' + opt.id + '\\')"' + (!opt.text ? ' disabled aria-disabled="true"' : '') + ' aria-label="Respond: ' + escapeForAriaLabel(opt.text || 'Empty option') + '">';
+              html += '<button class="option-btn" role="listitem" id="option-' + opt.id + '" onclick="handleSelect(\\'' + opt.id + '\\')"' + (!opt.text ? ' disabled aria-disabled="true"' : '') + ' aria-label="Respond with: ' + escapeForAriaLabel(opt.text || 'Empty option') + '">';
               html += opt.text || 'Empty option';
               html += '</button>';
             });
@@ -709,6 +817,26 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
           render();
         }
       };
+
+      // Keyboard event handling
+      document.addEventListener('keydown', function(e) {
+        // Escape to reset conversation
+        if (e.key === 'Escape' && isPlaying) {
+          handleReset();
+        }
+      });
+
+      // Skip link click handler - focus messages area
+      document.getElementById('skip-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        const messagesArea = document.getElementById('messages-area');
+        if (messagesArea) {
+          messagesArea.focus();
+        } else {
+          // If no messages yet, focus start button
+          focusElement('#start-btn');
+        }
+      });
 
       render();
       
