@@ -12,6 +12,7 @@ import { useScenario, PendingConnection } from "@/context/ScenarioContext";
 import { ResponseOption, ScenarioVariable, VariableAssignment, VariableCondition, VariableValue } from "@/types/scenario";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Trash2, Link2, Unlink, Zap, Eye } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -25,6 +26,7 @@ interface ResponseOptionRowProps {
   pendingConnection: PendingConnection | null;
   isConnecting: boolean;
   internalTabIndex?: number;
+  isExpanded?: boolean;
 }
 export function ResponseOptionRow({
   option,
@@ -33,7 +35,8 @@ export function ResponseOptionRow({
   variables,
   pendingConnection,
   isConnecting,
-  internalTabIndex
+  internalTabIndex,
+  isExpanded
 }: ResponseOptionRowProps) {
   const {
     updateResponseOption,
@@ -112,35 +115,58 @@ export function ResponseOptionRow({
 
   const conditionVariable = getConditionVariable();
   return <TooltipProvider>
-      <div className={cn("group relative flex items-center gap-2 rounded-lg bg-secondary/30 p-2", isPendingSource && "ring-2 ring-primary animate-pulse")}>
-        <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-xs font-semibold text-primary shrink-0">
-          {index + 1}
+      <div className={cn(
+        "group relative flex gap-2 rounded-lg bg-secondary/30 p-2 transition-all duration-200",
+        isPendingSource && "ring-2 ring-primary animate-pulse",
+        isExpanded ? "flex-col items-stretch" : "flex-row items-center"
+      )}>
+        <div className={cn("flex gap-2", isExpanded ? "items-start" : "items-center")}>
+          <div className="flex h-5 w-5 items-center justify-center rounded bg-primary/10 text-xs font-semibold text-primary shrink-0">
+            {index + 1}
+          </div>
+          
+          {isExpanded ? (
+            <Textarea 
+              value={option.text} 
+              onChange={e => updateResponseOption(messageId, option.id, e.target.value)} 
+              placeholder="Response text..." 
+              tabIndex={internalTabIndex} 
+              className="flex-1 min-h-[60px] text-xs rounded-md border-border/30 bg-card nodrag resize-none" 
+            />
+          ) : (
+            <Input 
+              value={option.text} 
+              onChange={e => updateResponseOption(messageId, option.id, e.target.value)} 
+              placeholder="Response text..." 
+              tabIndex={internalTabIndex} 
+              className="flex-1 h-7 text-xs rounded-md border-border/30 bg-card nodrag" 
+            />
+          )}
         </div>
-        
-        <Input value={option.text} onChange={e => updateResponseOption(messageId, option.id, e.target.value)} placeholder="Response text..." tabIndex={internalTabIndex} className="flex-1 h-7 text-xs rounded-md border-border/30 bg-card nodrag" />
 
-        {/* Variable indicators */}
-        {option.setsVariable && variables[option.setsVariable.variableId] && <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="flex items-center gap-0.5 text-[10px] bg-warning/20 text-warning px-1.5 py-1.5 rounded font-medium">
-                <Zap className="h-2.5 w-2.5" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>Sets: {variables[option.setsVariable.variableId].name} = {formatDisplayValue(option.setsVariable.value)}</p>
-            </TooltipContent>
-          </Tooltip>}
+        <div className={cn("flex items-center gap-1", isExpanded && "justify-end")}>
+          {/* Variable indicators */}
+          {option.setsVariable && variables[option.setsVariable.variableId] && <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="flex items-center gap-0.5 text-[10px] bg-warning/20 text-warning px-1.5 py-1.5 rounded font-medium">
+                  <Zap className="h-2.5 w-2.5" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Sets: {variables[option.setsVariable.variableId].name} = {formatDisplayValue(option.setsVariable.value)}</p>
+              </TooltipContent>
+            </Tooltip>}
 
-        {option.condition && variables[option.condition.variableId] && <Tooltip>
-            <TooltipTrigger asChild>
-              <span className="flex items-center gap-0.5 text-[10px] bg-info/20 text-info px-1.5 py-1.5 rounded font-medium">
-                <Eye className="h-2.5 w-2.5" />
-              </span>
-            </TooltipTrigger>
-            <TooltipContent side="top">
-              <p>Requires: {variables[option.condition.variableId].name} = {formatDisplayValue(option.condition.requiredValue)}</p>
-            </TooltipContent>
-          </Tooltip>}
+          {option.condition && variables[option.condition.variableId] && <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="flex items-center gap-0.5 text-[10px] bg-info/20 text-info px-1.5 py-1.5 rounded font-medium">
+                  <Eye className="h-2.5 w-2.5" />
+                </span>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <p>Requires: {variables[option.condition.variableId].name} = {formatDisplayValue(option.condition.requiredValue)}</p>
+              </TooltipContent>
+            </Tooltip>}
 
         {/* Variable configuration popover */}
         {variableList.length > 0 && <Popover>
@@ -314,6 +340,7 @@ export function ResponseOptionRow({
         <Button variant="ghost" size="icon" onClick={() => deleteResponseOption(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F] opacity-0 group-hover:opacity-100">
           <Trash2 className="h-3 w-3" />
         </Button>
+        </div>
 
         {/* Output handle for this option */}
         <Handle type="source" position={Position.Right} id={option.id} className={cn("!w-3 !h-3 !border-2 !border-background !right-[-6px]", option.nextMessageId ? "!bg-success" : "!bg-primary")} style={{
