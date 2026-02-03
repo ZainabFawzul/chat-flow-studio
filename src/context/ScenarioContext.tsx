@@ -60,7 +60,7 @@ function migrateScenario(input: any): ScenarioData {
 // Pending connection state for click-to-connect
 export interface PendingConnection {
   sourceMessageId: string;
-  optionId: string;
+  optionId: string | null; // null for direct message-to-message connections
 }
 
 // Action types
@@ -79,7 +79,9 @@ type ScenarioAction =
   | { type: "DELETE_RESPONSE_OPTION"; payload: { messageId: string; optionId: string } }
   | { type: "ADD_FOLLOW_UP_MESSAGE"; payload: { parentMessageId: string; optionId: string; content: string; position: NodePosition } }
   | { type: "CONNECT_NODES"; payload: { sourceMessageId: string; optionId: string; targetMessageId: string } }
+  | { type: "CONNECT_MESSAGE_DIRECT"; payload: { sourceMessageId: string; targetMessageId: string } }
   | { type: "DISCONNECT_OPTION"; payload: { messageId: string; optionId: string } }
+  | { type: "DISCONNECT_MESSAGE_DIRECT"; payload: { messageId: string } }
   | { type: "REORDER_OPTIONS"; payload: { messageId: string; fromIndex: number; toIndex: number } }
   | { type: "RESET_SCENARIO" }
   // Variable actions
@@ -378,6 +380,40 @@ function scenarioReducer(state: ScenarioData, action: ScenarioAction): ScenarioD
       };
     }
 
+    case "CONNECT_MESSAGE_DIRECT": {
+      const { sourceMessageId, targetMessageId } = action.payload;
+      if (!state.messages[sourceMessageId] || !state.messages[targetMessageId]) return state;
+      
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [sourceMessageId]: {
+            ...state.messages[sourceMessageId],
+            nextMessageId: targetMessageId,
+          },
+        },
+        updatedAt: now,
+      };
+    }
+
+    case "DISCONNECT_MESSAGE_DIRECT": {
+      const { messageId } = action.payload;
+      if (!state.messages[messageId]) return state;
+      
+      return {
+        ...state,
+        messages: {
+          ...state.messages,
+          [messageId]: {
+            ...state.messages[messageId],
+            nextMessageId: null,
+          },
+        },
+        updatedAt: now,
+      };
+    }
+
     case "REORDER_OPTIONS": {
       const { messageId, fromIndex, toIndex } = action.payload;
       if (!state.messages[messageId]) return state;
@@ -530,7 +566,9 @@ interface ScenarioContextType {
   deleteResponseOption: (messageId: string, optionId: string) => void;
   addFollowUpMessage: (parentMessageId: string, optionId: string, content: string, position: NodePosition) => void;
   connectNodes: (sourceMessageId: string, optionId: string, targetMessageId: string) => void;
+  connectMessageDirect: (sourceMessageId: string, targetMessageId: string) => void;
   disconnectOption: (messageId: string, optionId: string) => void;
+  disconnectMessageDirect: (messageId: string) => void;
   reorderOptions: (messageId: string, fromIndex: number, toIndex: number) => void;
   // Variables
   addVariable: (name: string, type: import("@/types/scenario").VariableType) => void;
@@ -541,7 +579,7 @@ interface ScenarioContextType {
   setMessageCondition: (messageId: string, condition: VariableCondition | null) => void;
   // Click-to-connect
   pendingConnection: PendingConnection | null;
-  startConnection: (sourceMessageId: string, optionId: string) => void;
+  startConnection: (sourceMessageId: string, optionId: string | null) => void;
   cancelConnection: () => void;
   completeConnection: (targetMessageId: string) => void;
   // Import/Export
@@ -634,8 +672,16 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "CONNECT_NODES", payload: { sourceMessageId, optionId, targetMessageId } });
   }, []);
 
+  const connectMessageDirect = useCallback((sourceMessageId: string, targetMessageId: string) => {
+    dispatch({ type: "CONNECT_MESSAGE_DIRECT", payload: { sourceMessageId, targetMessageId } });
+  }, []);
+
   const disconnectOption = useCallback((messageId: string, optionId: string) => {
     dispatch({ type: "DISCONNECT_OPTION", payload: { messageId, optionId } });
+  }, []);
+
+  const disconnectMessageDirect = useCallback((messageId: string) => {
+    dispatch({ type: "DISCONNECT_MESSAGE_DIRECT", payload: { messageId } });
   }, []);
 
   const reorderOptions = useCallback((messageId: string, fromIndex: number, toIndex: number) => {
@@ -668,7 +714,7 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Click-to-connect actions
-  const startConnection = useCallback((sourceMessageId: string, optionId: string) => {
+  const startConnection = useCallback((sourceMessageId: string, optionId: string | null) => {
     setPendingConnection({ sourceMessageId, optionId });
   }, []);
 
@@ -678,14 +724,26 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
 
   const completeConnection = useCallback((targetMessageId: string) => {
     if (pendingConnection) {
-      dispatch({
-        type: "CONNECT_NODES",
-        payload: {
-          sourceMessageId: pendingConnection.sourceMessageId,
-          optionId: pendingConnection.optionId,
-          targetMessageId,
-        },
-      });
+      if (pendingConnection.optionId) {
+        // Response option connection
+        dispatch({
+          type: "CONNECT_NODES",
+          payload: {
+            sourceMessageId: pendingConnection.sourceMessageId,
+            optionId: pendingConnection.optionId,
+            targetMessageId,
+          },
+        });
+      } else {
+        // Direct message-to-message connection
+        dispatch({
+          type: "CONNECT_MESSAGE_DIRECT",
+          payload: {
+            sourceMessageId: pendingConnection.sourceMessageId,
+            targetMessageId,
+          },
+        });
+      }
       setPendingConnection(null);
     }
   }, [pendingConnection]);
@@ -715,7 +773,9 @@ export function ScenarioProvider({ children }: { children: React.ReactNode }) {
         deleteResponseOption,
         addFollowUpMessage,
         connectNodes,
+        connectMessageDirect,
         disconnectOption,
+        disconnectMessageDirect,
         reorderOptions,
         // Variables
         addVariable,

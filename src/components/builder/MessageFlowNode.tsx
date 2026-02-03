@@ -14,7 +14,7 @@ import { ChatMessage, ScenarioVariable, VariableValue } from "@/types/scenario";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Flag, Plus, Trash2, Eye, MousePointerClick } from "lucide-react";
+import { Flag, Plus, Trash2, Eye, MousePointerClick, Link2, Unlink } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -46,7 +46,9 @@ function MessageFlowNodeComponent({
     toggleEndpoint,
     addResponseOption,
     completeConnection,
-    setMessageCondition
+    setMessageCondition,
+    startConnection,
+    disconnectMessageDirect
   } = useScenario();
   const [newOptionText, setNewOptionText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -58,10 +60,11 @@ function MessageFlowNodeComponent({
       setNewOptionText("");
     }
   };
-  const isComplete = message.isEndpoint || message.responseOptions.length > 0;
+  const isComplete = message.isEndpoint || message.responseOptions.length > 0 || !!message.nextMessageId;
   const isConnecting = pendingConnection !== null;
   const isPendingSource = pendingConnection?.sourceMessageId === message.id;
   const canReceiveConnection = isConnecting && !isPendingSource;
+  const hasNoResponses = message.responseOptions.length === 0 && !message.isEndpoint;
   const variableList = Object.values(variables || {});
   const handleMessageCondition = (variableId: string | null, requiredValue: VariableValue) => {
     if (variableId) {
@@ -295,12 +298,74 @@ function MessageFlowNodeComponent({
           <Textarea value={message.content} onChange={e => updateMessage(message.id, e.target.value)} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag" />
 
           {/* Status indicators */}
-          {!isComplete && <div className="mt-2">
+          {!isComplete && !hasNoResponses && <div className="mt-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/15 px-2 py-0.5 text-xs font-medium text-warning">
                 Add response options
               </span>
             </div>}
         </div>
+
+        {/* Direct message connection for messages without responses */}
+        {hasNoResponses && (
+          <div className="border-t border-border/30 p-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">
+                No responses - connect directly to next message
+              </span>
+              <div className="flex items-center gap-1">
+                {/* Link button for direct connection */}
+                {!message.nextMessageId && !isConnecting && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => startConnection(message.id, null)} 
+                        tabIndex={internalTabIndex} 
+                        className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]"
+                        aria-label="Link to another message"
+                      >
+                        <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p>Connect to next message</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+                {/* Unlink button when connected */}
+                {message.nextMessageId && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => disconnectMessageDirect(message.id)} 
+                        tabIndex={internalTabIndex} 
+                        className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
+                      >
+                        <Unlink className="h-3.5 w-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p>Disconnect</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
+            </div>
+            {/* Handle for direct connection */}
+            <Handle 
+              type="source" 
+              position={Position.Right} 
+              id="direct" 
+              className={cn(
+                "!w-3 !h-3 !border-2 !border-background !right-[-6px] !top-auto !bottom-4",
+                message.nextMessageId ? "!bg-success" : "!bg-primary"
+              )} 
+            />
+          </div>
+        )}
 
         {/* Response Options */}
         {!message.isEndpoint && <div className="border-t border-border/30 p-3 space-y-2" data-walkthrough="response-options-section">
