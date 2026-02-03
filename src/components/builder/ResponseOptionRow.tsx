@@ -128,10 +128,20 @@ export function ResponseOptionRow({
           {isExpanded ? (
             <Textarea 
               value={option.text} 
-              onChange={e => updateResponseOption(messageId, option.id, e.target.value)} 
+              onChange={e => {
+                updateResponseOption(messageId, option.id, e.target.value);
+                // Auto-resize textarea
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+              }}
+              onFocus={e => {
+                // Set initial height on focus
+                e.target.style.height = 'auto';
+                e.target.style.height = e.target.scrollHeight + 'px';
+              }}
               placeholder="Response text..." 
               tabIndex={internalTabIndex} 
-              className="flex-1 min-h-[60px] text-xs rounded-md border-border/30 bg-card nodrag resize-none" 
+              className="flex-1 min-h-[40px] text-xs rounded-md border-border/30 bg-card nodrag resize-none overflow-hidden" 
             />
           ) : (
             <Input 
@@ -173,7 +183,7 @@ export function ResponseOptionRow({
             <Tooltip>
               <TooltipTrigger asChild>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" tabIndex={internalTabIndex} className={cn("h-6 w-6 rounded text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]", option.setsVariable || option.condition ? "opacity-100" : "opacity-0 group-hover:opacity-100")} data-walkthrough="trigger-button">
+                  <Button variant="ghost" size="icon" tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]" data-walkthrough="trigger-button">
                     <Zap className="h-3 w-3" />
                   </Button>
                 </PopoverTrigger>
@@ -316,7 +326,7 @@ export function ResponseOptionRow({
         {/* Link button (only when not connected) */}
         {!option.nextMessageId && !isConnecting && <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => startConnection(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F] opacity-0 group-hover:opacity-100 focus:opacity-100" aria-label={`Link "${option.text || 'response'}" to another message`} data-walkthrough="link-button">
+              <Button variant="ghost" size="icon" onClick={() => startConnection(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]" aria-label={`Link "${option.text || 'response'}" to another message`} data-walkthrough="link-button">
                 <Link2 className="h-3 w-3" aria-hidden="true" />
               </Button>
             </TooltipTrigger>
@@ -328,7 +338,7 @@ export function ResponseOptionRow({
         {/* Unlink button (only when connected) */}
         {option.nextMessageId && <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => disconnectOption(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F] opacity-0 group-hover:opacity-100">
+              <Button variant="ghost" size="icon" onClick={() => disconnectOption(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]">
                 <Unlink className="h-3 w-3" />
               </Button>
             </TooltipTrigger>
@@ -337,7 +347,7 @@ export function ResponseOptionRow({
             </TooltipContent>
           </Tooltip>}
 
-        <Button variant="ghost" size="icon" onClick={() => deleteResponseOption(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F] opacity-0 group-hover:opacity-100">
+        <Button variant="ghost" size="icon" onClick={() => deleteResponseOption(messageId, option.id)} tabIndex={internalTabIndex} className="h-6 w-6 rounded text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]">
           <Trash2 className="h-3 w-3" />
         </Button>
         </div>
