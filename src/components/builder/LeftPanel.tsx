@@ -36,10 +36,10 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
   }
 
   return (
-    <aside className="flex h-full w-full flex-col bg-background" aria-label="Builder panel">
+    <div className="flex h-full w-full flex-col bg-background">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-full flex-col">
-        <div className="px-4 pt-4">
-          <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-secondary/50 rounded-xl" aria-label="Builder tabs">
+        <div className="px-4 pt-4" role="navigation" aria-label="Builder tabs">
+          <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-secondary/50 rounded-xl">
             <TabsTrigger 
               value="theme" 
               className="rounded-lg text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all"
@@ -67,6 +67,6 @@ export function LeftPanel({ requestedTab }: LeftPanelProps) {
           </div>
         </TabsContent>
       </Tabs>
-    </aside>
+    </div>
   );
 }

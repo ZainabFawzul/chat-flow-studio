@@ -33,9 +33,9 @@ function BuilderContent() {
       <TopBar onRestartWalkthrough={walkthrough.startWalkthrough} />
       <main id="main-content" className="flex flex-1 overflow-hidden">
         {/* Left Panel - 60% for Canvas/Theme */}
-        <aside className="w-3/5 min-w-0 lg:min-w-[480px] border-r border-border/50" aria-label="Builder panel">
+        <section className="w-3/5 min-w-0 lg:min-w-[480px] border-r border-border/50" aria-label="Builder controls">
           <LeftPanel requestedTab={walkthrough.requestedTab} />
-        </aside>
+        </section>
         
         {/* Right Panel - 40% for Chat Preview */}
         <section 

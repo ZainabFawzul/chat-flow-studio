@@ -182,6 +182,8 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
     <div 
       ref={containerRef}
       className={`${isExpanded ? "fixed inset-0 z-50 bg-background" : "h-full"}`}
+      role="application"
+      aria-label="Message flow canvas. Use Tab to navigate to controls, or click to interact with the canvas."
     >
       <ReactFlow
         nodes={nodes}
@@ -196,6 +198,8 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         proOptions={{ hideAttribution: true }}
         deleteKeyCode={null}
         selectionKeyCode={null}
+        tabIndex={0}
+        aria-label="Flow canvas area"
       >
         <Background
           variant={BackgroundVariant.Dots}
