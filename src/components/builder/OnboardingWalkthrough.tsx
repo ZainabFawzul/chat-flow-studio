@@ -135,17 +135,27 @@ export function OnboardingWalkthrough({
 
   // Focus management: save previous focus and move focus to dialog
   useEffect(() => {
-    if (isActive && dialogRef.current) {
-      previousActiveElement.current = document.activeElement as HTMLElement;
+    if (isActive && spotlightRect && dialogRef.current) {
+      // Only save previous focus once when dialog first becomes visible
+      if (!previousActiveElement.current) {
+        previousActiveElement.current = document.activeElement as HTMLElement;
+      }
       // Focus the first focusable element in the dialog
       const firstFocusable = dialogRef.current.querySelector<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
-      if (firstFocusable) {
-        firstFocusable.focus();
+      if (firstFocusable && document.activeElement !== firstFocusable) {
+        // Small delay to ensure dialog is rendered
+        requestAnimationFrame(() => {
+          firstFocusable.focus();
+        });
       }
-    } else if (!isActive && previousActiveElement.current) {
-      // Return focus when dialog closes
+    }
+  }, [isActive, spotlightRect]);
+
+  // Return focus when dialog closes
+  useEffect(() => {
+    if (!isActive && previousActiveElement.current) {
       previousActiveElement.current.focus();
       previousActiveElement.current = null;
     }
@@ -153,7 +163,7 @@ export function OnboardingWalkthrough({
 
   // Focus trap and keyboard navigation
   useEffect(() => {
-    if (!isActive || !dialogRef.current) return;
+    if (!isActive) return;
     
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -174,32 +184,54 @@ export function OnboardingWalkthrough({
         return;
       }
       
-      // Focus trap with Tab key
+      // Focus trap with Tab key - ALWAYS trap, even if focus is outside dialog
       if (e.key === "Tab" && dialogRef.current) {
+        e.preventDefault();
+        
         const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
+        
+        if (focusableElements.length === 0) return;
+        
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
         
+        // Check if focus is currently inside the dialog
+        const focusIsInDialog = dialogRef.current.contains(document.activeElement);
+        
+        if (!focusIsInDialog) {
+          // Focus is outside dialog, bring it in
+          firstElement.focus();
+          return;
+        }
+        
         if (e.shiftKey) {
-          // Shift + Tab: if on first element, go to last
+          // Shift + Tab: go to previous, or wrap to last
           if (document.activeElement === firstElement) {
-            e.preventDefault();
             lastElement.focus();
+          } else {
+            const currentIndex = Array.from(focusableElements).indexOf(document.activeElement as HTMLElement);
+            if (currentIndex > 0) {
+              focusableElements[currentIndex - 1].focus();
+            }
           }
         } else {
-          // Tab: if on last element, go to first
+          // Tab: go to next, or wrap to first
           if (document.activeElement === lastElement) {
-            e.preventDefault();
             firstElement.focus();
+          } else {
+            const currentIndex = Array.from(focusableElements).indexOf(document.activeElement as HTMLElement);
+            if (currentIndex < focusableElements.length - 1) {
+              focusableElements[currentIndex + 1].focus();
+            }
           }
         }
       }
     };
     
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown, true); // Use capture phase
+    return () => window.removeEventListener("keydown", handleKeyDown, true);
   }, [isActive, onNext, onPrevious, onSkip]);
 
   if (!isActive || !spotlightRect) return null;
