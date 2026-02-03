@@ -240,15 +240,9 @@ export function ThemeTab() {
               <Label htmlFor="start-btn-radius" className="mb-2 block text-sm font-medium">
                 Button Corner Radius (px)
               </Label>
-              <Input
-                id="start-btn-radius"
-                type="number"
-                min={0}
-                max={24}
-                value={theme.startButtonBorderRadius ?? 12}
-                onChange={e => updateTheme({ startButtonBorderRadius: Number(e.target.value) })}
-                className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
-              />
+              <Input id="start-btn-radius" type="number" min={0} max={24} value={theme.startButtonBorderRadius ?? 12} onChange={e => updateTheme({
+              startButtonBorderRadius: Number(e.target.value)
+            })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
 
             {/* Preview */}
@@ -299,7 +293,7 @@ export function ThemeTab() {
             </div>
 
             {/* Rise 360 Integration */}
-            <div className="flex items-center justify-between rounded-xl bg-secondary/30 p-3">
+            <div className="flex items-center justify-between rounded-xl p-3 bg-primary-foreground">
               <div className="flex flex-col gap-0.5">
                 <div className="flex items-center gap-2">
                   <Label htmlFor="rise-completion" className="text-sm font-medium">
@@ -350,15 +344,9 @@ export function ThemeTab() {
                   <Label htmlFor="frame-radius" className="mb-2 block text-sm font-medium">
                     Corner Radius (px)
                   </Label>
-                  <Input
-                    id="frame-radius"
-                    type="number"
-                    min={0}
-                    max={32}
-                    value={theme.frameBorderRadius ?? 16}
-                    onChange={e => updateTheme({ frameBorderRadius: Number(e.target.value) })}
-                    className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
-                  />
+                  <Input id="frame-radius" type="number" min={0} max={32} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
+                frameBorderRadius: Number(e.target.value)
+              })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
                 </div>
 
                 {/* Border Width */}
@@ -366,15 +354,9 @@ export function ThemeTab() {
                   <Label htmlFor="frame-border-width" className="mb-2 block text-sm font-medium">
                     Border Width (px)
                   </Label>
-                  <Input
-                    id="frame-border-width"
-                    type="number"
-                    min={0}
-                    max={4}
-                    value={theme.frameBorderWidth ?? 1}
-                    onChange={e => updateTheme({ frameBorderWidth: Number(e.target.value) })}
-                    className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
-                  />
+                  <Input id="frame-border-width" type="number" min={0} max={4} value={theme.frameBorderWidth ?? 1} onChange={e => updateTheme({
+                frameBorderWidth: Number(e.target.value)
+              })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
                 </div>
 
                 {/* Border Color */}
@@ -398,15 +380,9 @@ export function ThemeTab() {
               <Label htmlFor="font-size" className="mb-2 block text-sm font-medium">
                 Message Size (px)
               </Label>
-              <Input
-                id="font-size"
-                type="number"
-                min={12}
-                max={20}
-                value={theme.fontSize}
-                onChange={e => updateTheme({ fontSize: Number(e.target.value) })}
-                className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
-              />
+              <Input id="font-size" type="number" min={12} max={20} value={theme.fontSize} onChange={e => updateTheme({
+              fontSize: Number(e.target.value)
+            })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
             
             {/* Show Reset Button */}
@@ -540,15 +516,9 @@ export function ThemeTab() {
               <Label htmlFor="response-option-radius" className="mb-2 block text-sm font-medium">
                 Option Corner Radius (px)
               </Label>
-              <Input
-                id="response-option-radius"
-                type="number"
-                min={0}
-                max={24}
-                value={theme.responseOptionBorderRadius ?? 12}
-                onChange={e => updateTheme({ responseOptionBorderRadius: Number(e.target.value) })}
-                className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors"
-              />
+              <Input id="response-option-radius" type="number" min={0} max={24} value={theme.responseOptionBorderRadius ?? 12} onChange={e => updateTheme({
+              responseOptionBorderRadius: Number(e.target.value)
+            })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
 
             {/* Preview */}
