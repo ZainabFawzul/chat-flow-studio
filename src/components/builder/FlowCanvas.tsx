@@ -7,7 +7,7 @@
  * @usage Rendered in LeftPanel Canvas tab
  */
 
-import { useCallback, useMemo, useEffect, useRef } from "react";
+import { useCallback, useMemo, useEffect, useRef, useState } from "react";
 import {
   ReactFlow,
   Background,
@@ -18,6 +18,7 @@ import {
   BackgroundVariant,
   NodeChange,
   Panel,
+  applyNodeChanges,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useScenario } from "@/context/ScenarioContext";
@@ -52,6 +53,9 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const focusedNodeIndexRef = useRef<number>(0);
+  
+  // Track selected node ID for expand/collapse behavior
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   // Get list of valid target node IDs (all nodes except the source)
   const targetNodeIds = useMemo(() => {
@@ -121,6 +125,7 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
       type: "messageNode",
       // Fallback position for messages without coordinates (legacy data)
       position: message.position || { x: 100 + (index % 3) * 400, y: 100 + Math.floor(index / 3) * 300 },
+      selected: message.id === selectedNodeId,
       data: {
         message,
         isRoot: message.id === scenario.rootMessageId,
@@ -129,7 +134,7 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         variables: scenario.variables || {},
       },
     }));
-  }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables]);
+  }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables, selectedNodeId]);
 
   // Convert response options to React Flow edges
   const edges: Edge[] = useMemo(() => {
@@ -156,6 +161,10 @@ export function FlowCanvas({ isExpanded, onToggleExpand }: FlowCanvasProps) {
       changes.forEach((change) => {
         if (change.type === "position" && change.position && change.id) {
           updateNodePosition(change.id, change.position);
+        }
+        // Handle selection changes
+        if (change.type === "select" && change.id) {
+          setSelectedNodeId(change.selected ? change.id : null);
         }
       });
     },
