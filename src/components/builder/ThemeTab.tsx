@@ -249,10 +249,9 @@ export function ThemeTab() {
               })} />
                 <div className="flex items-center gap-2">
                   <Label htmlFor="start-btn-radius" className="text-sm font-medium whitespace-nowrap">Roundness</Label>
-                  <input id="start-btn-radius" type="range" min={0} max={20} value={theme.startButtonBorderRadius ?? 12} onChange={e => updateTheme({
-                  startButtonBorderRadius: Number(e.target.value)
-                })} className="w-20 h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary" />
-                  <span className="text-xs text-muted-foreground w-6">{theme.startButtonBorderRadius ?? 12}</span>
+                  <Input id="start-btn-radius" type="number" min={0} max={32} value={theme.startButtonBorderRadius ?? 12} onChange={e => updateTheme({
+                    startButtonBorderRadius: Math.min(32, Math.max(0, Number(e.target.value) || 0))
+                  })} className="w-16 h-8" />
                 </div>
               </div>
               <ContrastWarning bgColor={theme.startButtonColor ?? "221 83% 40%"} textColor={theme.startButtonTextColor ?? "0 0% 100%"} />
