@@ -36,7 +36,9 @@ function migrateScenario(input: any): ScenarioData {
     receiverBorderRadius: existingTheme?.receiverBorderRadius ?? DEFAULT_THEME.receiverBorderRadius,
     // Start screen customization (new fields)
     startScreenTitle: existingTheme?.startScreenTitle ?? DEFAULT_THEME.startScreenTitle,
+    startScreenTitleColor: existingTheme?.startScreenTitleColor ?? DEFAULT_THEME.startScreenTitleColor,
     startScreenSubtitle: existingTheme?.startScreenSubtitle ?? DEFAULT_THEME.startScreenSubtitle,
+    startScreenSubtitleColor: existingTheme?.startScreenSubtitleColor ?? DEFAULT_THEME.startScreenSubtitleColor,
     startButtonText: existingTheme?.startButtonText ?? DEFAULT_THEME.startButtonText,
     showResetButton: existingTheme?.showResetButton ?? DEFAULT_THEME.showResetButton,
   };

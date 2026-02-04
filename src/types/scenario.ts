@@ -76,7 +76,9 @@ export interface ChatTheme {
   fontFamily: string;
   // Start screen customization
   startScreenTitle: string;
+  startScreenTitleColor: string; // HSL for title text
   startScreenSubtitle: string;
+  startScreenSubtitleColor: string; // HSL for subtitle text
   startButtonText: string;
   startButtonColor: string;
   startButtonTextColor: string;
@@ -137,7 +139,9 @@ export const DEFAULT_THEME: ChatTheme = {
   fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif",
   // Start screen customization
   startScreenTitle: "Ready to Start",
+  startScreenTitleColor: "222 47% 11%", // Dark foreground
   startScreenSubtitle: "Begin the conversation",
+  startScreenSubtitleColor: "220 9% 46%", // Muted foreground
   startButtonText: "Start",
   startButtonColor: "221 83% 40%", // Dark blue - WCAG AA compliant with white (7.5:1)
   startButtonTextColor: "0 0% 100%", // White
