@@ -442,18 +442,7 @@ export function ThemeTab() {
           })} />
             
             {/* Preview */}
-            <div className="mt-2 flex justify-end">
-              <div className="max-w-[80%] px-4 py-2.5 shadow-sm" style={{
-              backgroundColor: `hsl(${theme.senderBubbleColor})`,
-              color: `hsl(${theme.senderTextColor})`,
-              borderTopLeftRadius: `${senderRadius.topLeft}px`,
-              borderTopRightRadius: `${senderRadius.topRight}px`,
-              borderBottomRightRadius: `${senderRadius.bottomRight}px`,
-              borderBottomLeftRadius: `${senderRadius.bottomLeft}px`
-            }}>
-                <span className="text-sm">Preview message</span>
-              </div>
-            </div>
+            
           </div>
         </Section>
 
