@@ -174,7 +174,7 @@ export function ThemeTab() {
                 {/* Color pickers (only when no custom image) */}
                 {!theme.contactAvatar && (
                   <>
-                    <div className="h-6 w-px bg-border/50 mx-1 shrink-0" />
+                    <span className="text-xs font-medium text-muted-foreground mx-1 shrink-0">OR</span>
                     <ColorPicker id="avatar-bg" label="Background" value={theme.avatarBackgroundColor ?? "221 83% 40%"} onChange={value => updateTheme({ avatarBackgroundColor: value })} />
                     <ColorPicker id="avatar-text" label="Text" value={theme.avatarTextColor ?? "0 0% 100%"} onChange={value => updateTheme({ avatarTextColor: value })} />
                   </>
