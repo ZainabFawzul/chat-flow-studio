@@ -290,10 +290,16 @@ export function ChatPreview() {
         {!isPlaying ? (
           <div className="flex h-full items-center justify-center">
             <div className="text-center max-w-sm">
-              <h3 className="text-lg font-semibold text-foreground mb-2">
+              <h3 
+                className="text-lg font-semibold mb-2"
+                style={{ color: `hsl(${theme.startScreenTitleColor ?? '222 47% 11%'})` }}
+              >
                 {startTitle}
               </h3>
-              <p className="text-sm text-muted-foreground mb-4">
+              <p 
+                className="text-sm mb-4"
+                style={{ color: `hsl(${theme.startScreenSubtitleColor ?? '220 9% 46%'})` }}
+              >
                 {startSubtitle}
               </p>
               <button

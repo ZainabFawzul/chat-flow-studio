@@ -194,69 +194,75 @@ export function ThemeTab() {
         {/* Start Screen */}
         <Section icon={<Play className="h-4 w-4" />} title="Start Screen" id="start-screen-heading">
           <div className="flex flex-col gap-5">
-            {/* Chat Background */}
-            <ColorPicker id="chat-bg" label="Background Color" value={theme.chatBackground} onChange={value => updateTheme({
-            chatBackground: value
-          })} />
+            {/* Colors Row */}
+            <div className="flex flex-wrap items-center gap-3">
+              <ColorPicker id="chat-bg" label="Background" value={theme.chatBackground} onChange={value => updateTheme({ chatBackground: value })} />
+              <ColorPicker id="title-color" label="Title Text" value={theme.startScreenTitleColor ?? "222 47% 11%"} onChange={value => updateTheme({ startScreenTitleColor: value })} />
+              <ColorPicker id="subtitle-color" label="Subtitle Text" value={theme.startScreenSubtitleColor ?? "220 9% 46%"} onChange={value => updateTheme({ startScreenSubtitleColor: value })} />
+            </div>
 
+            {/* Title */}
             <div>
               <Label htmlFor="start-title" className="mb-2 block text-sm font-medium">
                 Title
               </Label>
-              <Input id="start-title" value={theme.startScreenTitle ?? "Ready to Start"} onChange={e => updateTheme({
-              startScreenTitle: e.target.value
-            })} placeholder="Ready to Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+              <Input id="start-title" value={theme.startScreenTitle ?? "Ready to Start"} onChange={e => updateTheme({ startScreenTitle: e.target.value })} placeholder="Ready to Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
             
+            {/* Subtitle */}
             <div>
               <Label htmlFor="start-subtitle" className="mb-2 block text-sm font-medium">
                 Subtitle
               </Label>
-              <Input id="start-subtitle" value={theme.startScreenSubtitle ?? "Begin the conversation"} onChange={e => updateTheme({
-              startScreenSubtitle: e.target.value
-            })} placeholder="Begin the conversation" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+              <textarea 
+                id="start-subtitle" 
+                value={theme.startScreenSubtitle ?? "Begin the conversation"} 
+                onChange={e => updateTheme({ startScreenSubtitle: e.target.value })} 
+                placeholder="Begin the conversation" 
+                rows={2}
+                className="w-full rounded-xl border border-border/50 bg-secondary/30 focus:bg-background transition-colors px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              />
             </div>
             
+            {/* Button Label */}
             <div>
               <Label htmlFor="start-button" className="mb-2 block text-sm font-medium">
-                Button Text
+                Button Label
               </Label>
-              <Input id="start-button" value={theme.startButtonText ?? "Start"} onChange={e => updateTheme({
-              startButtonText: e.target.value
-            })} placeholder="Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+              <Input id="start-button" value={theme.startButtonText ?? "Start"} onChange={e => updateTheme({ startButtonText: e.target.value })} placeholder="Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
 
-            {/* Button Colors */}
-            <div className="flex gap-4">
-              <ColorPicker id="start-btn-bg" label="Button Color" value={theme.startButtonColor ?? "221 83% 40%"} onChange={value => updateTheme({
-              startButtonColor: value
-            })} />
-              <ColorPicker id="start-btn-text" label="Button Text" value={theme.startButtonTextColor ?? "0 0% 100%"} onChange={value => updateTheme({
-              startButtonTextColor: value
-            })} />
-            </div>
-
-            {/* Contrast Warning */}
-            <ContrastWarning bgColor={theme.startButtonColor ?? "221 83% 40%"} textColor={theme.startButtonTextColor ?? "0 0% 100%"} />
-
-            {/* Button Shape */}
+            {/* Button Style */}
             <div>
-              <Label htmlFor="start-btn-radius" className="mb-2 block text-sm font-medium">
-                Button Corner Radius (px)
-              </Label>
-              <Input id="start-btn-radius" type="number" min={0} max={24} value={theme.startButtonBorderRadius ?? 12} onChange={e => updateTheme({
-              startButtonBorderRadius: Number(e.target.value)
-            })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+              <Label className="mb-3 block text-sm font-medium">Button Style</Label>
+              <div className="flex flex-wrap items-center gap-3">
+                <ColorPicker id="start-btn-bg" label="Fill" value={theme.startButtonColor ?? "221 83% 40%"} onChange={value => updateTheme({ startButtonColor: value })} />
+                <ColorPicker id="start-btn-text" label="Text" value={theme.startButtonTextColor ?? "0 0% 100%"} onChange={value => updateTheme({ startButtonTextColor: value })} />
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="start-btn-radius" className="text-sm font-medium whitespace-nowrap">Roundness</Label>
+                  <input
+                    id="start-btn-radius"
+                    type="range"
+                    min={0}
+                    max={20}
+                    value={theme.startButtonBorderRadius ?? 12}
+                    onChange={e => updateTheme({ startButtonBorderRadius: Number(e.target.value) })}
+                    className="w-20 h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
+                  />
+                  <span className="text-xs text-muted-foreground w-6">{theme.startButtonBorderRadius ?? 12}</span>
+                </div>
+              </div>
+              <ContrastWarning bgColor={theme.startButtonColor ?? "221 83% 40%"} textColor={theme.startButtonTextColor ?? "0 0% 100%"} />
             </div>
 
             {/* Preview */}
             <div className="mt-2 flex justify-center">
               <button className="inline-flex items-center gap-2 px-5 py-2.5 font-medium" style={{
-              backgroundColor: `hsl(${theme.startButtonColor ?? '221 83% 40%'})`,
-              color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
-              borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
-              boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '221 83% 40%'} / 0.25)`
-            }}>
+                backgroundColor: `hsl(${theme.startButtonColor ?? '221 83% 40%'})`,
+                color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
+                borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
+                boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '221 83% 40%'} / 0.25)`
+              }}>
                 <Play className="h-4 w-4" />
                 {theme.startButtonText ?? "Start"}
               </button>
