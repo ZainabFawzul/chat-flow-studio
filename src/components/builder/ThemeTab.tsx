@@ -150,9 +150,9 @@ export function ThemeTab() {
                   <Avatar className="h-10 w-10 ring-2 ring-border/50 ring-offset-1 ring-offset-background transition-all group-hover:ring-primary/50">
                     {theme.contactAvatar ? <AvatarImage src={theme.contactAvatar} alt={theme.contactName} /> : null}
                     <AvatarFallback className="font-semibold text-sm" style={{
-                      backgroundColor: `hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'})`,
-                      color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`
-                    }}>
+                    backgroundColor: `hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'})`,
+                    color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`
+                  }}>
                       {getInitials(theme.contactName)}
                     </AvatarFallback>
                   </Avatar>
@@ -165,28 +165,28 @@ export function ThemeTab() {
                 </Button>
                 
                 {/* Remove button (only when image uploaded) */}
-                {theme.contactAvatar && (
-                  <Button variant="ghost" size="sm" onClick={() => updateTheme({ contactAvatar: null })} aria-label="Remove avatar" className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0">
+                {theme.contactAvatar && <Button variant="ghost" size="sm" onClick={() => updateTheme({
+                contactAvatar: null
+              })} aria-label="Remove avatar" className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0">
                     <X className="h-3.5 w-3.5" aria-hidden="true" />
-                  </Button>
-                )}
+                  </Button>}
                 
                 {/* Color pickers (only when no custom image) */}
-                {!theme.contactAvatar && (
-                  <>
+                {!theme.contactAvatar && <>
                     <span className="text-xs font-medium text-muted-foreground mx-1 shrink-0">OR</span>
-                    <ColorPicker id="avatar-bg" label="Background" value={theme.avatarBackgroundColor ?? "221 83% 40%"} onChange={value => updateTheme({ avatarBackgroundColor: value })} />
-                    <ColorPicker id="avatar-text" label="Text" value={theme.avatarTextColor ?? "0 0% 100%"} onChange={value => updateTheme({ avatarTextColor: value })} />
-                  </>
-                )}
+                    <ColorPicker id="avatar-bg" label="Background" value={theme.avatarBackgroundColor ?? "221 83% 40%"} onChange={value => updateTheme({
+                  avatarBackgroundColor: value
+                })} />
+                    <ColorPicker id="avatar-text" label="Text" value={theme.avatarTextColor ?? "0 0% 100%"} onChange={value => updateTheme({
+                  avatarTextColor: value
+                })} />
+                  </>}
               </div>
               
               {/* Contrast Warning */}
-              {!theme.contactAvatar && (
-                <div className="mt-3">
+              {!theme.contactAvatar && <div className="mt-3">
                   <ContrastWarning bgColor={theme.avatarBackgroundColor ?? "221 83% 40%"} textColor={theme.avatarTextColor ?? "0 0% 100%"} />
-                </div>
-              )}
+                </div>}
             </div>
           </div>
         </Section>
@@ -196,9 +196,15 @@ export function ThemeTab() {
           <div className="flex flex-col gap-5">
             {/* Colors Row */}
             <div className="flex flex-wrap items-center gap-3">
-              <ColorPicker id="chat-bg" label="Background" value={theme.chatBackground} onChange={value => updateTheme({ chatBackground: value })} />
-              <ColorPicker id="title-color" label="Title Text" value={theme.startScreenTitleColor ?? "222 47% 11%"} onChange={value => updateTheme({ startScreenTitleColor: value })} />
-              <ColorPicker id="subtitle-color" label="Subtitle Text" value={theme.startScreenSubtitleColor ?? "220 9% 46%"} onChange={value => updateTheme({ startScreenSubtitleColor: value })} />
+              <ColorPicker id="chat-bg" label="Background" value={theme.chatBackground} onChange={value => updateTheme({
+              chatBackground: value
+            })} />
+              <ColorPicker id="title-color" label="Title Text" value={theme.startScreenTitleColor ?? "222 47% 11%"} onChange={value => updateTheme({
+              startScreenTitleColor: value
+            })} />
+              <ColorPicker id="subtitle-color" label="Subtitle Text" value={theme.startScreenSubtitleColor ?? "220 9% 46%"} onChange={value => updateTheme({
+              startScreenSubtitleColor: value
+            })} />
             </div>
 
             {/* Title */}
@@ -206,7 +212,9 @@ export function ThemeTab() {
               <Label htmlFor="start-title" className="mb-2 block text-sm font-medium">
                 Title
               </Label>
-              <Input id="start-title" value={theme.startScreenTitle ?? "Ready to Start"} onChange={e => updateTheme({ startScreenTitle: e.target.value })} placeholder="Ready to Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+              <Input id="start-title" value={theme.startScreenTitle ?? "Ready to Start"} onChange={e => updateTheme({
+              startScreenTitle: e.target.value
+            })} placeholder="Ready to Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
             
             {/* Subtitle */}
@@ -214,14 +222,9 @@ export function ThemeTab() {
               <Label htmlFor="start-subtitle" className="mb-2 block text-sm font-medium">
                 Subtitle
               </Label>
-              <textarea 
-                id="start-subtitle" 
-                value={theme.startScreenSubtitle ?? "Begin the conversation"} 
-                onChange={e => updateTheme({ startScreenSubtitle: e.target.value })} 
-                placeholder="Begin the conversation" 
-                rows={2}
-                className="w-full rounded-xl border border-border/50 bg-secondary/30 focus:bg-background transition-colors px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              />
+              <textarea id="start-subtitle" value={theme.startScreenSubtitle ?? "Begin the conversation"} onChange={e => updateTheme({
+              startScreenSubtitle: e.target.value
+            })} placeholder="Begin the conversation" rows={2} className="w-full rounded-xl border border-border/50 bg-secondary/30 focus:bg-background transition-colors px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" />
             </div>
             
             {/* Button Label */}
@@ -229,26 +232,26 @@ export function ThemeTab() {
               <Label htmlFor="start-button" className="mb-2 block text-sm font-medium">
                 Button Label
               </Label>
-              <Input id="start-button" value={theme.startButtonText ?? "Start"} onChange={e => updateTheme({ startButtonText: e.target.value })} placeholder="Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+              <Input id="start-button" value={theme.startButtonText ?? "Start"} onChange={e => updateTheme({
+              startButtonText: e.target.value
+            })} placeholder="Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
 
             {/* Button Style */}
             <div>
               <Label className="mb-3 block text-sm font-medium">Button Style</Label>
               <div className="flex flex-wrap items-center gap-3">
-                <ColorPicker id="start-btn-bg" label="Fill" value={theme.startButtonColor ?? "221 83% 40%"} onChange={value => updateTheme({ startButtonColor: value })} />
-                <ColorPicker id="start-btn-text" label="Text" value={theme.startButtonTextColor ?? "0 0% 100%"} onChange={value => updateTheme({ startButtonTextColor: value })} />
+                <ColorPicker id="start-btn-bg" label="Fill" value={theme.startButtonColor ?? "221 83% 40%"} onChange={value => updateTheme({
+                startButtonColor: value
+              })} />
+                <ColorPicker id="start-btn-text" label="Text" value={theme.startButtonTextColor ?? "0 0% 100%"} onChange={value => updateTheme({
+                startButtonTextColor: value
+              })} />
                 <div className="flex items-center gap-2">
                   <Label htmlFor="start-btn-radius" className="text-sm font-medium whitespace-nowrap">Roundness</Label>
-                  <input
-                    id="start-btn-radius"
-                    type="range"
-                    min={0}
-                    max={20}
-                    value={theme.startButtonBorderRadius ?? 12}
-                    onChange={e => updateTheme({ startButtonBorderRadius: Number(e.target.value) })}
-                    className="w-20 h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary"
-                  />
+                  <input id="start-btn-radius" type="range" min={0} max={20} value={theme.startButtonBorderRadius ?? 12} onChange={e => updateTheme({
+                  startButtonBorderRadius: Number(e.target.value)
+                })} className="w-20 h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-primary" />
                   <span className="text-xs text-muted-foreground w-6">{theme.startButtonBorderRadius ?? 12}</span>
                 </div>
               </div>
@@ -256,17 +259,7 @@ export function ThemeTab() {
             </div>
 
             {/* Preview */}
-            <div className="mt-2 flex justify-center">
-              <button className="inline-flex items-center gap-2 px-5 py-2.5 font-medium" style={{
-                backgroundColor: `hsl(${theme.startButtonColor ?? '221 83% 40%'})`,
-                color: `hsl(${theme.startButtonTextColor ?? '0 0% 100%'})`,
-                borderRadius: `${theme.startButtonBorderRadius ?? 12}px`,
-                boxShadow: `0 4px 12px hsl(${theme.startButtonColor ?? '221 83% 40%'} / 0.25)`
-              }}>
-                <Play className="h-4 w-4" />
-                {theme.startButtonText ?? "Start"}
-              </button>
-            </div>
+            
           </div>
         </Section>
         {/* Frame Settings */}
@@ -551,25 +544,28 @@ export function ThemeTab() {
             <div>
               <Label className="mb-3 block text-sm font-medium">Option Text Alignment</Label>
               <div className="grid grid-cols-3 gap-2">
-                {[
-                  { value: 'left' as const, label: 'Left', icon: AlignLeft },
-                  { value: 'center' as const, label: 'Center', icon: AlignCenter },
-                  { value: 'right' as const, label: 'Right', icon: AlignRight },
-                ].map(({ value, label, icon: Icon }) => (
-                  <button
-                    key={value}
-                    onClick={() => updateTheme({ responseOptionTextAlign: value })}
-                    className={cn(
-                      "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all",
-                      (theme.responseOptionTextAlign ?? 'center') === value
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
-                    )}
-                  >
+                {[{
+                value: 'left' as const,
+                label: 'Left',
+                icon: AlignLeft
+              }, {
+                value: 'center' as const,
+                label: 'Center',
+                icon: AlignCenter
+              }, {
+                value: 'right' as const,
+                label: 'Right',
+                icon: AlignRight
+              }].map(({
+                value,
+                label,
+                icon: Icon
+              }) => <button key={value} onClick={() => updateTheme({
+                responseOptionTextAlign: value
+              })} className={cn("flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all", (theme.responseOptionTextAlign ?? 'center') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
                     <Icon className="h-5 w-5" />
                     <span className="text-xs font-medium">{label}</span>
-                  </button>
-                ))}
+                  </button>)}
               </div>
             </div>
 
@@ -588,7 +584,7 @@ export function ThemeTab() {
                 backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
                 color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
                 borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
-                textAlign: theme.responseOptionTextAlign ?? 'center',
+                textAlign: theme.responseOptionTextAlign ?? 'center'
               }}>
                   Option 1
                 </span>
@@ -596,7 +592,7 @@ export function ThemeTab() {
                 backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
                 color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
                 borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
-                textAlign: theme.responseOptionTextAlign ?? 'center',
+                textAlign: theme.responseOptionTextAlign ?? 'center'
               }}>
                   Option 2
                 </span>
