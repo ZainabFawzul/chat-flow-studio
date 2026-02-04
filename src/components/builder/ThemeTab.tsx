@@ -329,26 +329,26 @@ export function ThemeTab() {
             {/* Frame Style - only show when preset is 'none' */}
             {(theme.framePreset ?? 'none') === 'none' && <div>
               <Label className="mb-3 block text-sm font-semibold">Frame Style</Label>
-              <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-4 flex-wrap">
                 <ColorPicker id="frame-border-color" label="Border" value={theme.frameBorderColor ?? "220 13% 91%"} onChange={value => updateTheme({
                   frameBorderColor: value
                 })} />
-                <div className="flex items-center gap-1.5">
-                  <Label htmlFor="frame-border-width" className="text-xs text-muted-foreground whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="frame-border-width" className="text-sm font-medium text-foreground whitespace-nowrap">
                     Thickness
                   </Label>
                   <Input id="frame-border-width" type="number" min={0} max={4} value={theme.frameBorderWidth ?? 1} onChange={e => updateTheme({
                     frameBorderWidth: Number(e.target.value)
-                  })} className="h-8 w-14 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
+                  })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
                   <span className="text-xs text-muted-foreground">px</span>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Label htmlFor="frame-radius" className="text-xs text-muted-foreground whitespace-nowrap">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="frame-radius" className="text-sm font-medium text-foreground whitespace-nowrap">
                     Roundness
                   </Label>
                   <Input id="frame-radius" type="number" min={0} max={32} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
                     frameBorderRadius: Number(e.target.value)
-                  })} className="h-8 w-14 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
+                  })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
                   <span className="text-xs text-muted-foreground">px</span>
                 </div>
               </div>
