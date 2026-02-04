@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Play } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { BubbleBorderRadius } from "@/types/scenario";
+import { BubbleBorderRadius, MessageSize } from "@/types/scenario";
 
 const DEFAULT_SENDER_RADIUS: BubbleBorderRadius = { topLeft: 16, topRight: 4, bottomRight: 16, bottomLeft: 16 };
 const DEFAULT_RECEIVER_RADIUS: BubbleBorderRadius = { topLeft: 4, topRight: 16, bottomRight: 16, bottomLeft: 16 };
@@ -63,6 +63,16 @@ export function ChatPreview() {
   // Fallback for legacy scenarios without border radius
   const senderRadius = theme.senderBorderRadius ?? DEFAULT_SENDER_RADIUS;
   const receiverRadius = theme.receiverBorderRadius ?? DEFAULT_RECEIVER_RADIUS;
+  
+  // Convert messageSize to pixel value
+  const getMessageFontSize = (size: MessageSize | undefined): number => {
+    switch (size) {
+      case 'small': return 12;
+      case 'large': return 16;
+      default: return 14; // standard
+    }
+  };
+  const messageFontSize = getMessageFontSize(theme.messageSize);
 
   const [chatHistory, setChatHistory] = useState<ChatBubble[]>([]);
   const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
@@ -220,7 +230,7 @@ export function ChatPreview() {
       style={{
         backgroundColor: `hsl(${theme.chatBackground})`,
         fontFamily: theme.fontFamily,
-        fontSize: `${theme.fontSize}px`,
+        fontSize: `${messageFontSize}px`,
         borderRadius: `${frameBorderRadius}px`,
         border: frameBorderWidth > 0 ? `${frameBorderWidth}px solid hsl(${frameBorderColor})` : 'none',
       }}
