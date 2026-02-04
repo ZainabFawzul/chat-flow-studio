@@ -60,6 +60,8 @@ export interface BubbleBorderRadius {
   bottomLeft: number;
 }
 
+export type MessageSize = 'small' | 'standard' | 'large';
+
 export interface ChatTheme {
   contactName: string;
   contactAvatar: string | null; // Base64 image or null for initials
@@ -72,7 +74,8 @@ export interface ChatTheme {
   receiverTextColor: string;
   receiverBorderRadius: BubbleBorderRadius;
   chatBackground: string;
-  fontSize: number; // in pixels
+  fontSize: number; // in pixels (legacy, use messageSize instead)
+  messageSize: MessageSize; // small=12px, standard=14px, large=16px
   fontFamily: string;
   // Start screen customization
   startScreenTitle: string;
@@ -136,6 +139,7 @@ export const DEFAULT_THEME: ChatTheme = {
   receiverBorderRadius: { topLeft: 4, topRight: 16, bottomRight: 16, bottomLeft: 16 },
   chatBackground: "40 23% 97%", // Background
   fontSize: 14,
+  messageSize: 'standard',
   fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif",
   // Start screen customization
   startScreenTitle: "Ready to Start",

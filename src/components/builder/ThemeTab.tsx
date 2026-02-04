@@ -17,7 +17,7 @@ import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick,
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
-import { BubbleBorderRadius, DEFAULT_BORDER_RADIUS } from "@/types/scenario";
+import { BubbleBorderRadius, DEFAULT_BORDER_RADIUS, MessageSize } from "@/types/scenario";
 import { Switch } from "@/components/ui/switch";
 import { getContrastLevel } from "@/lib/contrast";
 const DEFAULT_SENDER_RADIUS: BubbleBorderRadius = {
@@ -272,31 +272,27 @@ export function ThemeTab() {
         <Section icon={<Smartphone className="h-4 w-4" />} title="Frame" id="frame-heading">
           <div className="flex flex-col gap-5">
             
-            {/* Conversation Type */}
+            {/* Conversation Style */}
             <div>
               <Label className="mb-3 block text-sm font-semibold">Conversation Style</Label>
               <div className="grid grid-cols-2 gap-2">
                 {[{
                 value: 'chat' as const,
                 label: 'Chat',
-                icon: MessageCircle,
-                description: 'Header & typing indicator'
+                icon: MessageCircle
               }, {
                 value: 'regular' as const,
                 label: 'Regular',
-                icon: FileText,
-                description: 'Clean, no header'
+                icon: FileText
               }].map(({
                 value,
                 label,
-                icon: Icon,
-                description
+                icon: Icon
               }) => <button key={value} onClick={() => updateTheme({
                 conversationType: value
-              })} className={cn("flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all text-center", (theme.conversationType ?? 'chat') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
-                    <Icon className="h-5 w-5" />
+              })} className={cn("flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all", (theme.conversationType ?? 'chat') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
+                    <Icon className="h-4 w-4" />
                     <span className="text-xs font-medium">{label}</span>
-                    <span className="text-[10px] opacity-70">{description}</span>
                   </button>)}
               </div>
             </div>
@@ -323,27 +319,77 @@ export function ThemeTab() {
                 icon: Icon
               }) => <button key={value} onClick={() => updateTheme({
                 framePreset: value
-              })} className={cn("flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all", (theme.framePreset ?? 'none') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
-                    <Icon className="h-5 w-5" />
+              })} className={cn("flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all", (theme.framePreset ?? 'none') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
+                    <Icon className="h-4 w-4" />
                     <span className="text-xs font-medium">{label}</span>
                   </button>)}
+              </div>
+            </div>
+
+            {/* Frame Style - only show when preset is 'none' */}
+            {(theme.framePreset ?? 'none') === 'none' && <div>
+              <Label className="mb-3 block text-sm font-semibold">Frame Style</Label>
+              <div className="flex items-center gap-3 flex-wrap">
+                <ColorPicker id="frame-border-color" label="Border" value={theme.frameBorderColor ?? "220 13% 91%"} onChange={value => updateTheme({
+                  frameBorderColor: value
+                })} />
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor="frame-border-width" className="text-xs text-muted-foreground whitespace-nowrap">
+                    Thickness
+                  </Label>
+                  <Input id="frame-border-width" type="number" min={0} max={4} value={theme.frameBorderWidth ?? 1} onChange={e => updateTheme({
+                    frameBorderWidth: Number(e.target.value)
+                  })} className="h-8 w-14 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
+                  <span className="text-xs text-muted-foreground">px</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor="frame-radius" className="text-xs text-muted-foreground whitespace-nowrap">
+                    Roundness
+                  </Label>
+                  <Input id="frame-radius" type="number" min={0} max={32} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
+                    frameBorderRadius: Number(e.target.value)
+                  })} className="h-8 w-14 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
+                  <span className="text-xs text-muted-foreground">px</span>
+                </div>
+              </div>
+            </div>}
+
+            {/* Message Size */}
+            <div>
+              <Label className="mb-3 block text-sm font-semibold">Message Size</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { value: 'small' as MessageSize, label: 'Small' },
+                  { value: 'standard' as MessageSize, label: 'Standard' },
+                  { value: 'large' as MessageSize, label: 'Large' }
+                ]).map(({ value, label }) => (
+                  <button 
+                    key={value} 
+                    onClick={() => updateTheme({ messageSize: value })} 
+                    className={cn(
+                      "flex items-center justify-center p-2.5 rounded-xl border-2 transition-all",
+                      (theme.messageSize ?? 'standard') === value 
+                        ? "border-primary bg-primary/5 text-primary" 
+                        : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
+                    )}
+                  >
+                    <span className="text-xs font-medium">{label}</span>
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Rise 360 Integration */}
             <div className="flex items-center justify-between">
               <div className="flex flex-col gap-0.5">
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="rise-completion" className="text-sm font-medium">
-                    Rise 360 Completion
-                  </Label>
-                  
-                </div>
-                <span className="text-xs text-muted-foreground">Autocomplete the next Continue Button in Articulate Rise.</span>
+                <Label htmlFor="rise-completion" className="text-sm font-medium">
+                  Rise 360 Completion
+                </Label>
+                <span className="text-xs text-muted-foreground">Autocomplete the next Continue Button in Rise.</span>
               </div>
               <Switch id="rise-completion" checked={theme.enableRiseCompletion ?? false} onCheckedChange={checked => updateTheme({
-              enableRiseCompletion: checked
-            })} />
+                enableRiseCompletion: checked
+              })} />
             </div>
             
             {/* Show Reset Button */}
@@ -357,67 +403,9 @@ export function ThemeTab() {
                 </span>
               </div>
               <Switch id="show-reset" checked={theme.showResetButton ?? true} onCheckedChange={checked => updateTheme({
-              showResetButton: checked
-            })} />
+                showResetButton: checked
+              })} />
             </div>
-
-            {/* Message Size */}
-            <div className="flex items-center justify-between">
-              <div className="flex flex-col gap-0.5">
-                <Label htmlFor="font-size" className="text-sm font-medium">
-                  Message Size (px)
-                </Label>
-                <span className="text-xs text-muted-foreground">
-                  Font size for chat messages
-                </span>
-              </div>
-              <Input id="font-size" type="number" min={12} max={20} value={theme.fontSize} onChange={e => updateTheme({
-              fontSize: Number(e.target.value)
-            })} className="h-10 w-20 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors text-center" />
-            </div>
-
-            {/* Custom Frame Options - only show when preset is 'none' */}
-            {(theme.framePreset ?? 'none') === 'none' && <>
-                {/* Corner Radius */}
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col gap-0.5">
-                    <Label htmlFor="frame-radius" className="text-sm font-medium">
-                      Corner Radius (px)
-                    </Label>
-                    <span className="text-xs text-muted-foreground">
-                      Frame border radius
-                    </span>
-                  </div>
-                  <Input id="frame-radius" type="number" min={0} max={32} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
-                frameBorderRadius: Number(e.target.value)
-              })} className="h-10 w-20 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors text-center" />
-                </div>
-
-                {/* Border Width */}
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-col gap-0.5">
-                    <Label htmlFor="frame-border-width" className="text-sm font-medium">
-                      Border Width (px)
-                    </Label>
-                    <span className="text-xs text-muted-foreground">
-                      Frame border thickness
-                    </span>
-                  </div>
-                  <Input id="frame-border-width" type="number" min={0} max={4} value={theme.frameBorderWidth ?? 1} onChange={e => updateTheme({
-                frameBorderWidth: Number(e.target.value)
-              })} className="h-10 w-20 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors text-center" />
-                </div>
-
-                {/* Border Color */}
-                <ColorPicker id="frame-border-color" label="Border Color" value={theme.frameBorderColor ?? "220 13% 91%"} onChange={value => updateTheme({
-              frameBorderColor: value
-            })} />
-                
-                {/* Preview */}
-                <div className="mt-2">
-                  
-                </div>
-              </>}
             
           </div>
         </Section>
