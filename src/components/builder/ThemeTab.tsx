@@ -238,6 +238,18 @@ export function ThemeTab() {
                 startScreenSubtitleColor: value
               })} />
               </div>
+              <div className="mt-3 flex flex-col gap-1">
+                <ContrastWarning 
+                  bgColor={theme.chatBackground} 
+                  textColor={theme.startScreenTitleColor ?? "222 47% 11%"} 
+                  label="Title"
+                />
+                <ContrastWarning 
+                  bgColor={theme.chatBackground} 
+                  textColor={theme.startScreenSubtitleColor ?? "220 9% 46%"} 
+                  label="Subtitle"
+                />
+              </div>
             </div>
 
             {/* Button Style */}
@@ -604,21 +616,24 @@ export function ThemeTab() {
 // Contrast warning component
 function ContrastWarning({
   bgColor,
-  textColor
+  textColor,
+  label
 }: {
   bgColor: string;
   textColor: string;
+  label?: string;
 }) {
   const {
     ratio,
     level
   } = getContrastLevel(bgColor, textColor);
   if (level === "aa" || level === "aaa") return null;
+  const labelPrefix = label ? `${label}: ` : "";
   return <div className="flex items-start gap-2 p-2.5 rounded-lg bg-destructive/10 border border-destructive/20">
       <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium text-destructive">
-          Low contrast ({ratio.toFixed(1)}:1)
+          {labelPrefix}Low contrast ({ratio.toFixed(1)}:1)
         </p>
         <p className="text-xs text-muted-foreground">
           {level === "aa-large" ? "Only meets WCAG AA for large text. Increase contrast for better accessibility." : "Does not meet WCAG 2.1 AA standards. Adjust colors for accessibility."}
