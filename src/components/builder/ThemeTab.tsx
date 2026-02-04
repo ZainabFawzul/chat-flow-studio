@@ -132,7 +132,7 @@ export function ThemeTab() {
         <Section icon={<User className="h-4 w-4" />} title="Contact Info" id="contact-heading">
           <div className="flex flex-col gap-4">
             <div>
-              <Label htmlFor="contact-name" className="mb-2 block text-sm font-medium">
+              <Label htmlFor="contact-name" className="mb-2 block text-sm font-semibold">
                 Display Name
               </Label>
               <Input id="contact-name" value={theme.contactName} onChange={e => updateTheme({
@@ -141,7 +141,7 @@ export function ThemeTab() {
             </div>
             
             <div>
-              <Label className="mb-2 block text-sm font-medium">Avatar</Label>
+              <Label className="mb-2 block text-sm font-semibold">Avatar</Label>
               <input ref={avatarInputRef} type="file" accept="image/*" className="sr-only" onChange={handleAvatarUpload} aria-label="Upload avatar image" />
               
               <div className="flex items-center gap-3 flex-wrap">
@@ -196,7 +196,7 @@ export function ThemeTab() {
           <div className="flex flex-col gap-5">
             {/* Title */}
             <div>
-              <Label htmlFor="start-title" className="mb-2 block text-sm font-medium">
+              <Label htmlFor="start-title" className="mb-2 block text-sm font-semibold">
                 Title
               </Label>
               <Input id="start-title" value={theme.startScreenTitle ?? "Ready to Start"} onChange={e => updateTheme({
@@ -206,7 +206,7 @@ export function ThemeTab() {
             
             {/* Subtitle */}
             <div>
-              <Label htmlFor="start-subtitle" className="mb-2 block text-sm font-medium">
+              <Label htmlFor="start-subtitle" className="mb-2 block text-sm font-semibold">
                 Subtitle
               </Label>
               <textarea id="start-subtitle" value={theme.startScreenSubtitle ?? "Begin the conversation"} onChange={e => updateTheme({
@@ -216,7 +216,7 @@ export function ThemeTab() {
             
             {/* Button Label */}
             <div>
-              <Label htmlFor="start-button" className="mb-2 block text-sm font-medium">
+              <Label htmlFor="start-button" className="mb-2 block text-sm font-semibold">
                 Button Label
               </Label>
               <Input id="start-button" value={theme.startButtonText ?? "Start"} onChange={e => updateTheme({
@@ -226,7 +226,7 @@ export function ThemeTab() {
 
             {/* Start Screen Style */}
             <div>
-              <Label className="mb-3 block text-sm font-medium">Start Screen Style</Label>
+              <Label className="mb-3 block text-sm font-semibold">Start Screen Style</Label>
               <div className="flex flex-wrap items-center gap-3">
                 <ColorPicker id="chat-bg" label="Background" value={theme.chatBackground} onChange={value => updateTheme({
                 chatBackground: value
@@ -242,7 +242,7 @@ export function ThemeTab() {
 
             {/* Button Style */}
             <div>
-              <Label className="mb-3 block text-sm font-medium">Button Style</Label>
+              <Label className="mb-3 block text-sm font-semibold">Button Style</Label>
               <div className="flex flex-wrap items-center gap-3">
                 <ColorPicker id="start-btn-bg" label="Fill" value={theme.startButtonColor ?? "221 83% 40%"} onChange={value => updateTheme({
                 startButtonColor: value
@@ -270,7 +270,7 @@ export function ThemeTab() {
             
             {/* Conversation Type */}
             <div>
-              <Label className="mb-3 block text-sm font-medium">Conversation Style</Label>
+              <Label className="mb-3 block text-sm font-semibold">Conversation Style</Label>
               <div className="grid grid-cols-2 gap-2">
                 {[{
                 value: 'chat' as const,
@@ -299,7 +299,7 @@ export function ThemeTab() {
 
             {/* Device Frame */}
             <div>
-              <Label className="mb-3 block text-sm font-medium">Device Frame</Label>
+              <Label className="mb-3 block text-sm font-semibold">Device Frame</Label>
               <div className="grid grid-cols-3 gap-2">
                 {[{
                 value: 'none' as const,
