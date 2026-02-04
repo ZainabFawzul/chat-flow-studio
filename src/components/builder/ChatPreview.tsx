@@ -238,7 +238,7 @@ export function ChatPreview() {
       {/* Chat Header - Only show in chat mode */}
       {!isRegularMode && (
         <header className="flex items-center gap-4 border-b border-border/30 bg-card/90 backdrop-blur-xl px-5 py-3.5">
-          <Avatar className="h-11 w-11 ring-2 ring-border/50 ring-offset-2 ring-offset-card">
+        <Avatar key={theme.contactAvatar ?? 'fallback'} className="h-11 w-11 ring-2 ring-border/50 ring-offset-2 ring-offset-card">
             {theme.contactAvatar && (
               <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
             )}
@@ -344,7 +344,7 @@ export function ChatPreview() {
                 )}
               >
                 {!bubble.isUser && !isRegularMode && (
-                  <Avatar className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
+                  <Avatar key={theme.contactAvatar ?? 'fallback'} className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
                     {theme.contactAvatar && (
                       <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
                     )}
@@ -384,7 +384,7 @@ export function ChatPreview() {
             {/* Typing indicator */}
             {typingMessageId && (
               <div className="flex justify-start animate-fade-in">
-                <Avatar className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
+                <Avatar key={theme.contactAvatar ?? 'fallback'} className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
                   {theme.contactAvatar && (
                     <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
                   )}
