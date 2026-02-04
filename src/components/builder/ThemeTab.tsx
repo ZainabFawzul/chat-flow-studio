@@ -239,16 +239,8 @@ export function ThemeTab() {
               })} />
               </div>
               <div className="mt-3 flex flex-col gap-1">
-                <ContrastWarning 
-                  bgColor={theme.chatBackground} 
-                  textColor={theme.startScreenTitleColor ?? "222 47% 11%"} 
-                  label="Title"
-                />
-                <ContrastWarning 
-                  bgColor={theme.chatBackground} 
-                  textColor={theme.startScreenSubtitleColor ?? "220 9% 46%"} 
-                  label="Subtitle"
-                />
+                <ContrastWarning bgColor={theme.chatBackground} textColor={theme.startScreenTitleColor ?? "222 47% 11%"} label="Title" />
+                <ContrastWarning bgColor={theme.chatBackground} textColor={theme.startScreenSubtitleColor ?? "220 9% 46%"} label="Subtitle" />
               </div>
             </div>
 
@@ -579,34 +571,7 @@ export function ThemeTab() {
             </div>
 
             {/* Preview */}
-            <div className="mt-2 p-4 border border-border/30" style={{
-            backgroundColor: `hsl(${theme.responsePanelBackground ?? '0 0% 100%'})`,
-            borderRadius: '12px'
-          }}>
-              <p className="mb-3 text-xs font-medium uppercase tracking-wide" style={{
-              color: `hsl(${theme.responsePanelLabelColor ?? '220 9% 46%'})`
-            }}>
-                {theme.responsePanelLabelText ?? "Choose a response"}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1.5 text-sm font-medium border border-border/50" style={{
-                backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
-                color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
-                borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
-                textAlign: theme.responseOptionTextAlign ?? 'center'
-              }}>
-                  Option 1
-                </span>
-                <span className="px-3 py-1.5 text-sm font-medium border border-border/50" style={{
-                backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
-                color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
-                borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
-                textAlign: theme.responseOptionTextAlign ?? 'center'
-              }}>
-                  Option 2
-                </span>
-              </div>
-            </div>
+            
           </div>
         </Section>
       </div>
