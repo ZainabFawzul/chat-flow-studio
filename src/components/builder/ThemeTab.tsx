@@ -142,48 +142,52 @@ export function ThemeTab() {
             
             <div>
               <Label className="mb-2 block text-sm font-medium">Avatar</Label>
-              <div className="flex items-center gap-4">
-                <div className="relative group">
-                  <Avatar className="h-14 w-14 ring-2 ring-border/50 ring-offset-2 ring-offset-background transition-all group-hover:ring-primary/50">
+              <input ref={avatarInputRef} type="file" accept="image/*" className="sr-only" onChange={handleAvatarUpload} aria-label="Upload avatar image" />
+              
+              <div className="flex items-center gap-3 flex-wrap">
+                {/* Avatar preview */}
+                <div className="relative group shrink-0">
+                  <Avatar className="h-10 w-10 ring-2 ring-border/50 ring-offset-1 ring-offset-background transition-all group-hover:ring-primary/50">
                     {theme.contactAvatar ? <AvatarImage src={theme.contactAvatar} alt={theme.contactName} /> : null}
-                    <AvatarFallback className="font-semibold" style={{
-                    backgroundColor: `hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'})`,
-                    color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`
-                  }}>
+                    <AvatarFallback className="font-semibold text-sm" style={{
+                      backgroundColor: `hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'})`,
+                      color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`
+                    }}>
                       {getInitials(theme.contactName)}
                     </AvatarFallback>
                   </Avatar>
                 </div>
                 
-                <input ref={avatarInputRef} type="file" accept="image/*" className="sr-only" onChange={handleAvatarUpload} aria-label="Upload avatar image" />
+                {/* Upload button */}
+                <Button variant="secondary" size="sm" onClick={() => avatarInputRef.current?.click()} className="gap-1.5 rounded-lg h-8 px-2.5 shrink-0">
+                  <Upload className="h-3.5 w-3.5" aria-hidden="true" />
+                  Upload
+                </Button>
                 
-                <div className="flex gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => avatarInputRef.current?.click()} className="gap-2 rounded-xl">
-                    <Upload className="h-4 w-4" aria-hidden="true" />
-                    Upload
+                {/* Remove button (only when image uploaded) */}
+                {theme.contactAvatar && (
+                  <Button variant="ghost" size="sm" onClick={() => updateTheme({ contactAvatar: null })} aria-label="Remove avatar" className="rounded-lg h-8 w-8 p-0 text-muted-foreground hover:text-destructive shrink-0">
+                    <X className="h-3.5 w-3.5" aria-hidden="true" />
                   </Button>
-                  
-                  {theme.contactAvatar && <Button variant="ghost" size="sm" onClick={() => updateTheme({
-                  contactAvatar: null
-                })} aria-label="Remove avatar" className="rounded-xl text-muted-foreground hover:text-destructive">
-                      <X className="h-4 w-4" aria-hidden="true" />
-                    </Button>}
-                </div>
+                )}
+                
+                {/* Color pickers (only when no custom image) */}
+                {!theme.contactAvatar && (
+                  <>
+                    <div className="h-6 w-px bg-border/50 mx-1 shrink-0" />
+                    <ColorPicker id="avatar-bg" label="Background" value={theme.avatarBackgroundColor ?? "221 83% 40%"} onChange={value => updateTheme({ avatarBackgroundColor: value })} />
+                    <ColorPicker id="avatar-text" label="Text" value={theme.avatarTextColor ?? "0 0% 100%"} onChange={value => updateTheme({ avatarTextColor: value })} />
+                  </>
+                )}
               </div>
-            </div>
-            
-            {/* Avatar Colors (only shown when no custom image) */}
-            {!theme.contactAvatar && <>
-                <div className="flex gap-4">
-                  <ColorPicker id="avatar-bg" label="Avatar Background" value={theme.avatarBackgroundColor ?? "221 83% 40%"} onChange={value => updateTheme({
-                avatarBackgroundColor: value
-              })} />
-                  <ColorPicker id="avatar-text" label="Avatar Text" value={theme.avatarTextColor ?? "0 0% 100%"} onChange={value => updateTheme({
-                avatarTextColor: value
-              })} />
+              
+              {/* Contrast Warning */}
+              {!theme.contactAvatar && (
+                <div className="mt-3">
+                  <ContrastWarning bgColor={theme.avatarBackgroundColor ?? "221 83% 40%"} textColor={theme.avatarTextColor ?? "0 0% 100%"} />
                 </div>
-                <ContrastWarning bgColor={theme.avatarBackgroundColor ?? "221 83% 40%"} textColor={theme.avatarTextColor ?? "0 0% 100%"} />
-              </>}
+              )}
+            </div>
           </div>
         </Section>
 
