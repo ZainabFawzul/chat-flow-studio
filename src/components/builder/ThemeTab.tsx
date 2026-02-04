@@ -465,19 +465,6 @@ export function ThemeTab() {
             receiverBorderRadius: value
           })} />
             
-            {/* Preview */}
-            <div className="mt-2 flex justify-start">
-              <div className="max-w-[80%] px-4 py-2.5 shadow-sm" style={{
-              backgroundColor: `hsl(${theme.receiverBubbleColor})`,
-              color: `hsl(${theme.receiverTextColor})`,
-              borderTopLeftRadius: `${receiverRadius.topLeft}px`,
-              borderTopRightRadius: `${receiverRadius.topRight}px`,
-              borderBottomRightRadius: `${receiverRadius.bottomRight}px`,
-              borderBottomLeftRadius: `${receiverRadius.bottomLeft}px`
-            }}>
-                <span className="text-sm">Preview message</span>
-              </div>
-            </div>
           </div>
         </Section>
 
