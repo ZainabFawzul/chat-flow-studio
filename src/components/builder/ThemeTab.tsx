@@ -194,19 +194,6 @@ export function ThemeTab() {
         {/* Start Screen */}
         <Section icon={<Play className="h-4 w-4" />} title="Start Screen" id="start-screen-heading">
           <div className="flex flex-col gap-5">
-            {/* Colors Row */}
-            <div className="flex flex-wrap items-center gap-3">
-              <ColorPicker id="chat-bg" label="Background" value={theme.chatBackground} onChange={value => updateTheme({
-              chatBackground: value
-            })} />
-              <ColorPicker id="title-color" label="Title Text" value={theme.startScreenTitleColor ?? "222 47% 11%"} onChange={value => updateTheme({
-              startScreenTitleColor: value
-            })} />
-              <ColorPicker id="subtitle-color" label="Subtitle Text" value={theme.startScreenSubtitleColor ?? "220 9% 46%"} onChange={value => updateTheme({
-              startScreenSubtitleColor: value
-            })} />
-            </div>
-
             {/* Title */}
             <div>
               <Label htmlFor="start-title" className="mb-2 block text-sm font-medium">
@@ -235,6 +222,19 @@ export function ThemeTab() {
               <Input id="start-button" value={theme.startButtonText ?? "Start"} onChange={e => updateTheme({
               startButtonText: e.target.value
             })} placeholder="Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
+            </div>
+
+            {/* Colors Row */}
+            <div className="flex flex-wrap items-center gap-3">
+              <ColorPicker id="chat-bg" label="Background" value={theme.chatBackground} onChange={value => updateTheme({
+              chatBackground: value
+            })} />
+              <ColorPicker id="title-color" label="Title Text" value={theme.startScreenTitleColor ?? "222 47% 11%"} onChange={value => updateTheme({
+              startScreenTitleColor: value
+            })} />
+              <ColorPicker id="subtitle-color" label="Subtitle Text" value={theme.startScreenSubtitleColor ?? "220 9% 46%"} onChange={value => updateTheme({
+              startScreenSubtitleColor: value
+            })} />
             </div>
 
             {/* Button Style */}
