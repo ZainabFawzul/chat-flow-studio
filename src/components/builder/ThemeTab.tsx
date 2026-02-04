@@ -13,13 +13,14 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, MessageSquare, FileText, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, FileText, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
 import { BubbleBorderRadius, DEFAULT_BORDER_RADIUS, MessageSize } from "@/types/scenario";
 import { Switch } from "@/components/ui/switch";
 import { getContrastLevel } from "@/lib/contrast";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 const DEFAULT_SENDER_RADIUS: BubbleBorderRadius = {
   topLeft: 16,
   topRight: 4,
@@ -79,25 +80,31 @@ interface SectionProps {
   icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
-  id: string;
+  value: string;
 }
 function Section({
   icon,
   title,
   children,
-  id
+  value
 }: SectionProps) {
-  return <section aria-labelledby={id} className="rounded-2xl bg-card border border-border/50 p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          {icon}
+  return (
+    <AccordionItem value={value} className="rounded-2xl bg-card border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden">
+      <AccordionTrigger className="px-5 py-4 hover:no-underline">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            {icon}
+          </div>
+          <span className="text-base font-semibold text-foreground">
+            {title}
+          </span>
         </div>
-        <h2 id={id} className="text-base font-semibold text-foreground">
-          {title}
-        </h2>
-      </div>
-      {children}
-    </section>;
+      </AccordionTrigger>
+      <AccordionContent className="px-5 pb-5">
+        {children}
+      </AccordionContent>
+    </AccordionItem>
+  );
 }
 export function ThemeTab() {
   const {
@@ -127,9 +134,9 @@ export function ThemeTab() {
     return name.split(" ").map(word => word[0]).join("").toUpperCase().slice(0, 2);
   };
   return <ScrollArea className="h-full">
-      <div className="flex flex-col gap-4 p-4">
+      <Accordion type="multiple" defaultValue={["contact-info"]} className="flex flex-col gap-4 p-4">
         {/* Contact Info */}
-        <Section icon={<User className="h-4 w-4" />} title="Contact Info" id="contact-heading">
+        <Section icon={<User className="h-4 w-4" />} title="Contact Info" value="contact-info">
           <div className="flex flex-col gap-4">
             <div>
               <Label htmlFor="contact-name" className="mb-2 block text-sm font-semibold">
@@ -192,7 +199,7 @@ export function ThemeTab() {
         </Section>
 
         {/* Start Screen */}
-        <Section icon={<Play className="h-4 w-4" />} title="Start Screen" id="start-screen-heading">
+        <Section icon={<Play className="h-4 w-4" />} title="Start Screen" value="start-screen">
           <div className="flex flex-col gap-5">
             {/* Title */}
             <div>
@@ -269,7 +276,7 @@ export function ThemeTab() {
           </div>
         </Section>
         {/* Frame Settings */}
-        <Section icon={<Smartphone className="h-4 w-4" />} title="Frame" id="frame-heading">
+        <Section icon={<Smartphone className="h-4 w-4" />} title="Frame" value="frame">
           <div className="flex flex-col gap-5">
             
             {/* Conversation Style */}
@@ -411,7 +418,7 @@ export function ThemeTab() {
         </Section>
 
         {/* Sender Bubbles */}
-        <Section icon={<MessageCircle className="h-4 w-4" />} title="Your Messages" id="sender-heading">
+        <Section icon={<MessageCircle className="h-4 w-4" />} title="Your Messages" value="sender">
           <div className="flex flex-col gap-[20px]">
             <div className="flex gap-4">
               <ColorPicker id="sender-bg" label="Bubble" value={theme.senderBubbleColor} onChange={value => updateTheme({
@@ -435,7 +442,7 @@ export function ThemeTab() {
         </Section>
 
         {/* Receiver Bubbles */}
-        <Section icon={<MessageCircle className="h-4 w-4" />} title="Contact Messages" id="receiver-heading">
+        <Section icon={<MessageCircle className="h-4 w-4" />} title="Contact Messages" value="receiver">
           <div className="flex flex-col gap-[20px]">
             <div className="flex gap-4">
               <ColorPicker id="receiver-bg" label="Bubble" value={theme.receiverBubbleColor} onChange={value => updateTheme({
@@ -457,7 +464,7 @@ export function ThemeTab() {
         </Section>
 
         {/* Response Panel */}
-        <Section icon={<MousePointerClick className="h-4 w-4" />} title="Response Panel" id="response-panel-heading">
+        <Section icon={<MousePointerClick className="h-4 w-4" />} title="Response Panel" value="response-panel">
           <div className="flex flex-col gap-5">
             {/* Label Text */}
             <div>
@@ -538,7 +545,7 @@ export function ThemeTab() {
             
           </div>
         </Section>
-      </div>
+      </Accordion>
     </ScrollArea>;
 }
 
