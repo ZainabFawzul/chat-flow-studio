@@ -872,6 +872,14 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
           html += startButtonText;
           html += '</button></div></main>';
         } else {
+          // Accessible message history region - screen reader can focus and read all messages
+          html += '<div class="sr-only" tabindex="0" role="region" aria-label="Message history. Use arrow keys to scroll." id="message-history-sr">';
+          html += 'Message history: ';
+          chatHistory.forEach(function(bubble) {
+            html += (bubble.isUser ? 'You' : theme.contactName) + ': ' + (bubble.content || 'Empty message') + '. ';
+          });
+          html += '</div>';
+
           // Messages area with log role for screen readers
           html += '<main class="chat-messages" role="log" aria-live="polite" aria-atomic="false" aria-label="Conversation messages" tabindex="-1" id="messages-area">';
           chatHistory.forEach(function(bubble) {
@@ -924,14 +932,17 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
           if (currentMessage && !currentMessage.isEndpoint && visibleOptions.length > 0 && !isTyping) {
             html += '<nav class="response-options" role="group" aria-labelledby="options-label" aria-describedby="options-instruction">';
             html += '<p class="options-label" id="options-label">' + ${JSON.stringify(responsePanelLabelText)} + '</p>';
-            html += '<p class="sr-only" id="options-instruction">Use Tab to navigate between options, Enter or Space to select</p>';
+            html += '<p class="sr-only" id="options-instruction">Use Tab to navigate between options, Enter or Space to select. After options, Tab to access Reset button or message history.</p>';
             html += '<div class="options-container" role="list">';
             visibleOptions.forEach(function(opt, index) {
               html += '<button class="option-btn" role="listitem" id="option-' + opt.id + '" onclick="handleSelect(\\'' + opt.id + '\\')"' + (!opt.text ? ' disabled aria-disabled="true"' : '') + ' aria-label="Respond with: ' + escapeForAriaLabel(opt.text || 'Empty option') + '">';
               html += opt.text || 'Empty option';
               html += '</button>';
             });
-            html += '</div></nav>';
+            html += '</div>';
+            // Add hidden link to message history after options
+            html += '<a href="#message-history-sr" class="sr-only" style="position:absolute;">Review message history</a>';
+            html += '</nav>';
           }
         }
 
