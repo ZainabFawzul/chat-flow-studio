@@ -948,7 +948,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
             content: content,
             isUser: false
           });
-          announceStatus('New message');
+          announceStatus(theme.contactName + ' says: ' + content);
           render();
           
           // Check for auto-advance before calling callback
@@ -969,7 +969,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
               isUser: false
             });
             isTyping = false;
-            announceStatus('New message from ' + theme.contactName);
+            announceStatus(theme.contactName + ' says: ' + content);
             render();
             
             // Check for auto-advance before calling callback
@@ -1034,7 +1034,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
           content: option.text,
           isUser: true
         });
-        announceStatus('You said: ' + option.text);
+        announceStatus('You selected: ' + option.text);
         render();
 
         // Add next message with typing indicator if exists

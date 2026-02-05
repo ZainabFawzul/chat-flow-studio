@@ -101,12 +101,22 @@ export function ChatPreview() {
       .slice(0, 2);
   };
 
+  // Announce message to screen readers
+  const announceToScreenReader = (message: string) => {
+    const announcer = document.getElementById('chat-announcer');
+    if (announcer) {
+      announcer.textContent = '';
+      setTimeout(() => { announcer.textContent = message; }, 50);
+    }
+  };
+
   const addContactMessage = (messageId: string, content: string, callback?: () => void) => {
     const isRegular = (theme.conversationType ?? 'chat') === 'regular';
     
     if (isRegular) {
       // In regular mode, show message immediately without typing indicator
       setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
+      announceToScreenReader(`${theme.contactName} says: ${content}`);
       callback?.();
       
       // Check for auto-advance (message with no responses but has direct connection)
@@ -124,11 +134,13 @@ export function ChatPreview() {
     } else {
       // In chat mode, show typing indicator first
       setTypingMessageId(messageId);
+      announceToScreenReader(`${theme.contactName} is typing`);
       
       // After delay, show actual message
       typingTimeoutRef.current = setTimeout(() => {
         setChatHistory(prev => [...prev, { id: messageId, content, isUser: false }]);
         setTypingMessageId(null);
+        announceToScreenReader(`${theme.contactName} says: ${content}`);
         callback?.();
         
         // Check for auto-advance (message with no responses but has direct connection)
@@ -183,6 +195,7 @@ export function ChatPreview() {
         isUser: true,
       },
     ]);
+    announceToScreenReader(`You selected: ${optionText}`);
 
     // If there's a follow-up message, show typing then message
     if (option.nextMessageId) {
@@ -297,6 +310,16 @@ export function ChatPreview() {
 
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto px-5 py-4">
+        {/* Screen reader announcements */}
+        <div 
+          aria-live="assertive" 
+          aria-atomic="true" 
+          className="sr-only"
+          id="chat-announcer"
+        >
+          {/* Content set dynamically for announcements */}
+        </div>
+
         {!isPlaying ? (
           <div className="flex h-full items-center justify-center">
             <div className="text-center max-w-sm">
