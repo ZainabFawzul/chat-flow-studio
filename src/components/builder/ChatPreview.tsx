@@ -357,16 +357,83 @@ export function ChatPreview() {
             </div>
           </div>
         ) : (
-          <div className="space-y-4" role="log" aria-label="Chat messages">
-            {chatHistory.map((bubble) => (
-              <div
-                key={bubble.id}
-                className={cn(
-                  "flex animate-fade-in",
-                  bubble.isUser ? "justify-end" : "justify-start"
-                )}
-              >
-                {!bubble.isUser && !isRegularMode && (
+          <>
+            {/* Accessible message history - visually hidden but focusable for screen readers */}
+            <div 
+              className="sr-only" 
+              tabIndex={0}
+              role="region"
+              aria-label="Message history. Use arrow keys to scroll."
+              onKeyDown={(e) => {
+                const container = e.currentTarget.nextElementSibling as HTMLElement;
+                if (container) {
+                  if (e.key === 'ArrowDown') {
+                    container.scrollTop += 50;
+                    e.preventDefault();
+                  } else if (e.key === 'ArrowUp') {
+                    container.scrollTop -= 50;
+                    e.preventDefault();
+                  }
+                }
+              }}
+            >
+              Message history: {chatHistory.map((bubble, index) => (
+                <span key={bubble.id}>
+                  {bubble.isUser ? 'You' : theme.contactName}: {bubble.content}.{' '}
+                </span>
+              ))}
+            </div>
+            
+            <div className="space-y-4" role="log" aria-label="Chat messages">
+              {chatHistory.map((bubble) => (
+                <div
+                  key={bubble.id}
+                  className={cn(
+                    "flex animate-fade-in",
+                    bubble.isUser ? "justify-end" : "justify-start"
+                  )}
+                >
+                  {!bubble.isUser && !isRegularMode && (
+                    <Avatar className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
+                      {theme.contactAvatar && (
+                        <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
+                      )}
+                      <AvatarFallback
+                        className="text-xs font-semibold"
+                        style={{
+                          background: `linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'}), hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'} / 0.7))`,
+                          color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
+                        }}
+                      >
+                        {getInitials(theme.contactName)}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  <div
+                    className="max-w-[75%] px-4 py-2.5 shadow-sm"
+                    style={{
+                      backgroundColor: bubble.isUser
+                        ? `hsl(${theme.senderBubbleColor})`
+                        : `hsl(${theme.receiverBubbleColor})`,
+                      color: bubble.isUser
+                        ? `hsl(${theme.senderTextColor})`
+                        : `hsl(${theme.receiverTextColor})`,
+                      borderTopLeftRadius: `${bubble.isUser ? senderRadius.topLeft : receiverRadius.topLeft}px`,
+                      borderTopRightRadius: `${bubble.isUser ? senderRadius.topRight : receiverRadius.topRight}px`,
+                      borderBottomRightRadius: `${bubble.isUser ? senderRadius.bottomRight : receiverRadius.bottomRight}px`,
+                      borderBottomLeftRadius: `${bubble.isUser ? senderRadius.bottomLeft : receiverRadius.bottomLeft}px`,
+                    }}
+                  >
+                    {bubble.content || (
+                      <span className="italic opacity-60">Empty message</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* Typing indicator */}
+              {typingMessageId && (
+                <div className="flex justify-start animate-fade-in">
                   <Avatar className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
                     {theme.contactAvatar && (
                       <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
@@ -381,62 +448,23 @@ export function ChatPreview() {
                       {getInitials(theme.contactName)}
                     </AvatarFallback>
                   </Avatar>
-                )}
-                <div
-                  className="max-w-[75%] px-4 py-2.5 shadow-sm"
-                  style={{
-                    backgroundColor: bubble.isUser
-                      ? `hsl(${theme.senderBubbleColor})`
-                      : `hsl(${theme.receiverBubbleColor})`,
-                    color: bubble.isUser
-                      ? `hsl(${theme.senderTextColor})`
-                      : `hsl(${theme.receiverTextColor})`,
-                    borderTopLeftRadius: `${bubble.isUser ? senderRadius.topLeft : receiverRadius.topLeft}px`,
-                    borderTopRightRadius: `${bubble.isUser ? senderRadius.topRight : receiverRadius.topRight}px`,
-                    borderBottomRightRadius: `${bubble.isUser ? senderRadius.bottomRight : receiverRadius.bottomRight}px`,
-                    borderBottomLeftRadius: `${bubble.isUser ? senderRadius.bottomLeft : receiverRadius.bottomLeft}px`,
-                  }}
-                >
-                  {bubble.content || (
-                    <span className="italic opacity-60">Empty message</span>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {/* Typing indicator */}
-            {typingMessageId && (
-              <div className="flex justify-start animate-fade-in">
-                <Avatar className="mr-3 h-8 w-8 shrink-0 ring-1 ring-border/30">
-                  {theme.contactAvatar && (
-                    <AvatarImage src={theme.contactAvatar} alt={theme.contactName} />
-                  )}
-                  <AvatarFallback
-                    className="text-xs font-semibold"
+                  <div
+                    className="shadow-sm"
                     style={{
-                      background: `linear-gradient(135deg, hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'}), hsl(${theme.avatarBackgroundColor ?? '214 100% 65%'} / 0.7))`,
-                      color: `hsl(${theme.avatarTextColor ?? '0 0% 100%'})`,
+                      backgroundColor: `hsl(${theme.receiverBubbleColor})`,
+                      borderTopLeftRadius: `${receiverRadius.topLeft}px`,
+                      borderTopRightRadius: `${receiverRadius.topRight}px`,
+                      borderBottomRightRadius: `${receiverRadius.bottomRight}px`,
+                      borderBottomLeftRadius: `${receiverRadius.bottomLeft}px`,
                     }}
                   >
-                    {getInitials(theme.contactName)}
-                  </AvatarFallback>
-                </Avatar>
-                <div
-                  className="shadow-sm"
-                  style={{
-                    backgroundColor: `hsl(${theme.receiverBubbleColor})`,
-                    borderTopLeftRadius: `${receiverRadius.topLeft}px`,
-                    borderTopRightRadius: `${receiverRadius.topRight}px`,
-                    borderBottomRightRadius: `${receiverRadius.bottomRight}px`,
-                    borderBottomLeftRadius: `${receiverRadius.bottomLeft}px`,
-                  }}
-                >
-                  <TypingIndicator color={`hsl(${theme.receiverTextColor} / 0.5)`} />
+                    <TypingIndicator color={`hsl(${theme.receiverTextColor} / 0.5)`} />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-          </div>
+            </div>
+          </>
         )}
       </div>
 
