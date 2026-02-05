@@ -115,7 +115,7 @@ export function TopBar({
   return <>
       <header className="flex h-16 items-center justify-between border-b border-border/50 bg-card/80 backdrop-blur-xl px-6">
         <div className="flex items-center gap-3">
-          <img src={chatScenarioIcon} alt="Chat Scenario" className="h-10 w-10 object-contain" />
+          <img alt="Chat Scenario" className="h-10 w-10 object-contain" src="/lovable-uploads/d0b802e3-21b8-4d85-a146-a654103331b5.png" />
           <div>
             <h1 className="text-lg font-semibold text-foreground tracking-tight">Chatatouille: The Branching Chat Builder</h1>
             <p className="text-xs text-muted-foreground">Design branching conversations and export as ZIP.</p>
