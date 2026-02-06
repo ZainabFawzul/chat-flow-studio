@@ -7,7 +7,7 @@
  * @usage Registered as custom node type in FlowCanvas
  */
 
-import { memo, useState, useRef, useEffect } from "react";
+import { memo, useState, useRef, useEffect, useCallback } from "react";
 import { Handle, Position, NodeProps } from "@xyflow/react";
 import { useScenario, PendingConnection } from "@/context/ScenarioContext";
 import { ChatMessage, ScenarioVariable, VariableValue } from "@/types/scenario";
@@ -55,6 +55,18 @@ function MessageFlowNodeComponent({
   const [newOptionText, setNewOptionText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-resize textarea without disrupting cursor position
+  const autoResizeTextarea = useCallback(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    // Use a hidden measurement to avoid layout thrash that resets cursor
+    const prevHeight = el.style.height;
+    el.style.height = '0px';
+    const newHeight = Math.max(60, el.scrollHeight);
+    el.style.height = `${newHeight}px`;
+  }, []);
 
   const handleAddOption = () => {
     if (newOptionText.trim()) {
@@ -142,6 +154,11 @@ function MessageFlowNodeComponent({
     nodeRef.current?.addEventListener('focusout', handleFocusOut);
     return () => nodeRef.current?.removeEventListener('focusout', handleFocusOut);
   }, [isEditing]);
+
+  // Re-measure textarea height when content changes externally
+  useEffect(() => {
+    autoResizeTextarea();
+  }, [message.content, autoResizeTextarea]);
 
   // Internal elements are only tabbable when in edit mode and not connecting
   const internalTabIndex = (isEditing && !isConnecting) ? 0 : -1;
@@ -359,20 +376,12 @@ function MessageFlowNodeComponent({
         <div className="p-3">
           <Textarea value={message.content} onChange={e => {
             updateMessage(message.id, e.target.value);
-            // Auto-resize textarea
-            const target = e.target;
-            target.style.height = 'auto';
-            target.style.height = `${target.scrollHeight}px`;
-          }} onFocus={e => {
-            // Auto-resize on focus to show full content
-            const target = e.target;
-            target.style.height = 'auto';
-            target.style.height = `${target.scrollHeight}px`;
-          }} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" style={{ height: 'auto' }} ref={(el) => {
-            // Set initial height on mount
+            autoResizeTextarea();
+          }} onFocus={autoResizeTextarea} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" ref={(el) => {
+            (textareaRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el;
             if (el) {
-              el.style.height = 'auto';
-              el.style.height = `${el.scrollHeight}px`;
+              el.style.height = '0px';
+              el.style.height = `${Math.max(60, el.scrollHeight)}px`;
             }
           }} />
 
