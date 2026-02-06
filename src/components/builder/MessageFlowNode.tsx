@@ -56,17 +56,29 @@ function MessageFlowNodeComponent({
   const [isEditing, setIsEditing] = useState(false);
   const nodeRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const cursorPosRef = useRef<{ start: number; end: number } | null>(null);
 
-  // Auto-resize textarea without disrupting cursor position
+  // Auto-resize textarea safely using a clone measurement to avoid cursor disruption
   const autoResizeTextarea = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
-    // Use a hidden measurement to avoid layout thrash that resets cursor
-    const prevHeight = el.style.height;
+    // Temporarily set to a small height to get accurate scrollHeight
+    const prevOverflow = el.style.overflow;
+    el.style.overflow = 'hidden';
     el.style.height = '0px';
     const newHeight = Math.max(60, el.scrollHeight);
     el.style.height = `${newHeight}px`;
+    el.style.overflow = prevOverflow;
   }, []);
+
+  // Restore cursor position after React re-render
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (el && cursorPosRef.current && document.activeElement === el) {
+      el.setSelectionRange(cursorPosRef.current.start, cursorPosRef.current.end);
+      cursorPosRef.current = null;
+    }
+  });
 
   const handleAddOption = () => {
     if (newOptionText.trim()) {
@@ -375,6 +387,11 @@ function MessageFlowNodeComponent({
         {/* Content */}
         <div className="p-3">
           <Textarea value={message.content} onChange={e => {
+            // Save cursor position before React re-render
+            cursorPosRef.current = {
+              start: e.target.selectionStart,
+              end: e.target.selectionEnd,
+            };
             updateMessage(message.id, e.target.value);
             autoResizeTextarea();
           }} onFocus={autoResizeTextarea} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" ref={(el) => {
