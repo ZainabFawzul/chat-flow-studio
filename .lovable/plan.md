@@ -1,124 +1,103 @@
 
+# Fix: Cursor Jump Bug in Message Textarea
 
-## Expand Onboarding Walkthrough
+## Root Cause Analysis
 
-### Overview
-Add four new tutorial steps to the onboarding walkthrough that teach users how to work with message nodes on the canvas:
-1. **Message Card Layout** - Explain the structure of a message node
-2. **Adding Responses** - Show how to add response options to messages
-3. **Adding Triggers** - Explain variable triggers on response options
-4. **Linking Responses** - Demonstrate how to connect responses to other messages
+After tracing the full data flow, there are **three separate issues** working together to cause the cursor jump. All three must be fixed:
 
-### Changes Required
+### Issue 1: React's Controlled Input Re-render Cycle
 
-#### 1. Add `data-walkthrough` Attributes to Target Elements
-
-**File: `src/components/builder/MessageFlowNode.tsx`**
-
-Add data attributes to enable spotlight targeting:
-
-- Add `data-walkthrough="message-card"` to the main message node container (the root `div`)
-- Add `data-walkthrough="response-options-section"` to the response options section wrapper
-- Add `data-walkthrough="add-response-input"` to the "Add new option" input area
-
-**File: `src/components/builder/ResponseOptionRow.tsx`**
-
-- Add `data-walkthrough="trigger-button"` to the variable configuration button (Zap icon popover trigger)
-- Add `data-walkthrough="link-button"` to the Link button
-
-#### 2. Update Walkthrough Steps Configuration
-
-**File: `src/hooks/use-walkthrough.ts`**
-
-Insert new steps after the current "canvas" step (which introduces variables and expand buttons). The new step order will be:
+When the user types a character, the following cascade happens:
 
 ```text
-1. Theme Tab (existing)
-2. Canvas (existing - with sub-steps for variables & expand)
-3. Message Card Layout (NEW)
-4. Adding Responses (NEW)
-5. Adding Triggers (NEW)
-6. Linking Responses (NEW)
-7. Save Your Work (existing)
-8. Download (existing)
+1. onChange fires -> updateMessage(id, newValue)
+2. Reducer creates new state (new scenario object)
+3. ScenarioContext re-renders all consumers
+4. FlowCanvas re-renders -> useMemo creates new nodes with new data objects
+5. React Flow re-renders MessageFlowNodeComponent with new message.content
+6. React sets the new "value" on the textarea -> CURSOR JUMPS TO END
+7. useEffect fires to restore cursor... but may be too late
 ```
 
-New steps configuration:
+The core problem is that `updateMessage` goes through a global reducer, which triggers a full re-render chain across the entire app. By the time React reconciles the textarea with the new `value` prop, the browser resets the cursor position. The `useEffect` to restore the cursor runs after paint, but React Flow's internal update cycle can interfere with timing.
 
-```typescript
-{
-  id: "message-card",
-  target: "message-card",
-  title: "Message Card",
-  description: "Each card represents a message from the contact. The header shows the message number and controls. Edit the message text in the content area below.",
-  switchToTab: "canvas",
-},
-{
-  id: "add-responses",
-  target: "add-response-input",
-  title: "Add Responses",
-  description: "Add response options that learners can choose. Type a response and click 'Add' or press Enter. Each message needs at least one response option to continue the conversation.",
-  switchToTab: "canvas",
-},
-{
-  id: "add-triggers",
-  target: "trigger-button",
-  title: "Add Triggers",
-  description: "Triggers let you set or check variables when a response is chosen. Use triggers to create conditional logic and branching paths based on learner choices.",
-  switchToTab: "canvas",
-},
-{
-  id: "link-responses",
-  target: "link-button",
-  title: "Link Responses",
-  description: "Connect response options to other message nodes. Click the link icon, then select the target message to create the connection. This defines where the conversation goes next.",
-  switchToTab: "canvas",
-},
+**Fix**: Use **local state as a buffer** for the textarea value. The component will maintain its own `localContent` state for immediate, uninterrupted typing. Changes will be flushed to the global context, but incoming prop changes (from undo/redo or external edits) will only sync back when the textarea is not actively being edited.
+
+### Issue 2: autoResizeTextarea Sets Height to 0px
+
+The current auto-resize function does this:
+```
+el.style.height = '0px';          // TEXTAREA COLLAPSES
+el.style.height = scrollHeight;   // TEXTAREA EXPANDS
 ```
 
-#### 3. Update Progress Index Calculation
+Setting height to `0px` causes a full layout reflow. The browser recalculates the element's geometry, which can disrupt cursor tracking and cause visual flicker even within a single frame.
 
-**File: `src/components/builder/OnboardingWalkthrough.tsx`**
+**Fix**: Use `requestAnimationFrame` and measure `scrollHeight` by temporarily setting `height = '0px'` only inside a rAF callback, or better yet, avoid the 0px trick entirely by comparing the current `scrollHeight` against the current height and only adjusting upward. For shrinking cases, a brief check can be done.
 
-The `getProgressIndex` function has hardcoded step calculations. Update it to dynamically calculate progress based on the `WALKTHROUGH_STEPS` array from the hook rather than hardcoded indices.
+### Issue 3: The Textarea ref Callback Runs on Every Render
 
-Replace the static calculation with:
-
-```typescript
-const getProgressIndex = useCallback(() => {
-  let index = 0;
-  for (let i = 0; i < currentStep; i++) {
-    index += 1; // Main step
-    const step = WALKTHROUGH_STEPS[i];
-    if (step.subSteps) {
-      index += step.subSteps.length;
-    }
+```jsx
+ref={(el) => {
+  textareaRef.current = el;
+  if (el) {
+    el.style.height = '0px';     // THIS RUNS EVERY RENDER
+    el.style.height = `${Math.max(60, el.scrollHeight)}px`;
   }
-  if (currentSubStep >= 0) {
-    index += currentSubStep + 1;
-  }
-  return index;
-}, [currentStep, currentSubStep]);
+}}
 ```
 
-This will need to import `WALKTHROUGH_STEPS` from the hook file.
+This inline ref callback executes on every render of the component, collapsing and re-expanding the textarea each time. Combined with React Flow's re-renders, this amplifies the layout disruption.
+
+**Fix**: Move the initial sizing into a `useEffect` that only runs on mount, and use a stable ref (not an inline callback that recreates every render).
 
 ---
 
-### Technical Details
+## Implementation Plan
 
-**Element Targeting Strategy:**
-The walkthrough uses `data-walkthrough` attributes and `document.querySelector` to find spotlight targets. For the new steps:
-- `message-card` - Targets the first message node on canvas
-- `add-response-input` - Targets the dashed input area at the bottom of a message card
-- `trigger-button` - Targets the Zap icon button on a response option row
-- `link-button` - Targets the Link icon button on response options
+### Step 1: Add Local State Buffer for Textarea
 
-**Prerequisite:** These elements only exist when there is at least one message on the canvas with at least one response option. Since the walkthrough starts on a fresh canvas, the user may need to have created content first. Consider adding a note in the "Canvas" step description encouraging the user to add a message before proceeding.
+In `MessageFlowNode.tsx`:
+- Add `const [localContent, setLocalContent] = useState(message.content)` 
+- Sync from props to local state only when: (a) the message ID changes, or (b) the content changes while the textarea is NOT focused (i.e., an external change like undo)
+- On `onChange`, update `localContent` immediately (no cursor issues) and call `updateMessage` to flush to context
+- Remove `cursorPosRef` and the cursor-restore `useEffect` entirely -- they are no longer needed since React won't fight with local state
 
-**Alternative Approach:** If the elements don't exist yet, the spotlight will fail gracefully (already handled in the existing code). The walkthrough could be enhanced to auto-create a demo message, but that would be a larger change.
+### Step 2: Fix Auto-resize Without Layout Thrashing
 
-**Total Steps After Change:** 
-- Before: 6 steps (Theme + Canvas main + 2 sub + Save + Finalize)
-- After: 10 steps (Theme + Canvas main + 2 sub + 4 new + Save + Finalize)
+- Replace the `height = '0px'` trick with a safer approach:
+  - Set `height = 'auto'` then read `scrollHeight`, then set the final height -- but do this in a way that doesn't affect cursor
+  - Or use `el.scrollHeight` directly after temporarily unsetting `height` via `requestAnimationFrame`
+- Better approach: Only auto-resize needs to handle two cases: growing (content got longer) and shrinking (content got shorter via delete). For growing, just check if `scrollHeight > clientHeight` and expand. For shrinking, temporarily set to a min height, read scrollHeight, then set final.
 
+### Step 3: Fix the Ref Callback
+
+- Switch from an inline ref callback to `useEffect` + stable `textareaRef` for initial sizing
+- Only run height calculation on mount, not on every render
+
+### Step 4: Remove Unnecessary Re-render Triggers
+
+- Since local state handles the typing, the component won't need to re-render from context changes during active typing
+- The `useEffect` for auto-resize on `message.content` change will still work for external updates
+
+---
+
+## Technical Details
+
+### Files to Modify
+
+**`src/components/builder/MessageFlowNode.tsx`**:
+- Add `localContent` state initialized from `message.content`
+- Add `isFocusedRef` to track if textarea is actively being edited
+- Add `useEffect` to sync `message.content` -> `localContent` when content changes externally (while not focused)
+- Update `Textarea` to use `value={localContent}` and `onChange` that sets local state + calls `updateMessage`
+- Add `onFocus`/`onBlur` handlers to manage `isFocusedRef`
+- Rewrite `autoResizeTextarea` to avoid the `height = '0px'` trick
+- Replace inline ref callback with a stable ref + mount effect
+- Remove `cursorPosRef` and cursor restoration `useEffect`
+
+### What This Achieves
+- Typing is fully local -- no cursor interference from React re-renders
+- Auto-resize doesn't cause layout thrashing
+- External changes (undo, import) still sync correctly
+- No performance regression since local state updates are lightweight
