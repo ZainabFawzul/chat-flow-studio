@@ -384,21 +384,27 @@ function MessageFlowNodeComponent({
 
         {/* Content */}
         <div className="p-3">
-          <Textarea value={localContent} onChange={e => {
-            setLocalContent(e.target.value);
-            updateMessage(message.id, e.target.value);
-            // Resize after local state update
-            requestAnimationFrame(() => autoResizeTextarea());
-          }} onFocus={() => {
-            isFocusedRef.current = true;
-            autoResizeTextarea();
-          }} onBlur={() => {
-            isFocusedRef.current = false;
-            // Ensure context has the final value
-            if (localContent !== message.content) {
-              updateMessage(message.id, localContent);
-            }
-          }} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" ref={textareaRef} />
+          {selected ? (
+            <Textarea value={localContent} onChange={e => {
+              setLocalContent(e.target.value);
+              updateMessage(message.id, e.target.value);
+              // Resize after local state update
+              requestAnimationFrame(() => autoResizeTextarea());
+            }} onFocus={() => {
+              isFocusedRef.current = true;
+              autoResizeTextarea();
+            }} onBlur={() => {
+              isFocusedRef.current = false;
+              // Ensure context has the final value
+              if (localContent !== message.content) {
+                updateMessage(message.id, localContent);
+              }
+            }} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" ref={textareaRef} />
+          ) : (
+            <div className="text-sm text-foreground rounded-xl border border-border/50 bg-secondary/30 px-3 py-2 min-h-[40px] nodrag">
+              {localContent.length > 100 ? `${localContent.slice(0, 100)}…` : (localContent || <span className="text-muted-foreground">Enter the contact's message...</span>)}
+            </div>
+          )}
 
           {/* Status indicators */}
           {!isComplete && !hasNoResponses && <div className="mt-2">
