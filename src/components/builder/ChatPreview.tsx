@@ -478,9 +478,12 @@ export function ChatPreview() {
             backgroundColor: `hsl(${theme.responsePanelBackground ?? '0 0% 100%'})`,
           }}
         >
-          <p 
-            className="mb-3 text-xs font-medium uppercase tracking-wide"
-            style={{ color: `hsl(${theme.responsePanelLabelColor ?? '220 9% 46%'})` }}
+            <p 
+            className="mb-3 font-medium uppercase tracking-wide"
+            style={{ 
+              color: `hsl(${theme.responsePanelLabelColor ?? '220 9% 46%'})`,
+              fontSize: `${Math.max(messageFontSize - 3, 11)}px`,
+            }}
           >
             {theme.responsePanelLabelText ?? "Choose a response"}
           </p>
@@ -490,11 +493,12 @@ export function ChatPreview() {
                 key={option.id}
                 onClick={() => handleSelectOption(option.id, option.text)}
                 disabled={!option.text}
-                className="px-3 py-1.5 text-sm font-medium border border-border/50 hover:opacity-80 transition-all disabled:opacity-50 text-left"
+                className="px-3 py-1.5 font-medium border border-border/50 hover:opacity-80 transition-all disabled:opacity-50 text-left"
                 style={{
                   backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
                   color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
                   borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
+                  fontSize: `${messageFontSize}px`,
                 }}
               >
                 {option.text || "Empty option"}

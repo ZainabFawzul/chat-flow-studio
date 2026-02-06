@@ -95,7 +95,9 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
   const responseOptionTextColor = theme.responseOptionTextColor ?? "220 9% 20%";
   const responseOptionBorderRadius = theme.responseOptionBorderRadius ?? 12;
 
-  // Frame settings
+  // Message size
+  const messageSizePx = theme.messageSize === 'extra-large' ? 18 : theme.messageSize === 'large' ? 16 : 14;
+  const responseLabelSizePx = Math.max(messageSizePx - 3, 11);
   const framePreset = theme.framePreset ?? 'none';
   const frameOrientation = theme.frameOrientation ?? 'vertical';
   const isHorizontalFrame = frameOrientation === 'horizontal';
@@ -548,7 +550,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     }
 
     .options-label {
-      font-size: 0.6875rem;
+      font-size: ${responseLabelSizePx / 16}rem;
       font-weight: 500;
       color: hsl(${responsePanelLabelColor});
       text-transform: uppercase;
@@ -569,7 +571,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       background: hsl(${responseOptionBackground});
       color: hsl(${responseOptionTextColor});
       cursor: pointer;
-      font-size: 0.875rem;
+      font-size: ${messageSizePx / 16}rem;
       text-align: left;
       transition: all 0.2s;
     }
