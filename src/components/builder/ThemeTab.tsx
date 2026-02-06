@@ -507,28 +507,24 @@ export function ThemeTab() {
             {/* Contrast Warning for Panel Label */}
             <ContrastWarning bgColor={theme.responsePanelBackground ?? "0 0% 100%"} textColor={theme.responsePanelLabelColor ?? "220 9% 35%"} />
 
-            {/* Option Bubble & Text */}
-            <div className="flex gap-4">
+            {/* Option Background, Text & Corner Radius */}
+            <div className="flex items-end gap-4 flex-wrap">
               <ColorPicker id="response-option-bg" label="Option Background" value={theme.responseOptionBackground ?? "0 0% 100%"} onChange={value => updateTheme({
               responseOptionBackground: value
             })} />
               <ColorPicker id="response-option-text" label="Option Text" value={theme.responseOptionTextColor ?? "222 47% 11%"} onChange={value => updateTheme({
               responseOptionTextColor: value
             })} />
+              <div className="flex items-center gap-2">
+                <Label htmlFor="response-option-radius" className="text-sm font-medium whitespace-nowrap">Corner Radius</Label>
+                <Input id="response-option-radius" type="number" min={0} max={24} value={theme.responseOptionBorderRadius ?? 12} onChange={e => updateTheme({
+                responseOptionBorderRadius: Number(e.target.value)
+              })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
+              </div>
             </div>
 
             {/* Contrast Warning */}
             <ContrastWarning bgColor={theme.responseOptionBackground ?? "0 0% 100%"} textColor={theme.responseOptionTextColor ?? "222 47% 11%"} />
-
-            {/* Option Border Radius */}
-            <div>
-              <Label htmlFor="response-option-radius" className="mb-2 block text-sm font-medium">
-                Option Corner Radius (px)
-              </Label>
-              <Input id="response-option-radius" type="number" min={0} max={24} value={theme.responseOptionBorderRadius ?? 12} onChange={e => updateTheme({
-              responseOptionBorderRadius: Number(e.target.value)
-            })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
-            </div>
 
 
             {/* Preview */}
