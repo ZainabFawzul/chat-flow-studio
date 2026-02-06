@@ -369,7 +369,7 @@ export function ThemeTab() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Label htmlFor="frame-radius" className="text-sm font-medium text-foreground whitespace-nowrap">
-                    Roundness
+                    Corner Radius
                   </Label>
                   <Input id="frame-radius" type="number" min={0} max={20} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
                     frameBorderRadius: Math.min(20, Math.max(0, Number(e.target.value) || 0))
