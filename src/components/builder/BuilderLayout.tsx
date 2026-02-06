@@ -20,6 +20,7 @@ function BuilderContent() {
   const walkthrough = useWalkthrough();
   const { scenario } = useScenario();
   const framePreset = scenario.theme.framePreset ?? 'none';
+  const frameOrientation = scenario.theme.frameOrientation ?? 'vertical';
   const [isCanvasExpanded, setIsCanvasExpanded] = useState(false);
 
   return (
@@ -52,7 +53,7 @@ function BuilderContent() {
             className="w-2/5 min-w-0 lg:min-w-[320px] overflow-hidden bg-muted/30" 
             aria-label="Chat preview"
           >
-            <DeviceFrame preset={framePreset}>
+            <DeviceFrame preset={framePreset} orientation={frameOrientation}>
               <ChatPreview />
             </DeviceFrame>
           </section>

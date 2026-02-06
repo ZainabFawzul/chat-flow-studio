@@ -67,8 +67,8 @@ export function ChatPreview() {
   // Convert messageSize to pixel value
   const getMessageFontSize = (size: MessageSize | undefined): number => {
     switch (size) {
-      case 'small': return 12;
       case 'large': return 16;
+      case 'extra-large': return 18;
       default: return 14; // standard
     }
   };
@@ -490,12 +490,11 @@ export function ChatPreview() {
                 key={option.id}
                 onClick={() => handleSelectOption(option.id, option.text)}
                 disabled={!option.text}
-                className="px-3 py-1.5 text-sm font-medium border border-border/50 hover:opacity-80 transition-all disabled:opacity-50"
+                className="px-3 py-1.5 text-sm font-medium border border-border/50 hover:opacity-80 transition-all disabled:opacity-50 text-left"
                 style={{
                   backgroundColor: `hsl(${theme.responseOptionBackground ?? '0 0% 100%'})`,
                   color: `hsl(${theme.responseOptionTextColor ?? '220 9% 20%'})`,
                   borderRadius: `${theme.responseOptionBorderRadius ?? 12}px`,
-                  textAlign: theme.responseOptionTextAlign ?? 'center',
                 }}
               >
                 {option.text || "Empty option"}
