@@ -357,7 +357,24 @@ function MessageFlowNodeComponent({
 
         {/* Content */}
         <div className="p-3">
-          <Textarea value={message.content} onChange={e => updateMessage(message.id, e.target.value)} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag" />
+          <Textarea value={message.content} onChange={e => {
+            updateMessage(message.id, e.target.value);
+            // Auto-resize textarea
+            const target = e.target;
+            target.style.height = 'auto';
+            target.style.height = `${target.scrollHeight}px`;
+          }} onFocus={e => {
+            // Auto-resize on focus to show full content
+            const target = e.target;
+            target.style.height = 'auto';
+            target.style.height = `${target.scrollHeight}px`;
+          }} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" style={{ height: 'auto' }} ref={(el) => {
+            // Set initial height on mount
+            if (el) {
+              el.style.height = 'auto';
+              el.style.height = `${el.scrollHeight}px`;
+            }
+          }} />
 
           {/* Status indicators */}
           {!isComplete && !hasNoResponses && <div className="mt-2">
