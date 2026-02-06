@@ -515,8 +515,8 @@ export function ThemeTab() {
               <ColorPicker id="response-option-text" label="Option Text" value={theme.responseOptionTextColor ?? "222 47% 11%"} onChange={value => updateTheme({
               responseOptionTextColor: value
             })} />
-              <div className="flex items-center gap-2">
-                <Label htmlFor="response-option-radius" className="text-sm font-medium whitespace-nowrap">Corner Radius</Label>
+              <div className="flex items-center justify-between gap-4">
+                <Label htmlFor="response-option-radius" className="text-sm font-medium text-foreground whitespace-nowrap">Corner Radius</Label>
                 <Input id="response-option-radius" type="number" min={0} max={24} value={theme.responseOptionBorderRadius ?? 12} onChange={e => updateTheme({
                 responseOptionBorderRadius: Number(e.target.value)
               })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
