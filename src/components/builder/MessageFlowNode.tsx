@@ -384,21 +384,25 @@ function MessageFlowNodeComponent({
 
         {/* Content */}
         <div className="p-3">
-          <Textarea value={localContent} onChange={e => {
-            setLocalContent(e.target.value);
-            updateMessage(message.id, e.target.value);
-            // Resize after local state update
-            requestAnimationFrame(() => autoResizeTextarea());
-          }} onFocus={() => {
-            isFocusedRef.current = true;
-            autoResizeTextarea();
-          }} onBlur={() => {
-            isFocusedRef.current = false;
-            // Ensure context has the final value
-            if (localContent !== message.content) {
-              updateMessage(message.id, localContent);
-            }
-          }} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" ref={textareaRef} />
+          {selected ? (
+            <Textarea value={localContent} onChange={e => {
+              setLocalContent(e.target.value);
+              updateMessage(message.id, e.target.value);
+              requestAnimationFrame(() => autoResizeTextarea());
+            }} onFocus={() => {
+              isFocusedRef.current = true;
+              autoResizeTextarea();
+            }} onBlur={() => {
+              isFocusedRef.current = false;
+              if (localContent !== message.content) {
+                updateMessage(message.id, localContent);
+              }
+            }} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" ref={textareaRef} />
+          ) : (
+            <p className="text-sm text-foreground line-clamp-3 whitespace-pre-wrap break-words">
+              {message.content || <span className="text-muted-foreground italic">Empty message</span>}
+            </p>
+          )}
 
           {/* Status indicators */}
           {!isComplete && !hasNoResponses && <div className="mt-2">
@@ -413,51 +417,50 @@ function MessageFlowNodeComponent({
           <div className="border-t border-border/30 p-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-muted-foreground">
-                No responses - connect directly to next message
+                {selected ? "No responses - connect directly to next message" : (message.nextMessageId ? "Connected →" : "No connection")}
               </span>
-              <div className="flex items-center gap-1">
-                {/* Link button for direct connection */}
-                {!message.nextMessageId && !isConnecting && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => startConnection(message.id, null)} 
-                        tabIndex={internalTabIndex} 
-                        className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]"
-                        aria-label="Link to another message"
-                      >
-                        <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      <p>Connect to next message</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-                {/* Unlink button when connected */}
-                {message.nextMessageId && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        onClick={() => disconnectMessageDirect(message.id)} 
-                        tabIndex={internalTabIndex} 
-                        className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
-                      >
-                        <Unlink className="h-3.5 w-3.5" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      <p>Disconnect</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </div>
+              {selected && (
+                <div className="flex items-center gap-1">
+                  {!message.nextMessageId && !isConnecting && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => startConnection(message.id, null)} 
+                          tabIndex={internalTabIndex} 
+                          className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]"
+                          aria-label="Link to another message"
+                        >
+                          <Link2 className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        <p>Connect to next message</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                  {message.nextMessageId && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => disconnectMessageDirect(message.id)} 
+                          tabIndex={internalTabIndex} 
+                          className="h-7 w-7 rounded-lg text-muted-foreground hover:bg-[#FFA2B6] hover:text-[#00178F]"
+                        >
+                          <Unlink className="h-3.5 w-3.5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top">
+                        <p>Disconnect</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+              )}
             </div>
-            {/* Handle for direct connection */}
             <Handle 
               type="source" 
               position={Position.Right} 
@@ -472,23 +475,41 @@ function MessageFlowNodeComponent({
 
         {/* Response Options */}
         {!message.isEndpoint && <div className="border-t border-border/30 p-3 space-y-2" data-walkthrough="response-options-section">
-            <span className="text-xs font-medium text-muted-foreground">Response Options</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Response Options{!selected && message.responseOptions.length > 0 ? ` (${message.responseOptions.length})` : ""}
+            </span>
             
-            {message.responseOptions.map((option, index) => <ResponseOptionRow key={option.id} option={option} index={index} messageId={message.id} variables={variables || {}} pendingConnection={pendingConnection} isConnecting={isConnecting} internalTabIndex={internalTabIndex} isExpanded={selected === true} />)}
+            {selected ? (
+              <>
+                {message.responseOptions.map((option, index) => <ResponseOptionRow key={option.id} option={option} index={index} messageId={message.id} variables={variables || {}} pendingConnection={pendingConnection} isConnecting={isConnecting} internalTabIndex={internalTabIndex} isExpanded={true} />)}
 
-            {/* Add new option */}
-            <div className="flex items-center gap-2 rounded-lg border border-dashed border-border/50 p-2" data-walkthrough="add-response-input">
-              <Input value={newOptionText} onChange={e => setNewOptionText(e.target.value)} placeholder="New response..." tabIndex={internalTabIndex} className="flex-1 h-7 text-xs border-0 bg-transparent focus-visible:ring-0 nodrag" onKeyDown={e => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleAddOption();
-            }
-          }} />
-              <Button variant="default" size="sm" onClick={handleAddOption} disabled={!newOptionText.trim()} tabIndex={internalTabIndex} className="h-7 px-2 text-xs rounded-md">
-                <Plus className="h-3 w-3 mr-1" />
-                Add
-              </Button>
-            </div>
+                {/* Add new option */}
+                <div className="flex items-center gap-2 rounded-lg border border-dashed border-border/50 p-2" data-walkthrough="add-response-input">
+                  <Input value={newOptionText} onChange={e => setNewOptionText(e.target.value)} placeholder="New response..." tabIndex={internalTabIndex} className="flex-1 h-7 text-xs border-0 bg-transparent focus-visible:ring-0 nodrag" onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddOption();
+                    }
+                  }} />
+                  <Button variant="default" size="sm" onClick={handleAddOption} disabled={!newOptionText.trim()} tabIndex={internalTabIndex} className="h-7 px-2 text-xs rounded-md">
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add
+                  </Button>
+                </div>
+              </>
+            ) : (
+              /* Compact response list when not selected */
+              message.responseOptions.length > 0 && (
+                <div className="space-y-1">
+                  {message.responseOptions.map((option) => (
+                    <div key={option.id} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className="w-1.5 h-1.5 rounded-full bg-primary/50 shrink-0" />
+                      <span className="truncate">{option.text || "Empty response"}</span>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
           </div>}
       </div>
     </TooltipProvider>;
