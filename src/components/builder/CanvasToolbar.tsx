@@ -38,37 +38,31 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
   const { scenario, resetScenario, addRootMessage } = useScenario();
   const [isVariablesPanelOpen, setIsVariablesPanelOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  const [position, setPosition] = useState({ x: 16, y: 16 });
   const dragOffset = useRef({ x: 0, y: 0 });
   const toolbarRef = useRef<HTMLDivElement>(null);
 
   const handleDragStart = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     if (toolbarRef.current) {
-      const rect = toolbarRef.current.getBoundingClientRect();
-      const parentRect = toolbarRef.current.offsetParent?.getBoundingClientRect() || { left: 0, top: 0 };
       dragOffset.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
       };
-      // Initialize position relative to parent if not yet set
-      if (!position) {
-        setPosition({
-          x: rect.left - parentRect.left,
-          y: rect.top - parentRect.top,
-        });
-      }
       setIsDragging(true);
     }
   }, [position]);
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isDragging || !toolbarRef.current) return;
-    const parentRect = toolbarRef.current.offsetParent?.getBoundingClientRect() || { left: 0, top: 0, width: window.innerWidth, height: window.innerHeight };
-    const newX = e.clientX - dragOffset.current.x - parentRect.left;
-    const newY = e.clientY - dragOffset.current.y - parentRect.top;
-    const maxX = parentRect.width - (toolbarRef.current.offsetWidth || 200);
-    const maxY = parentRect.height - (toolbarRef.current.offsetHeight || 50);
+    const parent = toolbarRef.current.parentElement;
+    const parentWidth = parent?.clientWidth || window.innerWidth;
+    const parentHeight = parent?.clientHeight || window.innerHeight;
+    const newX = e.clientX - dragOffset.current.x;
+    const newY = e.clientY - dragOffset.current.y;
+    const maxX = parentWidth - (toolbarRef.current.offsetWidth || 200);
+    const maxY = parentHeight - (toolbarRef.current.offsetHeight || 50);
     setPosition({
       x: Math.max(0, Math.min(newX, maxX)),
       y: Math.max(0, Math.min(newY, maxY)),
@@ -106,12 +100,12 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
       <div 
         ref={toolbarRef}
         className={cn(
-          "flex items-center gap-2 p-2 bg-card border border-border rounded-xl shadow-lg",
+          "absolute z-10 flex items-center gap-2 p-2 bg-card border border-border rounded-xl shadow-lg",
           isDragging && "cursor-grabbing select-none"
         )}
         role="toolbar"
         aria-label="Canvas toolbar. Tab to navigate buttons, then Tab again to move to message nodes."
-        style={position ? { position: 'absolute', left: position.x, top: position.y } : undefined}
+        style={{ left: position.x, top: position.y }}
       >
         {/* Drag handle */}
         <Tooltip>
