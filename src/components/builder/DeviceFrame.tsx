@@ -33,7 +33,7 @@ export function DeviceFrame({ preset, orientation = 'vertical', children, classN
             width: isHorizontal ? undefined : '380px',
             height: isHorizontal ? '380px' : undefined,
             maxWidth: isHorizontal ? '100%' : undefined,
-            aspectRatio: isHorizontal ? '18/9' : '9/18',
+            aspectRatio: isHorizontal ? '16/9' : '9/16',
             borderRadius: isHorizontal ? '28px' : '44px',
             padding: '10px',
           }}
