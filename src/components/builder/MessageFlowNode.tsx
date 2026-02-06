@@ -54,31 +54,29 @@ function MessageFlowNodeComponent({
   } = useScenario();
   const [newOptionText, setNewOptionText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [localContent, setLocalContent] = useState(message.content);
   const nodeRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const cursorPosRef = useRef<{ start: number; end: number } | null>(null);
+  const isFocusedRef = useRef(false);
 
-  // Auto-resize textarea safely using a clone measurement to avoid cursor disruption
+  // Sync external content changes (undo/redo, imports) to local state
+  // but only when the textarea is NOT focused (user is not actively typing)
+  useEffect(() => {
+    if (!isFocusedRef.current) {
+      setLocalContent(message.content);
+    }
+  }, [message.content]);
+
+  // Auto-resize textarea without layout thrashing
   const autoResizeTextarea = useCallback(() => {
     const el = textareaRef.current;
     if (!el) return;
-    // Temporarily set to a small height to get accurate scrollHeight
-    const prevOverflow = el.style.overflow;
+    // Use a hidden measurement approach: set to min height, read scrollHeight, set final
     el.style.overflow = 'hidden';
-    el.style.height = '0px';
-    const newHeight = Math.max(60, el.scrollHeight);
-    el.style.height = `${newHeight}px`;
-    el.style.overflow = prevOverflow;
+    el.style.height = '60px'; // min height for measurement
+    const scrollH = el.scrollHeight;
+    el.style.height = `${Math.max(60, scrollH)}px`;
   }, []);
-
-  // Restore cursor position after React re-render
-  useEffect(() => {
-    const el = textareaRef.current;
-    if (el && cursorPosRef.current && document.activeElement === el) {
-      el.setSelectionRange(cursorPosRef.current.start, cursorPosRef.current.end);
-      cursorPosRef.current = null;
-    }
-  });
 
   const handleAddOption = () => {
     if (newOptionText.trim()) {
@@ -167,10 +165,10 @@ function MessageFlowNodeComponent({
     return () => nodeRef.current?.removeEventListener('focusout', handleFocusOut);
   }, [isEditing]);
 
-  // Re-measure textarea height when content changes externally
+  // Re-measure textarea height on mount and when content changes externally
   useEffect(() => {
     autoResizeTextarea();
-  }, [message.content, autoResizeTextarea]);
+  }, [message.content, localContent, autoResizeTextarea]);
 
   // Internal elements are only tabbable when in edit mode and not connecting
   const internalTabIndex = (isEditing && !isConnecting) ? 0 : -1;
@@ -386,21 +384,21 @@ function MessageFlowNodeComponent({
 
         {/* Content */}
         <div className="p-3">
-          <Textarea value={message.content} onChange={e => {
-            // Save cursor position before React re-render
-            cursorPosRef.current = {
-              start: e.target.selectionStart,
-              end: e.target.selectionEnd,
-            };
+          <Textarea value={localContent} onChange={e => {
+            setLocalContent(e.target.value);
             updateMessage(message.id, e.target.value);
+            // Resize after local state update
+            requestAnimationFrame(() => autoResizeTextarea());
+          }} onFocus={() => {
+            isFocusedRef.current = true;
             autoResizeTextarea();
-          }} onFocus={autoResizeTextarea} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" ref={(el) => {
-            (textareaRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = el;
-            if (el) {
-              el.style.height = '0px';
-              el.style.height = `${Math.max(60, el.scrollHeight)}px`;
+          }} onBlur={() => {
+            isFocusedRef.current = false;
+            // Ensure context has the final value
+            if (localContent !== message.content) {
+              updateMessage(message.id, localContent);
             }
-          }} />
+          }} placeholder="Enter the contact's message..." tabIndex={internalTabIndex} className="min-h-[60px] resize-none rounded-xl border-border/50 bg-secondary/30 text-sm nodrag overflow-hidden" ref={textareaRef} />
 
           {/* Status indicators */}
           {!isComplete && !hasNoResponses && <div className="mt-2">
