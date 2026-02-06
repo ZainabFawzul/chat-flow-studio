@@ -60,7 +60,9 @@ export interface BubbleBorderRadius {
   bottomLeft: number;
 }
 
-export type MessageSize = 'small' | 'standard' | 'large';
+export type MessageSize = 'standard' | 'large' | 'extra-large';
+
+export type FrameOrientation = 'vertical' | 'horizontal';
 
 export interface ChatTheme {
   contactName: string;
@@ -93,12 +95,12 @@ export interface ChatTheme {
   responseOptionBackground: string;
   responseOptionTextColor: string;
   responseOptionBorderRadius: number;
-  responseOptionTextAlign: 'left' | 'center' | 'right';
   // Controls
   showResetButton: boolean;
   // Frame customization
   framePreset: 'none' | 'phone' | 'tablet';
-  frameBorderRadius: number; // 0-32px
+  frameOrientation: FrameOrientation; // vertical or horizontal
+  frameBorderRadius: number; // 0-20px
   frameBorderWidth: number; // 0-4px
   frameBorderColor: string; // HSL
   // Conversation type
@@ -157,11 +159,11 @@ export const DEFAULT_THEME: ChatTheme = {
   responseOptionBackground: "0 0% 100%", // White
   responseOptionTextColor: "222 47% 11%", // Dark foreground - WCAG AA compliant
   responseOptionBorderRadius: 12,
-  responseOptionTextAlign: 'center',
   // Controls
   showResetButton: true,
   // Frame customization
   framePreset: 'none',
+  frameOrientation: 'vertical',
   frameBorderRadius: 16,
   frameBorderWidth: 1,
   frameBorderColor: "220 13% 91%", // Light gray border

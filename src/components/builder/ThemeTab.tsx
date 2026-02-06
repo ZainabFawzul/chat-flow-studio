@@ -13,11 +13,11 @@ import { useScenario } from "@/context/ScenarioContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, MessageSquare, FileText, AlignLeft, AlignCenter, AlignRight } from "lucide-react";
+import { Upload, X, User, MessageCircle, Play, AlertTriangle, MousePointerClick, Smartphone, Tablet, Square, MessageSquare, FileText, RectangleVertical, RectangleHorizontal } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { cn } from "@/lib/utils";
-import { BubbleBorderRadius, DEFAULT_BORDER_RADIUS, MessageSize } from "@/types/scenario";
+import { BubbleBorderRadius, DEFAULT_BORDER_RADIUS, MessageSize, FrameOrientation } from "@/types/scenario";
 import { Switch } from "@/components/ui/switch";
 import { getContrastLevel } from "@/lib/contrast";
 const DEFAULT_SENDER_RADIUS: BubbleBorderRadius = {
@@ -297,6 +297,31 @@ export function ThemeTab() {
               </div>
             </div>
 
+            {/* Orientation */}
+            <div>
+              <Label className="mb-3 block text-sm font-semibold">Orientation</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: 'vertical' as FrameOrientation, label: 'Vertical', icon: RectangleVertical },
+                  { value: 'horizontal' as FrameOrientation, label: 'Horizontal', icon: RectangleHorizontal },
+                ]).map(({ value, label, icon: Icon }) => (
+                  <button 
+                    key={value} 
+                    onClick={() => updateTheme({ frameOrientation: value })} 
+                    className={cn(
+                      "flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all",
+                      (theme.frameOrientation ?? 'vertical') === value 
+                        ? "border-primary bg-primary/5 text-primary" 
+                        : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span className="text-xs font-medium">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Device Frame */}
             <div>
               <Label className="mb-3 block text-sm font-semibold">Device Frame</Label>
@@ -346,8 +371,8 @@ export function ThemeTab() {
                   <Label htmlFor="frame-radius" className="text-sm font-medium text-foreground whitespace-nowrap">
                     Roundness
                   </Label>
-                  <Input id="frame-radius" type="number" min={0} max={32} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
-                    frameBorderRadius: Number(e.target.value)
+                  <Input id="frame-radius" type="number" min={0} max={20} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
+                    frameBorderRadius: Math.min(20, Math.max(0, Number(e.target.value) || 0))
                   })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
                   <span className="text-xs text-muted-foreground">px</span>
                 </div>
@@ -359,9 +384,9 @@ export function ThemeTab() {
               <Label className="mb-3 block text-sm font-semibold">Message Size</Label>
               <div className="grid grid-cols-3 gap-2">
                 {([
-                  { value: 'small' as MessageSize, label: 'Small' },
                   { value: 'standard' as MessageSize, label: 'Standard' },
-                  { value: 'large' as MessageSize, label: 'Large' }
+                  { value: 'large' as MessageSize, label: 'Large' },
+                  { value: 'extra-large' as MessageSize, label: 'Extra Large' }
                 ]).map(({ value, label }) => (
                   <button 
                     key={value} 
@@ -505,34 +530,6 @@ export function ThemeTab() {
             })} className="h-10 w-24 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
 
-            {/* Text Alignment */}
-            <div>
-              <Label className="mb-3 block text-sm font-medium">Option Text Alignment</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {[{
-                value: 'left' as const,
-                label: 'Left',
-                icon: AlignLeft
-              }, {
-                value: 'center' as const,
-                label: 'Center',
-                icon: AlignCenter
-              }, {
-                value: 'right' as const,
-                label: 'Right',
-                icon: AlignRight
-              }].map(({
-                value,
-                label,
-                icon: Icon
-              }) => <button key={value} onClick={() => updateTheme({
-                responseOptionTextAlign: value
-              })} className={cn("flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all", (theme.responseOptionTextAlign ?? 'center') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
-                    <Icon className="h-5 w-5" />
-                    <span className="text-xs font-medium">{label}</span>
-                  </button>)}
-              </div>
-            </div>
 
             {/* Preview */}
             

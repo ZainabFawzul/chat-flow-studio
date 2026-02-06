@@ -97,6 +97,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
 
   // Frame settings
   const framePreset = theme.framePreset ?? 'none';
+  const frameOrientation = theme.frameOrientation ?? 'vertical';
+  const isHorizontalFrame = frameOrientation === 'horizontal';
   const frameBorderRadius = theme.frameBorderRadius ?? 16;
   const frameBorderWidth = theme.frameBorderWidth ?? 1;
   const frameBorderColor = theme.frameBorderColor ?? "220 13% 91%";
@@ -179,19 +181,19 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     .device-frame.phone {
       position: relative;
       background: #1a1a1a;
-      border-radius: 44px;
+      border-radius: ${isHorizontalFrame ? '28px' : '44px'};
       padding: 10px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-      width: 380px;
+      ${isHorizontalFrame ? 'height: 380px;' : 'width: 380px;'}
       max-width: 100%;
-      aspect-ratio: 9 / 18;
+      aspect-ratio: ${isHorizontalFrame ? '18 / 9' : '9 / 18'};
       max-height: 100%;
     }
 
     .device-frame.phone .frame-inner {
       position: absolute;
       inset: 10px;
-      border-radius: 36px;
+      border-radius: ${isHorizontalFrame ? '20px' : '36px'};
       overflow: hidden;
       background: black;
     }
@@ -199,10 +201,50 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     .device-frame.phone .chat-container {
       height: 100%;
       width: 100%;
-      border-radius: 36px;
+      border-radius: ${isHorizontalFrame ? '20px' : '36px'};
     }
 
     /* Phone side buttons */
+    ${isHorizontalFrame ? `
+    .phone-button-top-1 {
+      position: absolute;
+      top: -3px;
+      left: 112px;
+      height: 3px;
+      width: 32px;
+      background: #2a2a2a;
+      border-radius: 2px 2px 0 0;
+    }
+    .phone-button-top-2 {
+      position: absolute;
+      top: -3px;
+      left: 160px;
+      height: 3px;
+      width: 56px;
+      background: #2a2a2a;
+      border-radius: 2px 2px 0 0;
+    }
+    .phone-button-bottom {
+      position: absolute;
+      bottom: -3px;
+      left: 144px;
+      height: 3px;
+      width: 80px;
+      background: #2a2a2a;
+      border-radius: 0 0 2px 2px;
+    }
+    .phone-home-indicator {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 112px;
+      width: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 9999px;
+      z-index: 20;
+    }
+    ` : `
     .phone-button-left-1 {
       position: absolute;
       left: -3px;
@@ -250,6 +292,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       border-radius: 9999px;
       z-index: 20;
     }
+    `}
+    }
 
     .device-frame.tablet {
       position: relative;
@@ -258,8 +302,8 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       padding: 8px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       width: 100%;
-      max-width: 600px;
-      aspect-ratio: 4 / 3;
+      max-width: ${isHorizontalFrame ? '700px' : '600px'};
+      aspect-ratio: ${isHorizontalFrame ? '4 / 3' : '3 / 4'};
       max-height: 100%;
     }
 
@@ -526,6 +570,7 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
       color: hsl(${responseOptionTextColor});
       cursor: pointer;
       font-size: 0.875rem;
+      text-align: left;
       transition: all 0.2s;
     }
 
@@ -698,10 +743,16 @@ function generateStandaloneHTML(scenario: ScenarioData): string {
     <div class="frame-inner">
       <div class="chat-container" id="app" role="region" aria-label="Interactive chat conversation with ${escapeHTML(theme.contactName)}"></div>
     </div>
+    ${isHorizontalFrame ? `
+    <div class="phone-button-top-1"></div>
+    <div class="phone-button-top-2"></div>
+    <div class="phone-button-bottom"></div>
+    ` : `
     <div class="phone-button-left-1"></div>
     <div class="phone-button-left-2"></div>
     <div class="phone-button-left-3"></div>
     <div class="phone-button-right"></div>
+    `}
     <div class="phone-home-indicator"></div>
   </div>
   ` : framePreset === 'tablet' ? `
