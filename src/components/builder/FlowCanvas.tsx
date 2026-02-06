@@ -240,13 +240,7 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
       aria-label="Message flow canvas. Use Tab to navigate to controls, or click to interact with the canvas."
     >
       {/* FIRST in DOM = First in focus order */}
-      <div 
-        className="absolute top-4 left-4 z-10"
-        role="region" 
-        aria-label="Canvas controls. Tab through toolbar buttons first, then Tab to move through message nodes."
-      >
-        <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} />
-      </div>
+      <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} />
 
       <div className="absolute top-4 right-4 z-10">
         <Button
