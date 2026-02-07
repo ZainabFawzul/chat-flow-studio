@@ -353,7 +353,7 @@ export function ResponseOptionRow({
         </div>
 
         {/* Output handle for this option */}
-        <Handle type="source" position={Position.Right} id={option.id} className={cn("!w-3 !h-3 !border-2 !border-background !right-[-6px]", option.nextMessageId ? "!bg-success" : "!bg-primary")} style={{
+        <Handle type="source" position={Position.Right} id={option.id} className={cn("!w-4 !h-4 !border-2 !border-background !-right-2 source-handle cursor-crosshair", option.nextMessageId ? "!bg-success" : "!bg-primary source-handle-unconnected")} style={{
         top: "auto"
       }} />
       </div>
