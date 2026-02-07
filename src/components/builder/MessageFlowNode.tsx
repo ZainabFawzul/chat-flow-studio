@@ -293,9 +293,9 @@ function MessageFlowNodeComponent({
               </Tooltip>}
 
             {/* Connection mode indicator */}
-            {canReceiveConnection && <span className="flex items-center gap-1 text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded font-medium animate-pulse" aria-hidden="true">
+            {canReceiveConnection && <span className="flex items-center gap-1 text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded font-medium" aria-hidden="true">
                 <MousePointerClick className="h-2.5 w-2.5" />
-                Press Enter to connect
+                Click to connect
               </span>}
           </div>
 
