@@ -8,7 +8,7 @@
  */
 
 import { memo, useState, useRef, useEffect, useCallback } from "react";
-import { Handle, Position, NodeProps } from "@xyflow/react";
+import { NodeProps } from "@xyflow/react";
 import { useScenario, PendingConnection } from "@/context/ScenarioContext";
 import { ChatMessage, ScenarioVariable, VariableValue } from "@/types/scenario";
 import { Textarea } from "@/components/ui/textarea";
@@ -196,9 +196,7 @@ function MessageFlowNodeComponent({
               data-connection-target={canReceiveConnection ? message.id : undefined}
               data-message-node={message.id}
             >
-              {/* Input handle */}
-              <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-primary !border-2 !border-background" />
-              
+              {/* Handles removed — connections via Link button only */}
               <span className={cn(
                 "text-xl font-bold",
                 isRoot ? "text-primary" : "text-foreground"
@@ -206,24 +204,7 @@ function MessageFlowNodeComponent({
                 {nodeNumber}
               </span>
               
-              {/* Output handles - one for each response option + direct connection */}
-              {message.responseOptions.map((option, index) => (
-                <Handle 
-                  key={option.id}
-                  type="source" 
-                  position={Position.Right} 
-                  id={option.id}
-                  className="!w-2 !h-2 !bg-primary !border-2 !border-background !opacity-0"
-                  style={{ top: `${30 + index * 10}%` }}
-                />
-              ))}
-              {/* Direct connection handle */}
-              <Handle 
-                type="source" 
-                position={Position.Right} 
-                id="direct" 
-                className="!w-2 !h-2 !bg-primary !border-2 !border-background"
-              />
+              {/* Source handles removed — connections via Link button only */}
             </div>
           </TooltipTrigger>
           <TooltipContent side="top" className="max-w-[200px]">
@@ -267,9 +248,7 @@ function MessageFlowNodeComponent({
             : "Press Enter or Space to edit this message. Press Tab to move to the next message node."
           }
         </span>
-        {/* Input handle for connections */}
-        <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-primary !border-2 !border-background" />
-
+        {/* Target handle removed — connections via Link button only */}
         {/* Header */}
         <div className="flex items-center justify-between gap-2 p-3 border-b border-border/30">
           <div className="flex items-center gap-2">
@@ -466,16 +445,7 @@ function MessageFlowNodeComponent({
                 )}
               </div>
             </div>
-            {/* Handle for direct connection */}
-            <Handle 
-              type="source" 
-              position={Position.Right} 
-              id="direct" 
-              className={cn(
-                "!w-3 !h-3 !border-2 !border-background !right-[-6px] !top-auto !bottom-4",
-                message.nextMessageId ? "!bg-success" : "!bg-primary"
-              )} 
-            />
+            {/* Direct connection handle removed — connections via Link button only */}
           </div>
         )}
 
