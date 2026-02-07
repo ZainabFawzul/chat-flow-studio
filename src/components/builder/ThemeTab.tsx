@@ -93,7 +93,7 @@ function Section({
 }: SectionProps) {
   return <section aria-labelledby={id} className="rounded-2xl bg-card border border-border/50 p-5 shadow-sm hover:shadow-md transition-shadow duration-300">
       <div className="flex items-center gap-3 mb-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true">
           {icon}
         </div>
         <h2 id={id} className="text-base font-semibold text-foreground">
@@ -560,7 +560,7 @@ function ContrastWarning({
   if (level === "aa" || level === "aaa") return null;
   const labelPrefix = label ? `${label}: ` : "";
   return <div className="flex items-start gap-2 p-2.5 rounded-lg bg-destructive/10 border border-destructive/20">
-      <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+      <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-0.5" aria-hidden="true" />
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium text-destructive">
           {labelPrefix}Low contrast ({ratio.toFixed(1)}:1)
