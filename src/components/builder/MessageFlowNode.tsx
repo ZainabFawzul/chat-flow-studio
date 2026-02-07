@@ -197,7 +197,7 @@ function MessageFlowNodeComponent({
               data-message-node={message.id}
             >
               {/* Input handle */}
-              <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-primary !border-2 !border-background cursor-crosshair" />
+              <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-primary !border-2 !border-background" />
               
               <span className={cn(
                 "text-xl font-bold",
@@ -213,7 +213,7 @@ function MessageFlowNodeComponent({
                   type="source" 
                   position={Position.Right} 
                   id={option.id}
-                  className="!w-3 !h-3 !bg-primary !border-2 !border-background !opacity-0 source-handle cursor-crosshair"
+                  className="!w-2 !h-2 !bg-primary !border-2 !border-background !opacity-0"
                   style={{ top: `${30 + index * 10}%` }}
                 />
               ))}
@@ -222,7 +222,7 @@ function MessageFlowNodeComponent({
                 type="source" 
                 position={Position.Right} 
                 id="direct" 
-                className="!w-3 !h-3 !bg-primary !border-2 !border-background source-handle cursor-crosshair"
+                className="!w-2 !h-2 !bg-primary !border-2 !border-background"
               />
             </div>
           </TooltipTrigger>
@@ -268,7 +268,7 @@ function MessageFlowNodeComponent({
           }
         </span>
         {/* Input handle for connections */}
-        <Handle type="target" position={Position.Left} className="!w-4 !h-4 !bg-primary !border-2 !border-background !-left-2 cursor-crosshair" style={{ padding: '4px', backgroundClip: 'content-box' }} />
+        <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-primary !border-2 !border-background" />
 
         {/* Header */}
         <div className="flex items-center justify-between gap-2 p-3 border-b border-border/30">
@@ -472,8 +472,8 @@ function MessageFlowNodeComponent({
               position={Position.Right} 
               id="direct" 
               className={cn(
-                "!w-4 !h-4 !border-2 !border-background !-right-2 !top-auto !bottom-4 source-handle cursor-crosshair",
-                message.nextMessageId ? "!bg-success" : "!bg-primary source-handle-unconnected"
+                "!w-3 !h-3 !border-2 !border-background !right-[-6px] !top-auto !bottom-4",
+                message.nextMessageId ? "!bg-success" : "!bg-primary"
               )} 
             />
           </div>
