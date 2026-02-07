@@ -307,8 +307,8 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
               <Link2 className="h-4 w-4" aria-hidden="true" />
               <span className="text-sm font-medium">
                 {pendingOptionText 
-                  ? `Connecting "${pendingOptionText}" — Tab to a message node and press Enter`
-                  : "Connecting message — Tab to a message node and press Enter"
+                  ? `Connecting "${pendingOptionText}" — Select another message to connect them`
+                  : "Connecting message — Select another message to connect them"
                 }
               </span>
               <Button
