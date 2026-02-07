@@ -14,7 +14,7 @@ import { ChatMessage, ScenarioVariable, VariableValue } from "@/types/scenario";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Flag, Plus, Trash2, Eye, MousePointerClick, Link2, Unlink } from "lucide-react";
+import { Flag, Plus, Trash2, Eye, Link2, Unlink } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -272,8 +272,11 @@ function MessageFlowNodeComponent({
         {/* Header */}
         <div className="flex items-center justify-between gap-2 p-3 border-b border-border/30">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg font-bold text-sm bg-[#a8b7ff] text-sidebar-foreground">
-              {nodeNumber}
+            <div className={cn(
+              "flex h-7 w-7 items-center justify-center rounded-lg font-bold text-sm text-sidebar-foreground",
+              canReceiveConnection ? "bg-[#d3f3df]" : "bg-[#a8b7ff]"
+            )}>
+              {canReceiveConnection ? <Link2 className="h-4 w-4 text-success" /> : nodeNumber}
             </div>
             <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
               {isRoot ? "Start" : "Message"}
@@ -294,8 +297,7 @@ function MessageFlowNodeComponent({
 
             {/* Connection mode indicator */}
             {canReceiveConnection && <span className="flex items-center gap-1 text-[10px] bg-success/20 text-success px-1.5 py-0.5 rounded font-medium" aria-hidden="true">
-                <MousePointerClick className="h-2.5 w-2.5" />
-                Click to connect
+                Connect
               </span>}
           </div>
 
