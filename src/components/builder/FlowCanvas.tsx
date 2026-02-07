@@ -29,6 +29,7 @@ import { useScenario } from "@/context/ScenarioContext";
 import { MessageFlowNode } from "./MessageFlowNode";
 import { ResponseEdge } from "./ResponseEdge";
 import { CanvasToolbar } from "./CanvasToolbar";
+import { ValidationPanel } from "./ValidationPanel";
 import { Button } from "@/components/ui/button";
 import { Maximize2, Minimize2, Link2, X } from "lucide-react";
 
@@ -64,6 +65,50 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
   
   // Track zoom level for condensed node display
   const [zoomLevel, setZoomLevel] = useState(1);
+
+  // Validation state
+  const [isValidationOpen, setIsValidationOpen] = useState(false);
+  const [invalidMessageIds, setInvalidMessageIds] = useState<Set<string>>(new Set());
+
+  // Compute invalid messages when validation is open
+  const computeInvalidIds = useCallback(() => {
+    const ids = new Set<string>();
+    Object.values(scenario.messages).forEach((message) => {
+      // Messages with unconnected response options
+      const hasUnconnectedOption = message.responseOptions.some(
+        (opt) => !opt.nextMessageId
+      );
+      if (hasUnconnectedOption) {
+        ids.add(message.id);
+      }
+      // Messages with no responses, no direct connection, and not an endpoint
+      if (
+        message.responseOptions.length === 0 &&
+        !message.nextMessageId &&
+        !message.isEndpoint
+      ) {
+        ids.add(message.id);
+      }
+    });
+    return ids;
+  }, [scenario.messages]);
+
+  const handleValidate = useCallback(() => {
+    setInvalidMessageIds(computeInvalidIds());
+    setIsValidationOpen(true);
+  }, [computeInvalidIds]);
+
+  // Keep invalid IDs in sync while panel is open
+  useEffect(() => {
+    if (isValidationOpen) {
+      setInvalidMessageIds(computeInvalidIds());
+    }
+  }, [isValidationOpen, computeInvalidIds]);
+
+  const handleCloseValidation = useCallback(() => {
+    setIsValidationOpen(false);
+    setInvalidMessageIds(new Set());
+  }, []);
   
   // Update zoom level when viewport changes
   useOnViewportChange({
@@ -151,9 +196,10 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         pendingConnection,
         variables: scenario.variables || {},
         isCondensed: zoomLevel < 0.4, // Show condensed view when zoomed below 40%
+        isInvalid: invalidMessageIds.has(message.id),
       },
     }));
-  }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables, selectedNodeId, zoomLevel]);
+  }, [scenario.messages, scenario.rootMessageId, pendingConnection, scenario.variables, selectedNodeId, zoomLevel, invalidMessageIds]);
 
   // Ensure nodes are visible when entering expanded mode.
   // Using onInit avoids injecting custom children into <ReactFlow> (which can trigger ref warnings).
@@ -240,7 +286,13 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
       aria-label="Message flow canvas. Use Tab to navigate to controls, or click to interact with the canvas."
     >
       {/* FIRST in DOM = First in focus order */}
-      <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} />
+      <CanvasToolbar onAddNode={() => handleAddNode({ x: 200, y: 200 })} onValidate={handleValidate} />
+
+      <ValidationPanel
+        isOpen={isValidationOpen}
+        onClose={handleCloseValidation}
+        invalidMessageIds={invalidMessageIds}
+      />
 
       <div className="absolute top-4 right-4 z-10">
         <Button
