@@ -280,6 +280,8 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         selectionKeyCode={null}
         tabIndex={-1}
         aria-label="Flow canvas area"
+        connectOnClick={false}
+        nodesConnectable={false}
       >
         <Background
           variant={BackgroundVariant.Dots}

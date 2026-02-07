@@ -196,8 +196,8 @@ function MessageFlowNodeComponent({
               data-connection-target={canReceiveConnection ? message.id : undefined}
               data-message-node={message.id}
             >
-              {/* Input handle */}
-              <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-primary !border-2 !border-background" />
+              {/* Hidden target handle for edge rendering */}
+              <Handle type="target" position={Position.Left} className="!w-0 !h-0 !bg-transparent !border-0 !min-w-0 !min-h-0 !opacity-0 !pointer-events-none" />
               
               <span className={cn(
                 "text-xl font-bold",
@@ -206,23 +206,22 @@ function MessageFlowNodeComponent({
                 {nodeNumber}
               </span>
               
-              {/* Output handles - one for each response option + direct connection */}
+              {/* Hidden handles for edge rendering in condensed mode */}
               {message.responseOptions.map((option, index) => (
                 <Handle 
                   key={option.id}
                   type="source" 
                   position={Position.Right} 
                   id={option.id}
-                  className="!w-2 !h-2 !bg-primary !border-2 !border-background !opacity-0"
+                  className="!w-0 !h-0 !bg-transparent !border-0 !min-w-0 !min-h-0 !opacity-0 !pointer-events-none"
                   style={{ top: `${30 + index * 10}%` }}
                 />
               ))}
-              {/* Direct connection handle */}
               <Handle 
                 type="source" 
                 position={Position.Right} 
                 id="direct" 
-                className="!w-2 !h-2 !bg-primary !border-2 !border-background"
+                className="!w-0 !h-0 !bg-transparent !border-0 !min-w-0 !min-h-0 !opacity-0 !pointer-events-none"
               />
             </div>
           </TooltipTrigger>
@@ -267,8 +266,8 @@ function MessageFlowNodeComponent({
             : "Press Enter or Space to edit this message. Press Tab to move to the next message node."
           }
         </span>
-        {/* Input handle for connections */}
-        <Handle type="target" position={Position.Left} className="!w-3 !h-3 !bg-primary !border-2 !border-background" />
+        {/* Hidden target handle - required by React Flow for edge rendering */}
+        <Handle type="target" position={Position.Left} className="!w-0 !h-0 !bg-transparent !border-0 !min-w-0 !min-h-0 !opacity-0 !pointer-events-none" />
 
         {/* Header */}
         <div className="flex items-center justify-between gap-2 p-3 border-b border-border/30">
@@ -466,15 +465,12 @@ function MessageFlowNodeComponent({
                 )}
               </div>
             </div>
-            {/* Handle for direct connection */}
+            {/* Hidden source handle - required by React Flow for edge rendering */}
             <Handle 
               type="source" 
               position={Position.Right} 
               id="direct" 
-              className={cn(
-                "!w-3 !h-3 !border-2 !border-background !right-[-6px] !top-auto !bottom-4",
-                message.nextMessageId ? "!bg-success" : "!bg-primary"
-              )} 
+              className="!w-0 !h-0 !bg-transparent !border-0 !min-w-0 !min-h-0 !opacity-0 !pointer-events-none !right-[-6px] !top-auto !bottom-4"
             />
           </div>
         )}

@@ -352,8 +352,8 @@ export function ResponseOptionRow({
         </Button>
         </div>
 
-        {/* Output handle for this option */}
-        <Handle type="source" position={Position.Right} id={option.id} className={cn("!w-3 !h-3 !border-2 !border-background !right-[-6px]", option.nextMessageId ? "!bg-success" : "!bg-primary")} style={{
+        {/* Hidden source handle - required by React Flow for edge rendering */}
+        <Handle type="source" position={Position.Right} id={option.id} className="!w-0 !h-0 !bg-transparent !border-0 !min-w-0 !min-h-0 !opacity-0 !pointer-events-none" style={{
         top: "auto"
       }} />
       </div>
