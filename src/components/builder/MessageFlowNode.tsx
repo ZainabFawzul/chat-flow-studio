@@ -165,10 +165,13 @@ function MessageFlowNodeComponent({
     return () => nodeRef.current?.removeEventListener('focusout', handleFocusOut);
   }, [isEditing]);
 
-  // Re-measure textarea height on mount and when content changes externally
+  // Re-measure textarea height when selected (textarea mounts) or content changes externally
   useEffect(() => {
-    autoResizeTextarea();
-  }, [message.content, localContent, autoResizeTextarea]);
+    if (selected) {
+      // Delay to ensure textarea is mounted after selected changes
+      requestAnimationFrame(() => autoResizeTextarea());
+    }
+  }, [selected, message.content, localContent, autoResizeTextarea]);
 
   // Internal elements are only tabbable when in edit mode and not connecting
   const internalTabIndex = (isEditing && !isConnecting) ? 0 : -1;
