@@ -8,7 +8,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, RotateCcw, GripVertical } from "lucide-react";
+import { Plus, RotateCcw, GripVertical, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useScenario } from "@/context/ScenarioContext";
 import {
@@ -32,9 +32,10 @@ import { VariablesPanel, VariablesTrigger } from "./VariablesPanel";
 
 interface CanvasToolbarProps {
   onAddNode: () => void;
+  onValidate: () => void;
 }
 
-export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
+export function CanvasToolbar({ onAddNode, onValidate }: CanvasToolbarProps) {
   const { scenario, resetScenario, addRootMessage } = useScenario();
   const [isVariablesPanelOpen, setIsVariablesPanelOpen] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -158,6 +159,25 @@ export function CanvasToolbar({ onAddNode }: CanvasToolbarProps) {
           isOpen={isVariablesPanelOpen}
           onClose={() => setIsVariablesPanelOpen(false)}
         />
+
+        <div className="w-px h-6 bg-border" />
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onValidate}
+              className="h-9 w-9 rounded-lg text-muted-foreground hover:bg-[#A7B5FF] hover:text-[#00178F]"
+              tabIndex={0}
+            >
+              <ShieldCheck className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            <p>Validate connections</p>
+          </TooltipContent>
+        </Tooltip>
 
         <div className="w-px h-6 bg-border" />
 

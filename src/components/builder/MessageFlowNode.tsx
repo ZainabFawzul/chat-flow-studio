@@ -28,6 +28,7 @@ interface MessageFlowNodeData {
   pendingConnection: PendingConnection | null;
   variables: Record<string, ScenarioVariable>;
   isCondensed?: boolean;
+  isInvalid?: boolean;
 }
 function MessageFlowNodeComponent({
   data,
@@ -41,6 +42,7 @@ function MessageFlowNodeComponent({
     pendingConnection,
     variables,
     isCondensed = false,
+    isInvalid = false,
   } = nodeData;
   const {
     updateMessage,
@@ -185,7 +187,7 @@ function MessageFlowNodeComponent({
               ref={nodeRef}
               className={cn(
                 "w-16 h-16 rounded-2xl border-2 bg-card shadow-lg transition-all flex items-center justify-center relative",
-                selected ? "border-primary shadow-primary/20" : "border-border/50",
+                isInvalid ? "border-destructive shadow-destructive/20" : selected ? "border-primary shadow-primary/20" : "border-border/50",
                 isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
                 canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none"
               )}
@@ -239,7 +241,7 @@ function MessageFlowNodeComponent({
         ref={nodeRef}
         className={cn(
           "w-[320px] rounded-2xl border-2 bg-card shadow-lg transition-all",
-          selected ? "border-primary shadow-primary/20" : "border-border/50",
+          isInvalid ? "border-destructive shadow-destructive/20" : selected ? "border-primary shadow-primary/20" : "border-border/50",
           isRoot && "ring-2 ring-primary/30 ring-offset-2 ring-offset-background",
           canReceiveConnection && "ring-2 ring-success/50 cursor-pointer focus:ring-success focus:outline-none",
           isEditing && "ring-2 ring-primary focus:outline-none"
