@@ -130,6 +130,7 @@ export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
             <HexColorPicker 
               color={hexValue} 
               onChange={handleColorChange}
+              aria-label={`${label} color picker`}
               className="!w-full !h-[150px] [&_.react-colorful__saturation]:rounded-t-xl [&_.react-colorful__hue]:rounded-b-xl [&_.react-colorful__hue]:h-4"
             />
             
@@ -138,13 +139,16 @@ export function ColorPicker({ label, value, onChange, id }: ColorPickerProps) {
               <div
                 className="h-8 w-8 rounded-full shadow-lg ring-2 ring-white/20 shrink-0"
                 style={{ backgroundColor: hexValue }}
+                aria-hidden="true"
               />
               <div className="flex-1 relative">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">#</span>
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium" aria-hidden="true">#</span>
                 <Input
                   value={hexValue.replace('#', '')}
                   onChange={handleHexInput}
                   maxLength={6}
+                  name={`${id}-hex`}
+                  aria-label={`${label} hex color value`}
                   className={cn(
                     "h-8 pl-6 pr-2 rounded-lg border-border/50 bg-secondary/50",
                     "text-xs font-mono uppercase tracking-wider",
