@@ -34,14 +34,13 @@ export function LeftPanel({ requestedTab, isCanvasExpanded, onToggleCanvasExpand
 
   return (
     <div className="flex h-full w-full flex-col bg-background">
-      <Tabs value={activeTab} onValueChange={setActiveTab} activationMode="manual" className="flex h-full flex-col">
-        <div className="px-4 pt-4" role="navigation" aria-label="Builder tabs">
-          <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-secondary/50 rounded-xl">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex h-full flex-col">
+        <div className="px-4 pt-4">
+          <TabsList className="grid w-full grid-cols-2 h-11 p-1 bg-secondary/50 rounded-xl" aria-label="Builder tabs">
             <TabsTrigger 
               value="theme" 
               className="rounded-lg text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all"
               data-walkthrough="theme-tab"
-              tabIndex={0}
             >
               Theme
             </TabsTrigger>
@@ -49,7 +48,6 @@ export function LeftPanel({ requestedTab, isCanvasExpanded, onToggleCanvasExpand
               value="canvas" 
               className="rounded-lg text-sm font-medium data-[state=active]:bg-card data-[state=active]:shadow-sm transition-all"
               data-walkthrough="canvas-tab"
-              tabIndex={0}
             >
               Canvas
             </TabsTrigger>
