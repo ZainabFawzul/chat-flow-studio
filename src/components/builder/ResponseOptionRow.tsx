@@ -7,7 +7,7 @@
  * @usage Rendered by MessageFlowNode for each response option
  */
 
-// Handle removed — connections are made via the Link button only
+import { Handle, Position } from "@xyflow/react";
 import { useScenario, PendingConnection } from "@/context/ScenarioContext";
 import { ResponseOption, ScenarioVariable, VariableAssignment, VariableCondition, VariableValue } from "@/types/scenario";
 import { Button } from "@/components/ui/button";
@@ -352,7 +352,10 @@ export function ResponseOptionRow({
         </Button>
         </div>
 
-        {/* Handle removed — connections via Link button only */}
+        {/* Output handle for this option */}
+        <Handle type="source" position={Position.Right} id={option.id} className={cn("!w-3 !h-3 !border-2 !border-background !right-[-6px]", option.nextMessageId ? "!bg-success" : "!bg-primary")} style={{
+        top: "auto"
+      }} />
       </div>
     </TooltipProvider>;
 }
