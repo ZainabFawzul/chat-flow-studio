@@ -117,7 +117,7 @@ export function ResponseOptionRow({
   return <TooltipProvider>
       <div className={cn(
         "group relative flex gap-2 rounded-lg bg-secondary/30 p-2 transition-all duration-200",
-        isPendingSource && "ring-2 ring-[#ffcad4] bg-[#ffcad4]/20",
+        isPendingSource && "ring-2 ring-[#d3f3df] bg-[#d3f3df]/20",
         isExpanded ? "flex-col items-stretch" : "flex-row items-center"
       )}>
         <div className={cn("flex gap-2", isExpanded ? "items-start" : "items-center")}>
