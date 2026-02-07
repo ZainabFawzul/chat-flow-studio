@@ -13,14 +13,12 @@ import {
   ReactFlowProvider,
   Background,
   Controls,
-  Connection,
   Edge,
   Node,
   type ReactFlowInstance,
   BackgroundVariant,
   NodeChange,
   Panel,
-  applyNodeChanges,
   useOnViewportChange,
   type Viewport,
 } from "@xyflow/react";
@@ -50,7 +48,7 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
     scenario,
     updateNodePosition,
     addMessageAtPosition,
-    connectNodes,
+    // connectNodes removed — drag-to-connect disabled
     pendingConnection,
     cancelConnection,
   } = useScenario();
@@ -216,14 +214,7 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
     [updateNodePosition]
   );
 
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      if (connection.source && connection.target && connection.sourceHandle) {
-        connectNodes(connection.source, connection.sourceHandle, connection.target);
-      }
-    },
-    [connectNodes]
-  );
+  // Drag-to-connect disabled — connections are made via the Link button only
 
   const handleAddNode = useCallback(
     (position: { x: number; y: number }) => {
@@ -264,7 +255,7 @@ function FlowCanvasContent({ isExpanded, onToggleExpand }: FlowCanvasProps) {
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
-        onConnect={onConnect}
+        // onConnect removed — drag-to-connect disabled
         onInit={(instance) => {
           reactFlowInstanceRef.current = instance;
         }}
