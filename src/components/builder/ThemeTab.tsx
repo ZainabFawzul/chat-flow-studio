@@ -55,21 +55,25 @@ function BorderRadiusControl({
     key: "bottomRight" as const,
     label: "BOTTOM RIGHT"
   }];
+  const groupId = label.replace(/\s+/g, '-').toLowerCase();
   return <div>
-      <Label className="mb-2 block text-sm font-medium">{label}</Label>
-      <div className="flex gap-2">
+      <Label id={`${groupId}-label`} className="mb-2 block text-sm font-medium">{label}</Label>
+      <div className="flex gap-2" role="group" aria-labelledby={`${groupId}-label`}>
         {corners.map(({
         key,
         label: cornerLabel
-      }) => <div key={key} className="flex-1 flex flex-col gap-1">
-            <span className="text-[9px] text-muted-foreground font-medium text-center truncate">{cornerLabel}</span>
-            <Input type="number" min={0} max={32} value={value[key]} onChange={e => onChange({
+      }) => {
+          const inputId = `${groupId}-${key}`;
+          return <div key={key} className="flex-1 flex flex-col gap-1">
+            <label htmlFor={inputId} className="text-[9px] text-muted-foreground font-medium text-center truncate">{cornerLabel}</label>
+            <Input id={inputId} name={inputId} type="number" min={0} max={32} value={value[key]} onChange={e => onChange({
           ...value,
           [key]: Number(e.target.value)
-        })} className="h-8 w-full text-center text-sm rounded-lg border-border/50 bg-secondary/30" />
-          </div>)}
+        })} className="h-8 w-full text-center text-sm rounded-lg border-border/50 bg-secondary/30" aria-valuemin={0} aria-valuemax={32} aria-valuenow={value[key]} />
+          </div>;
+        })}
       </div>
-      <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5">
+      <div className="flex justify-between text-[10px] text-muted-foreground mt-1.5" aria-hidden="true">
         <span>0 = sharp</span>
         <span>32 = round</span>
       </div>
@@ -135,14 +139,14 @@ export function ThemeTab() {
               <Label htmlFor="contact-name" className="mb-2 block text-sm font-semibold">
                 Display Name
               </Label>
-              <Input id="contact-name" value={theme.contactName} onChange={e => updateTheme({
+              <Input id="contact-name" name="contact-name" value={theme.contactName} onChange={e => updateTheme({
               contactName: e.target.value
             })} placeholder="Enter contact name" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
             
             <div>
               <Label className="mb-2 block text-sm font-semibold">Avatar</Label>
-              <input ref={avatarInputRef} type="file" accept="image/*" className="sr-only" onChange={handleAvatarUpload} aria-label="Upload avatar image" />
+              <input ref={avatarInputRef} type="file" accept="image/*" className="sr-only" onChange={handleAvatarUpload} aria-label="Upload avatar image" name="avatar-upload" tabIndex={-1} />
               
               <div className="flex items-center gap-3 flex-wrap">
                 {/* Avatar preview */}
@@ -199,7 +203,7 @@ export function ThemeTab() {
               <Label htmlFor="start-title" className="mb-2 block text-sm font-semibold">
                 Title
               </Label>
-              <Input id="start-title" value={theme.startScreenTitle ?? "Ready to Start"} onChange={e => updateTheme({
+              <Input id="start-title" name="start-title" value={theme.startScreenTitle ?? "Ready to Start"} onChange={e => updateTheme({
               startScreenTitle: e.target.value
             })} placeholder="Ready to Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
@@ -209,7 +213,7 @@ export function ThemeTab() {
               <Label htmlFor="start-subtitle" className="mb-2 block text-sm font-semibold">
                 Subtitle
               </Label>
-              <textarea id="start-subtitle" value={theme.startScreenSubtitle ?? "Begin the conversation"} onChange={e => updateTheme({
+              <textarea id="start-subtitle" name="start-subtitle" value={theme.startScreenSubtitle ?? "Begin the conversation"} onChange={e => updateTheme({
               startScreenSubtitle: e.target.value
             })} placeholder="Begin the conversation" rows={2} className="w-full rounded-xl border border-border/50 bg-secondary/30 focus:bg-background transition-colors px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2" />
             </div>
@@ -219,7 +223,7 @@ export function ThemeTab() {
               <Label htmlFor="start-button" className="mb-2 block text-sm font-semibold">
                 Button Label
               </Label>
-              <Input id="start-button" value={theme.startButtonText ?? "Start"} onChange={e => updateTheme({
+              <Input id="start-button" name="start-button" value={theme.startButtonText ?? "Start"} onChange={e => updateTheme({
               startButtonText: e.target.value
             })} placeholder="Start" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
@@ -256,9 +260,9 @@ export function ThemeTab() {
               })} />
                 <div className="flex items-center gap-2">
                   <Label htmlFor="start-btn-radius" className="text-sm font-medium whitespace-nowrap">Roundness</Label>
-                  <Input id="start-btn-radius" type="number" min={0} max={32} value={theme.startButtonBorderRadius ?? 12} onChange={e => updateTheme({
+                  <Input id="start-btn-radius" name="start-btn-radius" type="number" min={0} max={32} value={theme.startButtonBorderRadius ?? 12} onChange={e => updateTheme({
                   startButtonBorderRadius: Math.min(32, Math.max(0, Number(e.target.value) || 0))
-                })} className="w-16 h-8" />
+                })} className="w-16 h-8" aria-valuemin={0} aria-valuemax={32} aria-valuenow={theme.startButtonBorderRadius ?? 12} />
                 </div>
               </div>
               <ContrastWarning bgColor={theme.startButtonColor ?? "221 83% 40%"} textColor={theme.startButtonTextColor ?? "0 0% 100%"} />
@@ -274,8 +278,8 @@ export function ThemeTab() {
             
             {/* Conversation Style */}
             <div>
-              <Label className="mb-3 block text-sm font-semibold">Conversation Style</Label>
-              <div className="grid grid-cols-2 gap-2">
+              <Label id="conversation-style-label" className="mb-3 block text-sm font-semibold">Conversation Style</Label>
+              <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-labelledby="conversation-style-label">
                 {[{
                 value: 'chat' as const,
                 label: 'Chat',
@@ -288,10 +292,10 @@ export function ThemeTab() {
                 value,
                 label,
                 icon: Icon
-              }) => <button key={value} onClick={() => updateTheme({
+              }) => <button key={value} role="radio" aria-checked={(theme.conversationType ?? 'chat') === value} onClick={() => updateTheme({
                 conversationType: value
               })} className={cn("flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all", (theme.conversationType ?? 'chat') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-xs font-medium">{label}</span>
                   </button>)}
               </div>
@@ -299,14 +303,16 @@ export function ThemeTab() {
 
             {/* Orientation */}
             <div>
-              <Label className="mb-3 block text-sm font-semibold">Orientation</Label>
-              <div className="grid grid-cols-2 gap-2">
+              <Label id="orientation-label" className="mb-3 block text-sm font-semibold">Orientation</Label>
+              <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-labelledby="orientation-label">
                 {([
                   { value: 'vertical' as FrameOrientation, label: 'Vertical', icon: RectangleVertical },
                   { value: 'horizontal' as FrameOrientation, label: 'Horizontal', icon: RectangleHorizontal },
                 ]).map(({ value, label, icon: Icon }) => (
                   <button 
-                    key={value} 
+                    key={value}
+                    role="radio"
+                    aria-checked={(theme.frameOrientation ?? 'vertical') === value}
                     onClick={() => updateTheme({ frameOrientation: value })} 
                     className={cn(
                       "flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all",
@@ -315,7 +321,7 @@ export function ThemeTab() {
                         : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground"
                     )}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-xs font-medium">{label}</span>
                   </button>
                 ))}
@@ -324,8 +330,8 @@ export function ThemeTab() {
 
             {/* Device Frame */}
             <div>
-              <Label className="mb-3 block text-sm font-semibold">Device Frame</Label>
-              <div className="grid grid-cols-3 gap-2">
+              <Label id="device-frame-label" className="mb-3 block text-sm font-semibold">Device Frame</Label>
+              <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="device-frame-label">
                 {[{
                 value: 'none' as const,
                 label: 'None',
@@ -342,10 +348,10 @@ export function ThemeTab() {
                 value,
                 label,
                 icon: Icon
-              }) => <button key={value} onClick={() => updateTheme({
+              }) => <button key={value} role="radio" aria-checked={(theme.framePreset ?? 'none') === value} onClick={() => updateTheme({
                 framePreset: value
               })} className={cn("flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all", (theme.framePreset ?? 'none') === value ? "border-primary bg-primary/5 text-primary" : "border-border/50 hover:border-border hover:bg-secondary/30 text-muted-foreground")}>
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span className="text-xs font-medium">{label}</span>
                   </button>)}
               </div>
@@ -362,18 +368,18 @@ export function ThemeTab() {
                   <Label htmlFor="frame-border-width" className="text-sm font-medium text-foreground whitespace-nowrap">
                     Thickness
                   </Label>
-                  <Input id="frame-border-width" type="number" min={0} max={4} value={theme.frameBorderWidth ?? 1} onChange={e => updateTheme({
+                  <Input id="frame-border-width" name="frame-border-width" type="number" min={0} max={4} value={theme.frameBorderWidth ?? 1} onChange={e => updateTheme({
                     frameBorderWidth: Number(e.target.value)
-                  })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
-                  <span className="text-xs text-muted-foreground">px</span>
+                  })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" aria-valuemin={0} aria-valuemax={4} aria-valuenow={theme.frameBorderWidth ?? 1} />
+                  <span className="text-xs text-muted-foreground" aria-hidden="true">px</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Label htmlFor="frame-radius" className="text-sm font-medium text-foreground whitespace-nowrap">
                     Corner Radius
                   </Label>
-                  <Input id="frame-radius" type="number" min={0} max={20} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
+                  <Input id="frame-radius" name="frame-radius" type="number" min={0} max={20} value={theme.frameBorderRadius ?? 16} onChange={e => updateTheme({
                     frameBorderRadius: Math.min(20, Math.max(0, Number(e.target.value) || 0))
-                  })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
+                  })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" aria-valuemin={0} aria-valuemax={20} aria-valuenow={theme.frameBorderRadius ?? 16} />
                   <span className="text-xs text-muted-foreground">px</span>
                 </div>
               </div>
@@ -381,15 +387,17 @@ export function ThemeTab() {
 
             {/* Message Size */}
             <div>
-              <Label className="mb-3 block text-sm font-semibold">Message Size</Label>
-              <div className="grid grid-cols-3 gap-2">
+              <Label id="message-size-label" className="mb-3 block text-sm font-semibold">Message Size</Label>
+              <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="message-size-label">
                 {([
                   { value: 'standard' as MessageSize, label: 'Standard' },
                   { value: 'large' as MessageSize, label: 'Large' },
                   { value: 'extra-large' as MessageSize, label: 'Extra Large' }
                 ]).map(({ value, label }) => (
                   <button 
-                    key={value} 
+                    key={value}
+                    role="radio"
+                    aria-checked={(theme.messageSize ?? 'standard') === value}
                     onClick={() => updateTheme({ messageSize: value })} 
                     className={cn(
                       "flex items-center justify-center p-2.5 rounded-xl border-2 transition-all",
@@ -489,7 +497,7 @@ export function ThemeTab() {
               <Label htmlFor="response-label" className="mb-2 block text-sm font-medium">
                 Label Text
               </Label>
-              <Input id="response-label" value={theme.responsePanelLabelText ?? "Choose a response"} onChange={e => updateTheme({
+              <Input id="response-label" name="response-label" value={theme.responsePanelLabelText ?? "Choose a response"} onChange={e => updateTheme({
               responsePanelLabelText: e.target.value
             })} placeholder="Choose a response" className="h-10 rounded-xl border-border/50 bg-secondary/30 focus:bg-background transition-colors" />
             </div>
@@ -517,9 +525,9 @@ export function ThemeTab() {
             })} />
               <div className="flex items-center justify-between gap-4">
                 <Label htmlFor="response-option-radius" className="text-sm font-medium text-foreground whitespace-nowrap">Corner Radius</Label>
-                <Input id="response-option-radius" type="number" min={0} max={24} value={theme.responseOptionBorderRadius ?? 12} onChange={e => updateTheme({
+                <Input id="response-option-radius" name="response-option-radius" type="number" min={0} max={24} value={theme.responseOptionBorderRadius ?? 12} onChange={e => updateTheme({
                 responseOptionBorderRadius: Number(e.target.value)
-              })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" />
+              })} className="h-8 w-16 rounded-lg border-border/50 bg-secondary/30 text-center text-sm" aria-valuemin={0} aria-valuemax={24} aria-valuenow={theme.responseOptionBorderRadius ?? 12} />
               </div>
             </div>
 

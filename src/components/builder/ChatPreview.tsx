@@ -27,9 +27,10 @@ interface ChatBubble {
 
 function TypingIndicator({ color }: { color: string }) {
   return (
-    <div className="flex items-center gap-1 px-4 py-3">
+    <div className="flex items-center gap-1 px-4 py-3" role="status" aria-label="Typing">
       <span 
         className="w-2 h-2 rounded-full animate-bounce"
+        aria-hidden="true"
         style={{ 
           backgroundColor: color,
           animationDelay: "0ms",
@@ -38,6 +39,7 @@ function TypingIndicator({ color }: { color: string }) {
       />
       <span 
         className="w-2 h-2 rounded-full animate-bounce"
+        aria-hidden="true"
         style={{ 
           backgroundColor: color,
           animationDelay: "150ms",
@@ -46,6 +48,7 @@ function TypingIndicator({ color }: { color: string }) {
       />
       <span 
         className="w-2 h-2 rounded-full animate-bounce"
+        aria-hidden="true"
         style={{ 
           backgroundColor: color,
           animationDelay: "300ms",
