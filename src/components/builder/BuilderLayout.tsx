@@ -61,7 +61,7 @@ function BuilderContent() {
       {!isCanvasExpanded && (
         <footer className="flex items-center justify-center py-2 px-4 border-t border-border/50 bg-background text-sm text-muted-foreground">
           <p>
-            Made with love by Zainab Fawzul. If you'd like to suggest a feature or experiencing issues,{" "}
+            Vibe coded with Lovable by Zainab Fawzul. To suggest features or discuss concerns,{" "}
             <a
               href="https://www.linkedin.com/in/zainab-fawzul"
               target="_blank"
